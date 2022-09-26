@@ -1,0 +1,78 @@
+import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { Configuration as WebpackConfig } from 'webpack';
+import { Configuration as WebpackDevServerConfig } from 'webpack-dev-server';
+
+const distPath = path.resolve(__dirname, 'dist');
+
+export default (env: any, options: any): WebpackConfig & WebpackDevServerConfig => {
+  const isProduction = options.mode === 'production';
+  const isDevToPublic = (
+    !isProduction
+    && env.public !== undefined
+    && !/^false$/.test(env.public)
+  );
+
+  return {
+    entry: path.resolve(__dirname, 'src/index.tsx'),
+    mode: isProduction ? 'production' : 'development',
+    optimization: {
+      usedExports: true,
+    },
+    output: {
+      filename: '[name].[contenthash].js',
+      path: distPath,
+      clean: true,
+      publicPath: '/',
+    },
+    target: ['web'],
+    module: {
+      rules: [
+        {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                '@babel/env',
+                '@babel/react',
+                '@babel/typescript',
+              ],
+            },
+          },
+        },
+      ],
+    },
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js'],
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: './src/index.html',
+      }),
+    ],
+    devtool: 'inline-source-map',
+    devServer: {
+      https: true,
+      host: isDevToPublic ? 'local-ip' : 'localhost',
+      port: 8080,
+      compress: true,
+      open: '/',
+      hot: true,
+      historyApiFallback: true,
+      client: {
+        progress: true,
+        overlay: {
+          warnings: false,
+        },
+      },
+      static: {
+        watch: true,
+        directory: distPath,
+        publicPath: '/',
+        serveIndex: true,
+      },
+    },
+  };
+};
