@@ -1,0 +1,21 @@
+.tag {
+  --shadow-color: #000;
+  --font-color: #fff;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5em;
+  font-size: 1rem;
+  color: var(--font-color);
+  text-shadow:
+    0 1px 0 var(--shadow-color),
+    0 -1px 0 var(--shadow-color),
+    1px 0 0 var(--shadow-color),
+    -1px 0 0 var(--shadow-color),
+    1px 1px 0 var(--shadow-color),
+    1px -1px 0 var(--shadow-color),
+    -1px 1px 0 var(--shadow-color),
+    -1px -1px 0 var(--shadow-color);
+  z-index: 1;
+}
