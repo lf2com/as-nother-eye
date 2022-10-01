@@ -1,0 +1,36 @@
+.message {
+  margin-block-end: -1px;
+  padding: 0.25em 0.5em;
+  border: 0 solid #eee;
+  border-width: 1px 0;
+  background-color: transparent;
+  color: #eee;
+  font-size: 0.8rem;
+  pointer-events: all;
+
+  &.debug {
+    color: #ccc;
+  }
+
+  &.log {
+    color: #eee;
+  }
+
+  &.info {
+    border-color: #9cf;
+    background-color: #bce;
+    color: #03f;
+  }
+
+  &.warn {
+    border-color: #fec;
+    background-color: #bce;
+    color: #630;
+  }
+
+  &.error {
+    border-color: #fdd;
+    background-color: #fee;
+    color: #f00;
+  }
+}
