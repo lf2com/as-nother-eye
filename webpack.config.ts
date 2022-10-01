@@ -1,5 +1,5 @@
-import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
 import { Configuration as WebpackConfig } from 'webpack';
 import { Configuration as WebpackDevServerConfig } from 'webpack-dev-server';
 
@@ -41,6 +41,20 @@ export default (env: any, options: any): WebpackConfig & WebpackDevServerConfig 
               ],
             },
           },
+        },
+        {
+          test: /\.s?css$/,
+          use: [
+            'style-loader',
+            'css-modules-typescript-loader',
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+              },
+            },
+            'sass-loader',
+          ],
         },
       ],
     },
