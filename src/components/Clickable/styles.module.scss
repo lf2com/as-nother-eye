@@ -1,0 +1,7 @@
+.clickable {
+  z-index: 1;
+
+  &:active > * {
+    filter: brightness(0.9);
+  }
+}
