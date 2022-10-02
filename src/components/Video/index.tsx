@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import React, {
   FunctionComponent, ReactEventHandler, useCallback, useEffect, useRef,
 } from 'react';
@@ -9,6 +10,7 @@ interface VideoProps extends React.HTMLAttributes<HTMLVideoElement> {
 }
 
 const Video: FunctionComponent<VideoProps> = ({
+  className,
   srcObject,
   onLoadedMetadata,
   ...restProps
@@ -32,12 +34,13 @@ const Video: FunctionComponent<VideoProps> = ({
   }, [videoRef, srcObject]);
 
   return (
-    <video
-      {...restProps}
-      ref={videoRef}
-      className={styles.video}
-      onLoadedMetadata={handleLoadedMetadata}
-    />
+    <div className={classnames(styles.video, className)}>
+      <video
+        {...restProps}
+        ref={videoRef}
+        onLoadedMetadata={handleLoadedMetadata}
+      />
+    </div>
   );
 };
 

@@ -1,13 +1,17 @@
-import React, { FunctionComponent } from 'react';
+import classnames from 'classnames';
+import React, { FunctionComponent, PropsWithChildren } from 'react';
 
 import styles from './styles.module.scss';
 
 interface FrameProps {
-  children: React.ReactNode;
+  className?: string;
 }
 
-const Frame: FunctionComponent<FrameProps> = ({ children }) => (
-  <div className={styles.frame}>
+const Frame: FunctionComponent<PropsWithChildren<FrameProps>> = ({
+  className,
+  children,
+}) => (
+  <div className={classnames(styles.frame, className)}>
     {children}
   </div>
 );

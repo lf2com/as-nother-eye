@@ -50,7 +50,9 @@ export default (env: any, options: any): WebpackConfig & WebpackDevServerConfig 
             {
               loader: 'css-loader',
               options: {
-                modules: true,
+                modules: {
+                  localIdentName: '[local]_[hash:base64:5]',
+                },
               },
             },
             'sass-loader',
