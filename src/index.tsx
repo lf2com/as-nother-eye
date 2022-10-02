@@ -1,9 +1,12 @@
 import React, { FunctionComponent } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
-import Camera from './pages/Camera';
-import Photoer from './pages/Photoer';
+
+import LoggerContextProvider from './contexts/LoggerContext';
+
+import Camera from './pages/AsCamera';
+import Photoer from './pages/AsPhotoer';
 import Welcome from './pages/Welcome';
 import Test from './Test';
 
@@ -18,7 +21,16 @@ const AppElem = styled.div`
 
 const App: FunctionComponent = () => (
   <AppElem>
-    Hi
+    <LoggerContextProvider show={false}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="photoer/:targetId" element={<Photoer />} />
+          <Route path="camera" element={<Camera />} />
+          <Route path="test" element={<Test />} />
+          <Route path="*" element={<Welcome />} />
+        </Routes>
+      </BrowserRouter>
+    </LoggerContextProvider>
   </AppElem>
 );
 
