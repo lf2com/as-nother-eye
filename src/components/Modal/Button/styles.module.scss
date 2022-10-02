@@ -1,0 +1,26 @@
+.button {
+  --theme-color: #36f;
+
+  margin: 0 1em;
+  padding: 0.35em 1em;
+  min-width: 3em;
+  max-width: 100%;
+  border-radius: 0.25em;
+  border: 0.05em solid var(--theme-color);
+  background-color: #fff;
+  color: var(--theme-color);
+  font-size: 0.95em;
+  text-align: center;
+  display: block;
+  cursor: pointer;
+  user-select: none;
+
+  &.highlight {
+    background-color: var(--theme-color);
+    color: #fff;
+  }
+
+  &.disabled {
+    pointer-events: none;
+  }
+}

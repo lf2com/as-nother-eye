@@ -1,0 +1,49 @@
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 1rem;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+
+  &.highlight {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: brightness(0.75);
+  }
+
+  &.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .box {
+    padding: 1em 0;
+    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+    border-radius: 0.25em;
+    background-color: #fff;
+    display: flex;
+    flex-flow: column;
+    overflow: hidden;
+  
+    > * {
+      padding: 0 1em;
+    }
+  }
+
+  .body {
+    margin: 1em 0;
+  }
+
+  .foot {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-evenly;
+  }
+}
