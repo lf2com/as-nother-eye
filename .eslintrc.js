@@ -65,6 +65,8 @@ module.exports = {
     // method overload
     'no-dupe-class-members': 'off',
 
+    'object-curly-spacing': ['error', 'always'],
+
     'simple-import-sort/imports': [
       'warn',
       {
