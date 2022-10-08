@@ -25,13 +25,19 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
       className={classnames(styles.stream, styles.major)}
       srcObject={majorStream}
     />
-    <Clickable onClick={onClickMinor}>
+    <Clickable
+      stopPropagation
+      onClick={onClickMinor}
+    >
       <Video
         className={classnames(styles.stream, styles.minor)}
         srcObject={minorStream}
       />
     </Clickable>
-    <Clickable onClick={onPhoto}>
+    <Clickable
+      stopPropagation
+      onClick={onPhoto}
+    >
       <div className={styles.shutter} />
     </Clickable>
     {children}
