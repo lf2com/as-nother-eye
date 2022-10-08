@@ -1,7 +1,5 @@
 import classnames from 'classnames';
-import React, {
-  FunctionComponent, ReactEventHandler, useCallback, useEffect, useRef,
-} from 'react';
+import React, { FunctionComponent, useEffect, useRef } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -12,20 +10,9 @@ interface VideoProps extends React.HTMLAttributes<HTMLVideoElement> {
 const Video: FunctionComponent<VideoProps> = ({
   className,
   srcObject,
-  onLoadedMetadata,
   ...restProps
 }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handleLoadedMetadata = useCallback<ReactEventHandler<HTMLVideoElement>>((event) => {
-    onLoadedMetadata?.(event);
-
-    if (event.isDefaultPrevented() || event.isPropagationStopped()) {
-      return;
-    }
-
-    videoRef.current?.play();
-  }, [onLoadedMetadata]);
 
   useEffect(() => {
     if (videoRef.current && srcObject) {
@@ -38,7 +25,7 @@ const Video: FunctionComponent<VideoProps> = ({
       <video
         {...restProps}
         ref={videoRef}
-        onLoadedMetadata={handleLoadedMetadata}
+        autoPlay
       />
     </div>
   );
