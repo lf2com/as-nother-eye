@@ -66,6 +66,10 @@ module.exports = {
     'no-dupe-class-members': 'off',
 
     'object-curly-spacing': ['error', 'always'],
+    'no-param-reassign': ['error', { props: false }],
+
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
 
     'simple-import-sort/imports': [
       'warn',
@@ -77,6 +81,7 @@ module.exports = {
           ['/components/?'],
           ['/hooks/?'],
           ['/utils/?'],
+          ['\\./\\w+$'],
           ['/\\w+.scss$'],
         ],
       },
