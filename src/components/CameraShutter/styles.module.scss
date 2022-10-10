@@ -1,0 +1,16 @@
+.shutter {
+  --size: 20vmin;
+  --color: #fff;
+
+  margin: 1em;
+  left: 50%;
+  padding: 0.5em;
+  width: var(--size);
+  height: var(--size);
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 0.2em solid var(--color);
+  background-color: var(--color);
+  background-clip: content-box;
+  cursor: pointer;
+}

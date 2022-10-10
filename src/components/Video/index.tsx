@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, useEffect, useRef } from 'react';
+import React, { forwardRef, RefCallback, useCallback } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -7,28 +7,35 @@ interface VideoProps extends React.HTMLAttributes<HTMLVideoElement> {
   srcObject?: MediaStream;
 }
 
-const Video: FunctionComponent<VideoProps> = ({
+const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   className,
   srcObject,
   ...restProps
-}: VideoProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (videoRef.current && srcObject) {
-      videoRef.current.srcObject = srcObject;
+}, ref) => {
+  const handleRef = useCallback<RefCallback<HTMLVideoElement>>((node) => {
+    if (node) {
+      if (srcObject) {
+        node.srcObject = srcObject;
+      }
+      if (ref) {
+        if (typeof ref === 'function') {
+          ref(node);
+        } else {
+          ref.current = node;
+        }
+      }
     }
-  }, [videoRef, srcObject]);
+  }, [ref, srcObject]);
 
   return (
     <div className={classnames(styles.video, className)}>
       <video
         {...restProps}
-        ref={videoRef}
+        ref={handleRef}
         autoPlay
       />
     </div>
   );
-};
+});
 
 export default Video;

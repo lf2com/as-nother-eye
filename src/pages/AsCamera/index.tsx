@@ -1,56 +1,80 @@
+import classnames from 'classnames';
 import { DataConnection, MediaConnection } from 'peerjs';
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 
 // import { useLoggerContext } from '../../contexts/LoggerContext';
 import useLogger from '../../contexts/LoggerContext/hooks/useLogger';
 
-import CameraView from '../../components/CameraView';
+import Shutter from '../../components/CameraShutter';
+import Frame from '../../components/Frame';
 import Loading from '../../components/Loading';
 import ConfirmModal from '../../components/Modal/ConfirmModal';
 import Tag from '../../components/Tag';
+import Video from '../../components/Video';
 
-import useCamera from '../../hooks/useCamera';
 import usePeer from '../../hooks/usePeer';
+
+import { startStream, stopStream } from '../../utils/userMedia';
+
+import styles from './styles.module.scss';
 
 const Camera = () => {
   // const { logger } = useLoggerContext();
   const logger = useLogger({ tag: '[Camera]' });
   const { peer } = usePeer();
-
+  const majorVideoRef = useRef<HTMLVideoElement>(null);
   const [loadingMessage, setLoadingMessage] = useState<string>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [peerConnection, setPeerConnection] = useState<DataConnection>();
   const [peerCall, setPeerCall] = useState<MediaConnection>();
+  const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
+  const [handlingPhoto, setHandlingPhoto] = useState<boolean>(false);
   const sourcePeerId = useMemo(() => peerCall?.peer, [peerCall]);
 
-  const {
-    start: startStream,
-    stop: stopStream,
-  } = useCamera();
+  const holdMajorVideo = useMemo(() => (
+    takingPhoto || handlingPhoto
+  ), [handlingPhoto, takingPhoto]);
 
-  const { majorStream, minorStream } = useMemo(() => ({
-    majorStream: remoteStream,
-    minorStream: localStream,
-  }), [remoteStream, localStream]);
+  const takePhoto = useCallback(async () => {
+    const track = localStream?.getVideoTracks()[0];
+
+    if (!track) {
+      return;
+    }
+
+    setHandlingPhoto(true);
+    setTakingPhoto(true);
+
+    const imageCapture = new ImageCapture(track);
+    console.log('TAKE PHOTO 2');
+    const photoBlob = await imageCapture.takePhoto();
+    console.log('TAKE PHOTO 3');
+
+    setHandlingPhoto(false);
+  }, [localStream]);
 
   const onAcceptPeerCall = useCallback(async () => {
-    const selfStream = await startStream({ video: true, audio: true });
+    try {
+      const selfStream = await startStream();
 
-    setLocalStream(selfStream);
-    logger.log('Peer stream ready', selfStream);
-    peerCall?.answer(selfStream);
+      logger.log('Peer stream ready', selfStream);
+      setLocalStream(selfStream);
+      peerCall?.answer(selfStream);
 
-    peerCall?.on('stream', (peerStream) => {
-      logger.log('Remote stream', peerStream);
-      setLoadingMessage(`Got call from <${peerCall.peer}>`);
-      setRemoteStream(peerStream);
-      setPeerCall(undefined);
-      setLoadingMessage(undefined);
-    });
-  }, [logger, peerCall, startStream]);
+      peerCall?.on('stream', (peerStream) => {
+        logger.log('Remote stream', peerStream);
+        setLoadingMessage(`Got call from <${peerCall.peer}>`);
+        setRemoteStream(peerStream);
+        setPeerCall(undefined);
+        setLoadingMessage(undefined);
+      });
+    } catch (error) {
+      logger.warn(error);
+    }
+  }, [logger, peerCall]);
 
   const onRejectPeerCall = useCallback(() => {
     peerCall?.close();
@@ -58,6 +82,12 @@ const Camera = () => {
     setPeerCall(undefined);
     setLoadingMessage(undefined);
   }, [peerCall, peerConnection]);
+
+  const onPhoto = takePhoto;
+
+  const afterTakingPhoto = useCallback(() => {
+    setTakingPhoto(false);
+  }, []);
 
   useEffect(() => {
     setLoadingMessage('Initializing');
@@ -75,55 +105,103 @@ const Camera = () => {
           logger.log(`Getting call from <${call.peer}>`);
           setPeerCall(call);
         });
-
-        conn.on('close', () => {
-          logger.log('Close');
-        });
-
-        conn.on('data', (data) => {
-          const [key, value] = `${data}`.substring(1).split(':');
-
-          logger.log('Data', key, value);
-
-          switch (key) {
-            case 'photo':
-              break;
-
-            default:
-              break;
-          }
-        });
-
-        conn.on('error', (err) => {
-          logger.warn('Conn error', err);
-        });
       });
     });
   }, [logger, peer]);
 
+  useEffect(() => {
+    if (peerConnection) {
+      peerConnection.on('error', (error) => {
+        logger.warn('Conn error', error);
+      });
+
+      peerConnection.on('close', () => {
+        logger.log('Close');
+      });
+
+      peerConnection.on('data', (data) => {
+        const [key, value] = `${data}`.substring(1).split(':');
+
+        logger.log('Data', key, value);
+
+        switch (key) {
+          case 'photo':
+            takePhoto();
+            break;
+
+          default:
+            break;
+        }
+      });
+    }
+
+    return () => {
+      if (peerConnection) {
+        peerConnection.off('error');
+        peerConnection.off('close');
+        peerConnection.off('data');
+      }
+    };
+  }, [logger, peerConnection, takePhoto]);
+
   useEffect(() => (
     () => {
-      stopStream();
+      if (localStream) {
+        stopStream(localStream);
+      }
     }
-  ), [stopStream]);
+  ), [localStream]);
+
+  useEffect(() => {
+    const majorVideo = majorVideoRef.current;
+
+    if (majorVideo) {
+      if (holdMajorVideo) {
+        majorVideo.pause();
+      } else {
+        majorVideo.play();
+      }
+    }
+  }, [holdMajorVideo]);
+
+  logger.log({
+    localStream, remoteStream, takingPhoto, handlingPhoto, holdMajorVideo,
+  });
 
   return (
-    <CameraView
-      majorStream={majorStream}
-      minorStream={minorStream}
-    >
+    <Frame className={styles.camera}>
       <Tag>Camera</Tag>
       <Loading show={!!loadingMessage}>
         {loadingMessage}
       </Loading>
       <ConfirmModal
-        show={!!peerCall}
+        show={!!(peerCall && !localStream)}
         onYes={onAcceptPeerCall}
         onNo={onRejectPeerCall}
       >
         Accept photoer from {'<'}{sourcePeerId}{'>'}?
       </ConfirmModal>
-    </CameraView>
+      <Frame
+        className={classnames(styles.major, {
+          [styles['taking-photo']]: takingPhoto,
+        })}
+        onAnimationEnd={afterTakingPhoto}
+      >
+        <Video
+          ref={majorVideoRef}
+          srcObject={localStream}
+        />
+      </Frame>
+      <Video
+        className={styles.minor}
+        srcObject={remoteStream}
+      />
+      <Shutter
+        disabled={holdMajorVideo}
+        className={styles.shutter}
+        onShot={onPhoto}
+      />
+    </Frame>
   );
 };
 

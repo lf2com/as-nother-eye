@@ -7,12 +7,17 @@ import { useParams } from 'react-router-dom';
 // import { useLoggerContext } from '../../contexts/LoggerContext';
 import useLogger from '../../contexts/LoggerContext/hooks/useLogger';
 
-import CameraView from '../../components/CameraView';
+import Shutter from '../../components/CameraShutter';
+import Frame from '../../components/Frame';
 import Loading from '../../components/Loading';
 import Tag from '../../components/Tag';
+import Video from '../../components/Video';
 
-import useCamera from '../../hooks/useCamera';
 import usePeer from '../../hooks/usePeer';
+
+import { startStream, stopStream } from '../../utils/userMedia';
+
+import styles from './styles.module.scss';
 
 interface PhotoerProps {
 }
@@ -27,11 +32,6 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [peerConnection, setPeerConnection] = useState<DataConnection>();
 
-  const {
-    start: startStream,
-    stop: stopStream,
-  } = useCamera();
-
   const onPhoto = useCallback(() => {
     if (!peer || !peerConnection) {
       return;
@@ -43,7 +43,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   useEffect(() => {
     setLoadingMessage('Initializing');
 
-    peer.once('open', (id) => {
+    peer.once('open', async (id) => {
       logger.log(`Peer ready <${id}>`);
 
       if (!targetId) {
@@ -52,10 +52,11 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
 
       const conn = peer.connect(targetId);
 
+      logger.log(`Connecting to <${targetId}>`);
       setLoadingMessage(`Connecting to <${targetId}>`);
 
       conn.on('open', async () => {
-        const selfStream = await startStream({ video: true, audio: true });
+        const selfStream = await startStream();
         const call = peer.call(targetId, selfStream);
 
         setLocalStream(selfStream);
@@ -115,25 +116,34 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
         logger.log(`Getting call from <${call.peer}>`);
       });
     });
-  }, [logger, peer, startStream, targetId]);
+  }, [logger, peer, targetId]);
 
   useEffect(() => (
     () => {
-      stopStream();
+      if (localStream) {
+        stopStream(localStream);
+      }
     }
-  ), [stopStream]);
+  ), [localStream]);
 
   return (
-    <CameraView
-      majorStream={remoteStream}
-      minorStream={localStream}
-      onPhoto={onPhoto}
-    >
+    <Frame className={styles.photoer}>
       <Tag>Photoer</Tag>
       <Loading show={!!loadingMessage}>
         {loadingMessage}
       </Loading>
-    </CameraView>
+      <Frame className={styles.major}>
+        <Video srcObject={localStream} />
+      </Frame>
+      <Video
+        className={styles.minor}
+        srcObject={remoteStream}
+      />
+      <Shutter
+        className={styles.shutter}
+        onShot={onPhoto}
+      />
+    </Frame>
   );
 };
 

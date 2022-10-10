@@ -1,17 +1,21 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, PropsWithChildren } from 'react';
+import React, { AllHTMLAttributes, FunctionComponent, PropsWithChildren } from 'react';
 
 import styles from './styles.module.scss';
 
-interface FrameProps {
+interface FrameProps extends AllHTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
 const Frame: FunctionComponent<PropsWithChildren<FrameProps>> = ({
   className,
   children,
+  ...restProps
 }) => (
-  <div className={classnames(styles.frame, className)}>
+  <div
+    className={classnames(styles.frame, className)}
+    {...restProps}
+  >
     {children}
   </div>
 );
