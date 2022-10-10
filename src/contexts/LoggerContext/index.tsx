@@ -1,23 +1,23 @@
 import classnames from 'classnames';
 import React, {
   createContext, FunctionComponent, PropsWithChildren, Reducer,
-  useCallback, useContext, useMemo, useReducer, useState,
+  useContext, useMemo, useReducer, useState,
 } from 'react';
 
 import LogMessage, { LogMessageProps } from './components/LogMessage';
 
-import useLogger, { UseLoggerProps } from './hooks/useLogger';
+import Logger from '../../utils/logger';
 
 import styles from './styles.module.scss';
 
 interface LoggerContextProps {
-  logger: ReturnType<typeof useLogger>;
+  logger: Logger;
   showLog: () => void;
   hideLog: () => void;
 }
 
 const LoggerContext = createContext<LoggerContextProps>({
-  logger: console,
+  logger: new Logger(),
   showLog: () => {},
   hideLog: () => {},
 });
@@ -49,15 +49,16 @@ const LoggerContextProvider: FunctionComponent<PropsWithChildren<LoggerContextPr
     })
   ), [show]);
 
-  const onLog = useCallback<Required<UseLoggerProps>['onLog']>((type, ...args) => {
-    appendLog({
-      type,
-      timestamp: Date.now(),
-      message: args.map((arg) => `${arg}`).join(' '),
-    });
-  }, []);
-
-  const logger = useLogger({ tag, onLog });
+  const logger = useMemo(() => new Logger({
+    tag,
+    onLog: (type, ...args) => {
+      appendLog({
+        type,
+        timestamp: Date.now(),
+        message: args.map((arg) => `${arg}`).join(' '),
+      });
+    },
+  }), [tag]);
 
   const contextValue = useMemo(() => ({
     logger,

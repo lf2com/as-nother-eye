@@ -4,9 +4,6 @@ import React, {
   useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 
-// import { useLoggerContext } from '../../contexts/LoggerContext';
-import useLogger from '../../contexts/LoggerContext/hooks/useLogger';
-
 import Shutter from '../../components/CameraShutter';
 import Frame from '../../components/Frame';
 import Loading from '../../components/Loading';
@@ -16,13 +13,14 @@ import Video from '../../components/Video';
 
 import usePeer from '../../hooks/usePeer';
 
+import Logger from '../../utils/logger';
 import { startStream, stopStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
 
+const logger = new Logger({ tag: '[Camera]' });
+
 const Camera = () => {
-  // const { logger } = useLoggerContext();
-  const logger = useLogger({ tag: '[Camera]' });
   const { peer } = usePeer();
   const majorVideoRef = useRef<HTMLVideoElement>(null);
   const [loadingMessage, setLoadingMessage] = useState<string>();
@@ -49,9 +47,7 @@ const Camera = () => {
     setTakingPhoto(true);
 
     const imageCapture = new ImageCapture(track);
-    console.log('TAKE PHOTO 2');
     const photoBlob = await imageCapture.takePhoto();
-    console.log('TAKE PHOTO 3');
 
     setHandlingPhoto(false);
   }, [localStream]);
@@ -74,7 +70,7 @@ const Camera = () => {
     } catch (error) {
       logger.warn(error);
     }
-  }, [logger, peerCall]);
+  }, [peerCall]);
 
   const onRejectPeerCall = useCallback(() => {
     peerCall?.close();
@@ -107,7 +103,7 @@ const Camera = () => {
         });
       });
     });
-  }, [logger, peer]);
+  }, [peer]);
 
   useEffect(() => {
     if (peerConnection) {
@@ -142,7 +138,7 @@ const Camera = () => {
         peerConnection.off('data');
       }
     };
-  }, [logger, peerConnection, takePhoto]);
+  }, [peerConnection, takePhoto]);
 
   useEffect(() => (
     () => {

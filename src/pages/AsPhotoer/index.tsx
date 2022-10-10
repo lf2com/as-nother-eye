@@ -4,9 +4,6 @@ import React, {
 } from 'react';
 import { useParams } from 'react-router-dom';
 
-// import { useLoggerContext } from '../../contexts/LoggerContext';
-import useLogger from '../../contexts/LoggerContext/hooks/useLogger';
-
 import Shutter from '../../components/CameraShutter';
 import Frame from '../../components/Frame';
 import Loading from '../../components/Loading';
@@ -15,6 +12,7 @@ import Video from '../../components/Video';
 
 import usePeer from '../../hooks/usePeer';
 
+import Logger from '../../utils/logger';
 import { startStream, stopStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
@@ -22,9 +20,9 @@ import styles from './styles.module.scss';
 interface PhotoerProps {
 }
 
+const logger = new Logger({ tag: '[Photoer]' });
+
 const Photoer: FunctionComponent<PhotoerProps> = () => {
-  // const { logger } = useLoggerContext();
-  const logger = useLogger({ tag: '[Photoer]' });
   const { targetId } = useParams();
   const { peer } = usePeer();
   const [loadingMessage, setLoadingMessage] = useState<string>();
@@ -116,7 +114,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
         logger.log(`Getting call from <${call.peer}>`);
       });
     });
-  }, [logger, peer, targetId]);
+  }, [peer, targetId]);
 
   useEffect(() => (
     () => {
