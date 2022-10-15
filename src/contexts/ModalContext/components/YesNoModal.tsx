@@ -1,14 +1,14 @@
 import React, { FunctionComponent, PropsWithChildren } from 'react';
 
-import Modal, { ModalBasicProps } from '.';
-import ModalButton from './Button';
+import Modal, { ModalBasicProps } from './Modal';
+import ModalButton from './ModalButton';
 
-interface ConfirmModalProps extends ModalBasicProps {
+interface YesNoModalProps extends ModalBasicProps {
   onYes: () => void;
   onNo: () => void;
 }
 
-const ConfirmModal: FunctionComponent<PropsWithChildren<ConfirmModalProps>> = ({
+const YesNoModal: FunctionComponent<PropsWithChildren<YesNoModalProps>> = ({
   onYes,
   onNo,
   children,
@@ -33,4 +33,4 @@ const ConfirmModal: FunctionComponent<PropsWithChildren<ConfirmModalProps>> = ({
   </Modal>
 );
 
-export default ConfirmModal;
+export default YesNoModal;

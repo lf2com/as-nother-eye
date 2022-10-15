@@ -1,7 +1,10 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, PropsWithChildren, useMemo } from 'react';
+import React, {
+  FunctionComponent, PropsWithChildren, useCallback, useMemo,
+} from 'react';
 
-import Clickable from '../../Clickable';
+import Clickable from '../../../../components/Clickable';
+
 import styles from './styles.module.scss';
 
 export interface ModalButtonProps {
@@ -23,8 +26,15 @@ const ModalButton: FunctionComponent<PropsWithChildren<ModalButtonProps>> = ({
     })
   ), [disabled, highlight]);
 
+  const handleClick = useCallback(() => {
+    onClick();
+  }, [onClick]);
+
   return (
-    <Clickable onClick={onClick}>
+    <Clickable
+      stopPropagation={disabled}
+      onClick={handleClick}
+    >
       <div className={className}>
         {children}
       </div>
