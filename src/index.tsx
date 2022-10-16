@@ -4,11 +4,13 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
 import LoggerContextProvider from './contexts/LoggerContext';
+import ModalContextProvider from './contexts/ModalContext';
+
+import Test from './Test';
 
 import Camera from './pages/AsCamera';
 import Photoer from './pages/AsPhotoer';
 import Welcome from './pages/Welcome';
-import Test from './Test';
 
 const AppElem = styled.div`
   position: fixed;
@@ -22,14 +24,16 @@ const AppElem = styled.div`
 const App: FunctionComponent = () => (
   <AppElem>
     <LoggerContextProvider show={false}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="photoer/:targetId" element={<Photoer />} />
-          <Route path="camera" element={<Camera />} />
-          <Route path="test" element={<Test />} />
-          <Route path="*" element={<Welcome />} />
-        </Routes>
-      </BrowserRouter>
+      <ModalContextProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="photoer/:targetId" element={<Photoer />} />
+            <Route path="camera" element={<Camera />} />
+            <Route path="test" element={<Test />} />
+            <Route path="*" element={<Welcome />} />
+          </Routes>
+        </BrowserRouter>
+      </ModalContextProvider>
     </LoggerContextProvider>
   </AppElem>
 );

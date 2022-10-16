@@ -1,6 +1,5 @@
-import { DataConnection } from 'peerjs';
 import React, {
-  FunctionComponent, useCallback, useEffect, useState,
+  FunctionComponent, useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -10,9 +9,8 @@ import Loading from '../../components/Loading';
 import Tag from '../../components/Tag';
 import Video from '../../components/Video';
 
-import usePeer from '../../hooks/usePeer';
-
 import Logger from '../../utils/logger';
+import RemoteConnection from '../../utils/remoteConnection';
 import { startStream, stopStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
@@ -23,98 +21,52 @@ interface PhotoerProps {
 const logger = new Logger({ tag: '[Photoer]' });
 
 const Photoer: FunctionComponent<PhotoerProps> = () => {
-  const { targetId } = useParams();
-  const { peer } = usePeer();
+  const params = useParams();
+  const targetId = useMemo(() => params.targetId as string, [params]);
+  const remoteConnection = useMemo(() => new RemoteConnection({ connect: false }), []);
   const [loadingMessage, setLoadingMessage] = useState<string>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [localStream, setLocalStream] = useState<MediaStream>();
-  const [peerConnection, setPeerConnection] = useState<DataConnection>();
+
+  logger.log('target id', targetId);
 
   const onPhoto = useCallback(() => {
-    if (!peer || !peerConnection) {
-      return;
-    }
-
-    peerConnection.send('#photo');
-  }, [peer, peerConnection]);
+    // peerConnection.send('#photo');
+  }, [remoteConnection]);
 
   useEffect(() => {
     setLoadingMessage('Initializing');
+    remoteConnection.connectToServer()
+      .then(async () => {
+        logger.log('Connected to server');
+        setLoadingMessage('Connected to server');
 
-    peer.once('open', async (id) => {
-      logger.log(`Peer ready <${id}>`);
+        try {
+          const selfStream = await startStream();
+          const peerStream = await remoteConnection.call(targetId, selfStream);
 
-      if (!targetId) {
-        return;
-      }
-
-      const conn = peer.connect(targetId);
-
-      logger.log(`Connecting to <${targetId}>`);
-      setLoadingMessage(`Connecting to <${targetId}>`);
-
-      conn.on('open', async () => {
-        const selfStream = await startStream();
-        const call = peer.call(targetId, selfStream);
-
-        setLocalStream(selfStream);
-        logger.log(`Connection to <${targetId}>`, selfStream);
-        setLoadingMessage(`Connected to <${conn.peer}>. Calling peer`);
-
-        call.on('stream', (peerStream) => {
+          setLocalStream(selfStream);
+          logger.log(`Connection to <${targetId}>`, selfStream);
+          setLoadingMessage(`Connected to <${targetId}>. Calling peer`);
           logger.log('Peer stream ready', peerStream);
-          setLoadingMessage(`Called <${conn.peer}>`);
+          setLoadingMessage(`Called <${targetId}>`);
           setRemoteStream(peerStream);
-          setPeerConnection(conn);
           setLoadingMessage(undefined);
-        });
 
-        call.on('close', () => {
-          logger.log('Closed');
-          selfStream.getTracks().forEach((track) => {
-            track.stop();
+          remoteConnection.addEventListener('hangup', () => {
+            logger.log('Closed');
+            selfStream.getTracks().forEach((track) => {
+              track.stop();
+            });
           });
-        });
-
-        call.on('error', (error) => {
-          logger.warn('Error', error);
-        });
-
-        call.on('iceStateChanged', (state) => {
-          logger.log('Ice state changed', state);
-        });
-
-        conn.send('#ask:call');
-
-        conn.on('close', () => {
-          logger.log('Close');
-          selfStream.getTracks().forEach((track) => {
-            track.stop();
-          });
-        });
-
-        conn.on('data', (data) => {
-          logger.log('Data', data);
-        });
+        } catch (error) {
+          logger.warn(error);
+        }
+      })
+      .catch((error) => {
+        console.warn('Failed to init remote connection', error);
       });
-
-      conn.on('error', (err) => {
-        logger.warn('Conn error', err);
-      });
-
-      peer.on('connection', (conn2) => {
-        logger.log('Peer connection', conn2);
-      });
-
-      peer.on('error', (err) => {
-        logger.warn('Peer error', err);
-      });
-
-      peer.on('call', (call) => {
-        logger.log(`Getting call from <${call.peer}>`);
-      });
-    });
-  }, [peer, targetId]);
+  }, [remoteConnection, targetId]);
 
   useEffect(() => (
     () => {
