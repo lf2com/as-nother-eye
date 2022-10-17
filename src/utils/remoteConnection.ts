@@ -1,4 +1,4 @@
-import Peer from 'peerjs';
+import Peer, { DataConnection } from 'peerjs';
 
 import randomStr from './random';
 
@@ -14,6 +14,7 @@ interface RemoteConnectionEventCallback {
     metadata?: unknown,
   ) => void;
   hangup: (sourceId: string, metadata?: unknown) => void;
+  data: (sourceId: string, data: unknown) => void;
 }
 
 type RemoteConnectionEvent = keyof RemoteConnectionEventCallback;
@@ -34,6 +35,8 @@ class RemoteConnection {
   protected selfId: string;
 
   protected peer: Peer | null = null;
+
+  protected connection: DataConnection | null = null;
 
   protected opened: boolean = false;
 
@@ -149,6 +152,34 @@ class RemoteConnection {
         this.disconnectFromServer();
       });
 
+      peer.on('connection', (connection) => {
+        const targetId = connection.peer;
+
+        connection.on('data', (data) => {
+          console.log('Peer connection data', data);
+          this.dispatchEvent('data', targetId, data);
+        });
+
+        connection.on('open', () => {
+          console.log('Peer connection open');
+          this.connection = connection;
+        });
+
+        connection.on('close', () => {
+          this.connection = null;
+          this.dispatchEvent('hangup', targetId);
+        });
+
+        connection.on('error', (error) => {
+          console.warn('Peer connection error', error);
+          this.connection = null;
+        });
+
+        connection.on('iceStateChanged', (state) => {
+          console.warn('Peer connection state changed', state);
+        });
+      });
+
       peer.on('open', (peerId) => {
         console.log('Peer open', peerId);
         this.opened = true;
@@ -176,6 +207,7 @@ class RemoteConnection {
 
               connection.on('stream', (remoteStream) => {
                 console.log('Connection stream', remoteStream);
+
                 resolveAnswer(remoteStream);
               });
 
@@ -185,6 +217,7 @@ class RemoteConnection {
 
           connection.on('close', () => {
             console.warn('Connection close');
+            this.connection = null;
           });
 
           connection.on('iceStateChanged', (state) => {
@@ -206,6 +239,10 @@ class RemoteConnection {
       this.peer.destroy();
     }
 
+    if (this.connection) {
+      this.connection = null;
+    }
+
     this.opened = false;
   }
 
@@ -222,15 +259,13 @@ class RemoteConnection {
       const connection = peer.connect(targetId);
 
       connection.on('close', () => {
+        this.connection = null;
         this.dispatchEvent('hangup', targetId);
-      });
-
-      connection.on('data', (data) => {
-        console.log('My connection data', data);
       });
 
       connection.on('error', (error) => {
         console.warn('My connection error', error);
+        this.connection = null;
         reject(error);
       });
 
@@ -239,14 +274,22 @@ class RemoteConnection {
       });
 
       connection.on('open', () => {
-        console.warn('My connection open');
+        console.log('My connection open');
+        this.connection = connection;
+
+        connection.on('data', (data) => {
+          console.log('My connection data', data);
+          this.dispatchEvent('data', targetId, data);
+        });
+
         resolve();
       });
     });
 
-    const connection = peer.call(targetId, mediaStream);
-
     return new Promise((resolve, reject) => {
+      console.log('Calling', targetId);
+      const connection = peer.call(targetId, mediaStream);
+
       connection.on('error', (error) => {
         console.warn('My call error', error);
         reject(error);
@@ -279,6 +322,18 @@ class RemoteConnection {
         }
       });
     });
+  }
+
+  /**
+   * Sends message to connected peer.
+   */
+  async sendMessage(message: string): Promise<void> {
+    if (!this.connection) {
+      throw Error('Not connect to target yet');
+    }
+
+    console.log('SEND', message);
+    this.connection.send(message);
   }
 }
 

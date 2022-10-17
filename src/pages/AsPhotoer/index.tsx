@@ -31,7 +31,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   logger.log('target id', targetId);
 
   const onPhoto = useCallback(() => {
-    // peerConnection.send('#photo');
+    remoteConnection.sendMessage('#photo');
   }, [remoteConnection]);
 
   useEffect(() => {
@@ -91,6 +91,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
       />
       <Shutter
         className={styles.shutter}
+        disabled={!remoteConnection.isOnline}
         onShot={onPhoto}
       />
     </Frame>

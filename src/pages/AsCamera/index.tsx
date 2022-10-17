@@ -94,6 +94,10 @@ const Camera = () => {
             setLoadingMessage(`Got call from <${sourceId}>`);
             setRemoteStream(peerStream);
             setLoadingMessage(undefined);
+
+            remoteConnection.addEventListener('data', (_, data) => {
+              console.log('DATA', data);
+            });
           } catch (error) {
             logger.warn(error);
           }
