@@ -7,7 +7,7 @@ interface RemoteConnectionOptions {
   connect?: boolean;
 }
 
-interface RemoteConnectionEventCallback {
+export interface RemoteConnectionEventCallback {
   call: (
     sourceId: string,
     answer: (accept: boolean, stream?: MediaStream) => Promise<MediaStream | void>,

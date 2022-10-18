@@ -13,7 +13,7 @@ import Tag from '../../components/Tag';
 import Video from '../../components/Video';
 
 import Logger from '../../utils/logger';
-import RemoteConnection from '../../utils/remoteConnection';
+import RemoteConnection, { RemoteConnectionEventCallback } from '../../utils/remoteConnection';
 import { startStream, stopStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
@@ -64,6 +64,53 @@ const Camera = () => {
     setTakingPhoto(false);
   }, []);
 
+  const onGetData = useCallback<RemoteConnectionEventCallback['data']>((_, data) => {
+    const message = data as string;
+    console.log('DATA', data);
+
+    if (/^#/.test(message)) {
+      console.log('MESSAGE', message.substring(1));
+      switch (message.substring(1)) {
+        case 'photo':
+          takePhoto();
+          break;
+
+        default:
+          break;
+      }
+    }
+  }, [takePhoto]);
+
+  const onCall = useCallback<RemoteConnectionEventCallback['call']>(async (sourceId, answer) => {
+    logger.log(`Get call from <${sourceId}>`);
+
+    const acceptPeerCall = await askYesNo(`Accept photoer from <${sourceId}>?`);
+
+    if (!acceptPeerCall) {
+      setLoadingMessage(undefined);
+      answer(false);
+      return;
+    }
+
+    try {
+      const selfStream = await startStream();
+
+      logger.log('My stream ready', selfStream);
+      setLocalStream(selfStream);
+
+      const peerStream = await answer(true, selfStream) as MediaStream;
+
+      logger.log('Remote stream', peerStream);
+      setLoadingMessage(`Got call from <${sourceId}>`);
+      setRemoteStream(peerStream);
+      setLoadingMessage(undefined);
+
+      remoteConnection.addEventListener('data', onGetData);
+    } catch (error) {
+      logger.warn(error);
+    }
+  }, [askYesNo, onGetData, remoteConnection]);
+
   useEffect(() => {
     setLoadingMessage('Initializing');
     remoteConnection.connectToServer()
@@ -71,42 +118,17 @@ const Camera = () => {
         logger.log('Connected to server');
         setLoadingMessage('Connected to server');
 
-        remoteConnection.addEventListener('call', async (sourceId, answer) => {
-          logger.log(`Get call from <${sourceId}>`);
-
-          const acceptPeerCall = await askYesNo(`Accept photoer from <${sourceId}>?`);
-
-          if (!acceptPeerCall) {
-            setLoadingMessage(undefined);
-            answer(false);
-            return;
-          }
-
-          try {
-            const selfStream = await startStream();
-
-            logger.log('My stream ready', selfStream);
-            setLocalStream(selfStream);
-
-            const peerStream = await answer(true, selfStream) as MediaStream;
-
-            logger.log('Remote stream', peerStream);
-            setLoadingMessage(`Got call from <${sourceId}>`);
-            setRemoteStream(peerStream);
-            setLoadingMessage(undefined);
-
-            remoteConnection.addEventListener('data', (_, data) => {
-              console.log('DATA', data);
-            });
-          } catch (error) {
-            logger.warn(error);
-          }
-        });
+        remoteConnection.addEventListener('call', onCall);
       })
       .catch((error) => {
         logger.warn('Failed to init remote connection', error);
       });
-  }, [askYesNo, remoteConnection]);
+
+    return () => {
+      remoteConnection.removeEventListener('call', onCall);
+      remoteConnection.removeEventListener('data', onGetData);
+    };
+  }, [onCall, onGetData, remoteConnection]);
 
   useEffect(() => (
     () => {
