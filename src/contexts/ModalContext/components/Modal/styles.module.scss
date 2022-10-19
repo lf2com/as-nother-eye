@@ -29,8 +29,10 @@
   }
 
   .box {
+    $dur: 0.25s;
+
     position: relative;
-    transform: translateY(0.25em);
+    transform: translateY(0.35em);
     top: -2em;
     padding: 1em 0;
     box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
@@ -41,9 +43,9 @@
     overflow: hidden;
     opacity: 0;
     transition:
-      top 0.25s ease-in-out,
-      opacity 0.25s ease-in-out,
-      transform 0.1s ease-in-out 0.25s;
+      top $dur ease-in-out,
+      opacity $dur ease-in-out,
+      transform 0.1s ease-in-out $dur;
   
     > * {
       padding: 0 1em;

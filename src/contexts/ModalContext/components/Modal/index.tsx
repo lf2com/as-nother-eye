@@ -4,6 +4,8 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
+import wait from '../../../../utils/wait';
+
 import ModalButton from '../ModalButton';
 
 import styles from './styles.module.scss';
@@ -63,7 +65,9 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   }, [onHidden, onShown, show]);
 
   useEffect(() => {
-    setShow(true);
+    wait(100).then(() => {
+      setShow(true);
+    });
   }, []);
 
   return (
