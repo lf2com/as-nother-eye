@@ -43,22 +43,29 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
 
         try {
           const selfStream = await startStream();
-          const peerStream = await remoteConnection.call(targetId, selfStream);
 
-          setLocalStream(selfStream);
-          logger.log(`Connection to <${targetId}>`, selfStream);
-          setLoadingMessage(`Connected to <${targetId}>. Calling peer`);
-          logger.log('Peer stream ready', peerStream);
-          setLoadingMessage(`Called <${targetId}>`);
-          setRemoteStream(peerStream);
-          setLoadingMessage(undefined);
+          try {
+            const peerStream = await remoteConnection.call(targetId, selfStream);
 
-          remoteConnection.addEventListener('hangup', () => {
-            logger.log('Closed');
-            selfStream.getTracks().forEach((track) => {
-              track.stop();
+            setLocalStream(selfStream);
+            logger.log(`Connection to <${targetId}>`, selfStream);
+            setLoadingMessage(`Connected to <${targetId}>. Calling peer`);
+            logger.log('Peer stream ready', peerStream);
+            setLoadingMessage(`Called <${targetId}>`);
+            setRemoteStream(peerStream);
+            setLoadingMessage(undefined);
+
+            remoteConnection.addEventListener('hangup', () => {
+              logger.log('Closed');
+              selfStream.getTracks().forEach((track) => {
+                track.stop();
+              });
             });
-          });
+          } catch (error) {
+            stopStream(selfStream);
+
+            throw error;
+          }
         } catch (error) {
           logger.warn(error);
           setLoadingMessage(undefined);
