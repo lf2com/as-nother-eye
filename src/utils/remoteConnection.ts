@@ -193,8 +193,7 @@ class RemoteConnection {
 
           this.dispatchEvent('call', sourceId, async (accept, localStream) => {
             if (!accept) {
-              connection.close();
-              connection.peerConnection.close();
+              this.sendMessage('#cmd:decline');
 
               return undefined;
             }
@@ -254,72 +253,80 @@ class RemoteConnection {
 
     const peer = this.peer as Peer;
 
-    await new Promise<void>((resolve, reject) => {
+    return new Promise<MediaStream>((resolve, reject) => {
       console.log('Connecting to', targetId);
-      const connection = peer.connect(targetId);
+      const peerConnection = peer.connect(targetId);
 
-      connection.on('close', () => {
+      peerConnection.on('close', () => {
         this.connection = null;
         this.dispatchEvent('hangup', targetId);
       });
 
-      connection.on('error', (error) => {
+      peerConnection.on('error', (error) => {
         console.warn('My connection error', error);
         this.connection = null;
         reject(error);
       });
 
-      connection.on('iceStateChanged', (state) => {
+      peerConnection.on('iceStateChanged', (state) => {
         console.warn('My connection state changed', state);
       });
 
-      connection.on('open', () => {
+      peerConnection.on('open', () => {
         console.log('My connection open');
-        this.connection = connection;
+        console.log('Calling', targetId);
+        const callConnection = peer.call(targetId, mediaStream);
 
-        connection.on('data', (data) => {
+        this.connection = peerConnection;
+
+        peerConnection.on('data', (data) => {
+          const message = data as string;
           console.log('My connection data', data);
+
+          if (/^#cmd:/.test(message)) {
+            switch (message.replace(/^#cmd:/, '')) {
+              case 'decline':
+                reject(Error('decline'));
+                break;
+
+              default:
+                break;
+            }
+          }
           this.dispatchEvent('data', targetId, data);
         });
 
-        resolve();
-      });
-    });
+        callConnection.on('error', (error) => {
+          console.warn('My call error', error);
+          reject(error);
+        });
 
-    return new Promise((resolve, reject) => {
-      console.log('Calling', targetId);
-      const connection = peer.call(targetId, mediaStream);
+        callConnection.on('close', () => {
+          this.dispatchEvent('hangup', targetId);
+        });
 
-      connection.on('error', (error) => {
-        console.warn('My call error', error);
-        reject(error);
-      });
+        callConnection.on('stream', (remoteStream) => {
+          resolve(remoteStream);
+        });
 
-      connection.on('close', () => {
-        this.dispatchEvent('hangup', targetId);
-      });
+        callConnection.on('iceStateChanged', (state) => {
+          console.warn('My call state changed', state);
 
-      connection.on('stream', (remoteStream) => {
-        resolve(remoteStream);
-      });
+          switch (state) {
+            case 'connected':
+            case 'new':
+            case 'checking':
+            case 'completed':
+              break;
 
-      connection.on('iceStateChanged', (state) => {
-        console.warn('My call state changed', state);
-
-        switch (state) {
-          case 'connected':
-          case 'new':
-          case 'checking':
-          case 'completed':
-            break;
-
-          case 'closed':
-          case 'disconnected':
-          case 'failed':
-          default:
-            reject(Error(state));
-            break;
-        }
+            case 'closed':
+            case 'disconnected':
+            case 'failed':
+            default:
+              reject(Error(state));
+              break;
+          }
+        });
       });
     });
   }
