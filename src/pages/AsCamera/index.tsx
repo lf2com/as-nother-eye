@@ -44,6 +44,7 @@ const Camera = () => {
 
   const takePhoto = useCallback(async () => {
     const track = localStream?.getVideoTracks()[0];
+    console.log('TRACK', track);
 
     if (!track) {
       return;
@@ -72,6 +73,7 @@ const Camera = () => {
       console.log('MESSAGE', message.substring(1));
       switch (message.substring(1)) {
         case 'photo':
+          console.log('GOTO TAKE PHOTO');
           takePhoto();
           break;
 
@@ -104,12 +106,10 @@ const Camera = () => {
       setLoadingMessage(`Got call from <${sourceId}>`);
       setRemoteStream(peerStream);
       setLoadingMessage(undefined);
-
-      remoteConnection.addEventListener('data', onGetData);
     } catch (error) {
       logger.warn(error);
     }
-  }, [askYesNo, onGetData, remoteConnection]);
+  }, [askYesNo]);
 
   useEffect(() => {
     setLoadingMessage('Initializing');
@@ -119,6 +119,7 @@ const Camera = () => {
         setLoadingMessage('Connected to server');
 
         remoteConnection.addEventListener('call', onCall);
+        remoteConnection.addEventListener('data', onGetData);
       })
       .catch((error) => {
         logger.warn('Failed to init remote connection', error);
@@ -160,13 +161,6 @@ const Camera = () => {
       <Loading show={!!loadingMessage}>
         {loadingMessage}
       </Loading>
-      {/* <ConfirmModal
-        show={!!(peerCall && !localStream)}
-        onYes={onAcceptPeerCall}
-        onNo={onRejectPeerCall}
-      >
-        Accept photoer from {'<'}{sourcePeerId}{'>'}?
-      </ConfirmModal> */}
       <Frame
         className={majorClassName}
         onAnimationEnd={afterTakingPhoto}

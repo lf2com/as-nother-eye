@@ -61,6 +61,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
           });
         } catch (error) {
           logger.warn(error);
+          setLoadingMessage(undefined);
         }
       })
       .catch((error) => {
