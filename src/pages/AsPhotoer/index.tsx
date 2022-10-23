@@ -10,7 +10,7 @@ import Tag from '../../components/Tag';
 import Video from '../../components/Video';
 
 import Logger from '../../utils/logger';
-import RemoteConnection from '../../utils/remoteConnection';
+import RemoteConnection from '../../utils/RemoteConnection';
 import { startStream, stopStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
@@ -23,7 +23,7 @@ const logger = new Logger({ tag: '[Photoer]' });
 const Photoer: FunctionComponent<PhotoerProps> = () => {
   const params = useParams();
   const targetId = useMemo(() => params.targetId as string, [params]);
-  const remoteConnection = useMemo(() => new RemoteConnection({ connect: false }), []);
+  const remoteConnection = useMemo(() => new RemoteConnection(), []);
   const [loadingMessage, setLoadingMessage] = useState<string>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [localStream, setLocalStream] = useState<MediaStream>();
@@ -31,12 +31,12 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   logger.log('target id', targetId);
 
   const onPhoto = useCallback(() => {
-    remoteConnection.sendMessage('#photo');
-  }, [remoteConnection]);
+    remoteConnection.sendMessage(targetId, '#photo');
+  }, [remoteConnection, targetId]);
 
   useEffect(() => {
     setLoadingMessage('Initializing');
-    remoteConnection.connectToServer()
+    remoteConnection.connect()
       .then(async () => {
         logger.log('Connected to server');
         setLoadingMessage('Connected to server');

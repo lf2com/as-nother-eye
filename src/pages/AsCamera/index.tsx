@@ -13,7 +13,8 @@ import Tag from '../../components/Tag';
 import Video from '../../components/Video';
 
 import Logger from '../../utils/logger';
-import RemoteConnection, { RemoteConnectionEventCallback } from '../../utils/remoteConnection';
+import RemoteConnection from '../../utils/RemoteConnection';
+import EventHandler from '../../utils/RemoteConnection/event/handler';
 import { startStream, stopStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
@@ -23,7 +24,7 @@ const logger = new Logger({ tag: '[Camera]' });
 const Camera = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id') as string;
-  const remoteConnection = useMemo(() => new RemoteConnection({ id, connect: false }), [id]);
+  const remoteConnection = useMemo(() => new RemoteConnection(id), [id]);
   const { askYesNo } = useModalContext();
   const majorVideoRef = useRef<HTMLVideoElement>(null);
   const [loadingMessage, setLoadingMessage] = useState<string>();
@@ -65,7 +66,7 @@ const Camera = () => {
     setTakingPhoto(false);
   }, []);
 
-  const onGetData = useCallback<RemoteConnectionEventCallback['data']>((_, data) => {
+  const onGetData = useCallback<EventHandler['data']>((_, data) => {
     const message = data as string;
     console.log('DATA', data);
 
@@ -83,7 +84,7 @@ const Camera = () => {
     }
   }, [takePhoto]);
 
-  const onCall = useCallback<RemoteConnectionEventCallback['call']>(async (sourceId, answer) => {
+  const onCall = useCallback<EventHandler['call']>(async (sourceId, answer) => {
     logger.log(`Get call from <${sourceId}>`);
 
     const acceptPeerCall = await askYesNo(`Accept photoer from <${sourceId}>?`);
@@ -113,7 +114,7 @@ const Camera = () => {
 
   useEffect(() => {
     setLoadingMessage('Initializing');
-    remoteConnection.connectToServer()
+    remoteConnection.connect()
       .then(() => {
         logger.log('Connected to server');
         setLoadingMessage('Connected to server');
