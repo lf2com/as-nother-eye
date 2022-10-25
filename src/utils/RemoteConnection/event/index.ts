@@ -80,8 +80,6 @@ RemoteConnection.prototype.dispatchEvent = function f(
   this.eventHandlerList[eventName] = handlers.filter(({ handler, once }) => {
     (handler as any).apply(this, args);
 
-    return once;
+    return !once;
   });
 };
-
-export default EventName;
