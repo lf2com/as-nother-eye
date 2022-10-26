@@ -21,7 +21,7 @@ const PhotoItem: FunctionComponent<PhotoItemProps> = React.memo(
     const rotateDegree = useMemo(() => (10 * 2 * (Math.random() - 0.5)), []);
 
     const style = useMemo(() => ({
-      '--deg': `${rotateDegree}deg`,
+      '--x-deg': `${rotateDegree}deg`,
       '--heightPerc': `${Math.round(100 * heightRatio)}%`,
     } as React.CSSProperties), [heightRatio, rotateDegree]);
 

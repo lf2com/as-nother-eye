@@ -1,5 +1,5 @@
 .photo-list {
-  --border-size: 0.25em;
+  --border-size: 0.2em;
   --margin: calc(2 * var(--border-size));
 
   position: relative;
@@ -10,8 +10,9 @@
   flex-direction: column-reverse;
 
   .photo {
-    transform: rotate(var(--deg));
-    padding-block-end: var(--heightPerc);
+    transform: rotate(var(--deg, 0));
+    margin-block-end: 0.75em;
+    padding-block-end: var(--heightPerc, 100%);
     width: 100%;
     height: 0;
     outline: var(--border-size) solid #fff;
