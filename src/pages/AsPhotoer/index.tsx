@@ -111,11 +111,11 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
         {loadingMessage}
       </Loading>
       <Frame className={styles.major}>
-        <Video srcObject={localStream} />
+        <Video srcObject={remoteStream} />
       </Frame>
       <Video
         className={styles.minor}
-        srcObject={remoteStream}
+        srcObject={localStream}
       />
       <Shutter
         className={styles.shutter}

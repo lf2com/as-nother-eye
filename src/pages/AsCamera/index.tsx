@@ -31,6 +31,7 @@ const Camera = () => {
   const [loadingMessage, setLoadingMessage] = useState<string>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [localStream, setLocalStream] = useState<MediaStream>();
+  const [localConnStream, setLocalConnStream] = useState<MediaStream>();
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const [handlingPhoto, setHandlingPhoto] = useState<boolean>(false);
   const [lastPhoto, setLastPhoto] = useState<Blob>();
@@ -99,12 +100,27 @@ const Camera = () => {
     }
 
     try {
-      const selfStream = await startStream();
+      const selfStream = await startStream({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 960 },
+        },
+      });
+      const selfConnStream = selfStream.clone();
+
+      selfConnStream.getTracks().forEach((track) => {
+        track.applyConstraints({
+          width: { ideal: 160 },
+          height: { ideal: 120 },
+          frameRate: 15,
+        });
+      });
 
       logger.log('My stream ready', selfStream);
       setLocalStream(selfStream);
+      setLocalConnStream(selfConnStream);
 
-      const peerStream = await answer(true, selfStream) as MediaStream;
+      const peerStream = await answer(true, selfConnStream) as MediaStream;
 
       logger.log('Remote stream', peerStream);
       setLoadingMessage(`Got call from <${sourceId}>`);
