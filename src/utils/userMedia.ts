@@ -1,3 +1,5 @@
+import { mergeObject } from './stdlib';
+
 type MediaStreamConstraints = Parameters<MediaDevices['getUserMedia']>[0];
 
 const defaultStreamConstraints: MediaStreamConstraints = {
@@ -19,7 +21,9 @@ export const getSpeakers = async () => (await getDevices())
 
 export const startStream = async (
   constraints: MediaStreamConstraints = defaultStreamConstraints,
-) => navigator.mediaDevices.getUserMedia(constraints);
+) => navigator.mediaDevices.getUserMedia(
+  mergeObject(defaultStreamConstraints, constraints),
+);
 
 export const stopStream = (stream: MediaStream) => {
   stream.getTracks().forEach((track) => track.stop());
