@@ -3,16 +3,19 @@ import React, {
   ReactElement, ReactNode, useCallback, useContext, useMemo, useState,
 } from 'react';
 
+import NotificationModal from './components/NotificationModal';
 import YesNoModal from './components/YesNoModal';
 
-type AskFunc = (message: ReactNode, title?: ReactNode) => Promise<boolean>;
+type BaseModalFunc<T = void> = (message: ReactNode, title?: ReactNode) => Promise<T>;
 
 interface ModalContextProps {
-  askYesNo: AskFunc;
+  askYesNo: BaseModalFunc<boolean>;
+  notice: BaseModalFunc;
 }
 
 const ModalContext = createContext<ModalContextProps>({
   askYesNo: async () => true,
+  notice: async () => {},
 });
 
 interface ModalItem {
@@ -42,6 +45,25 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
           >
             {message}
           </YesNoModal>
+        );
+
+        return prevModals.concat({ id, Modal });
+      });
+    }),
+
+    notice: (message, title) => new Promise((resolve) => {
+      setModals((prevModals) => {
+        const id = Date.now();
+        const Modal = (
+          <NotificationModal
+            title={title}
+            onOk={() => resolve()}
+            onHidden={() => {
+              removeModal(id);
+            }}
+          >
+            {message}
+          </NotificationModal>
         );
 
         return prevModals.concat({ id, Modal });
