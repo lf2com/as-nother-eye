@@ -1,0 +1,24 @@
+.button {
+  --float-width: 0.5em;
+  --bg-color: #69f;
+  --light-color: transparent;
+  --shadow-color: rgba(0, 0, 0, 0.25);
+  --color: #fff;
+
+  padding: 1em;
+  border-radius: 0.5em;
+  border-width: var(--float-width);
+  border-style: solid;
+  border-color: var(--light-color) var(--shadow-color) var(--shadow-color) var(--light-color);
+  background-color: var(--bg-color);
+  color: var(--color);
+  display: inline-block;
+
+  &:active {
+    border-color: var(--shadow-color) var(--light-color) var(--light-color) var(--shadow-color);
+  }
+  
+  &:global(.disabled) {
+    background-color: #ccc;
+  }
+}
