@@ -54,6 +54,29 @@
 
   .body {
     margin: 1em 0;
+
+    input {
+      --blur-color: #999;
+      --focus-color: #333;
+
+      margin: 0 0.25em;
+      padding: 0.25em 0.35em;
+      outline: none;
+      border-radius: 0.5em;
+      border: 1px solid var(--blur-color);
+      color: var(--blur-color);
+      font-size: 1em;
+      font-family: monospace;
+
+      &:hover,
+      &:focus {
+        border-color: var(--focus-color);
+      }
+
+      &:focus {
+        color: var(--focus-color);
+      }
+    }
   }
 
   .foot {

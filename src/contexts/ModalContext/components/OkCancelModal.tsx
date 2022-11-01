@@ -3,12 +3,12 @@ import React, { FunctionComponent, PropsWithChildren } from 'react';
 import Modal, { ModalBasicProps } from './Modal';
 import ModalButton from './ModalButton';
 
-interface ConfirmModalProps extends ModalBasicProps {
+interface OkCancelModalProps extends ModalBasicProps {
   onOk: () => void;
   onCancel: () => void;
 }
 
-const ConfirmModal: FunctionComponent<PropsWithChildren<ConfirmModalProps>> = ({
+const OkCancelModal: FunctionComponent<PropsWithChildren<OkCancelModalProps>> = ({
   onOk,
   onCancel,
   children,
@@ -33,4 +33,4 @@ const ConfirmModal: FunctionComponent<PropsWithChildren<ConfirmModalProps>> = ({
   </Modal>
 );
 
-export default ConfirmModal;
+export default OkCancelModal;

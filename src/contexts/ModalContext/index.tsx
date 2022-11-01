@@ -3,22 +3,26 @@ import React, {
   ReactElement, ReactNode, useCallback, useContext, useMemo, useState,
 } from 'react';
 
-import ConfirmModal from './components/ConfirmModal';
+import { ModalBasicProps } from './components/Modal';
 import NotificationModal from './components/NotificationModal';
+import OkCancelModal from './components/OkCancelModal';
 import YesNoModal from './components/YesNoModal';
 
-type BaseModalFunc<T = void> = (message: ReactNode, title?: ReactNode) => Promise<T>;
+type BaseModalFunc<T = void> = (
+  message: ReactNode,
+  options?: ModalBasicProps,
+) => Promise<T>;
 
 interface ModalContextProps {
   askYesNo: BaseModalFunc<boolean>;
   notice: BaseModalFunc;
-  confirm: BaseModalFunc<boolean>;
+  askOkCancel: BaseModalFunc<boolean>;
 }
 
 const ModalContext = createContext<ModalContextProps>({
   askYesNo: async () => true,
   notice: async () => {},
-  confirm: async () => true,
+  askOkCancel: async () => true,
 });
 
 interface ModalItem {
@@ -34,15 +38,18 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
   }, []);
 
   const contextValue = useMemo<ModalContextProps>(() => ({
-    askYesNo: (message, title) => new Promise((resolve) => {
+    askYesNo: (message, options) => new Promise((resolve) => {
       setModals((prevModals) => {
         const id = Date.now();
         const Modal = (
           <YesNoModal
-            title={title}
             onYes={() => resolve(true)}
             onNo={() => resolve(false)}
-            onHidden={() => removeModal(id)}
+            onHidden={() => {
+              removeModal(id);
+              options?.onHidden?.();
+            }}
+            {...options}
           >
             {message}
           </YesNoModal>
@@ -52,14 +59,17 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
       });
     }),
 
-    notice: (message, title) => new Promise((resolve) => {
+    notice: (message, options) => new Promise((resolve) => {
       setModals((prevModals) => {
         const id = Date.now();
         const Modal = (
           <NotificationModal
-            title={title}
             onOk={() => resolve()}
-            onHidden={() => removeModal(id)}
+            onHidden={() => {
+              removeModal(id);
+              options?.onHidden?.();
+            }}
+            {...options}
           >
             {message}
           </NotificationModal>
@@ -69,18 +79,21 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
       });
     }),
 
-    confirm: (message, title) => new Promise<boolean>((resolve) => {
+    askOkCancel: (message, options) => new Promise<boolean>((resolve) => {
       setModals((prevModals) => {
         const id = Date.now();
         const Modal = (
-          <ConfirmModal
-            title={title}
+          <OkCancelModal
             onOk={() => resolve(true)}
             onCancel={() => resolve(false)}
-            onHidden={() => removeModal(id)}
+            onHidden={() => {
+              removeModal(id);
+              options?.onHidden?.();
+            }}
+            {...options}
           >
             {message}
-          </ConfirmModal>
+          </OkCancelModal>
         );
 
         return prevModals.concat({ id, Modal });
