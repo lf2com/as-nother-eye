@@ -70,14 +70,16 @@ RemoteConnection.prototype.removeEventListener = function f(
 /**
  * Dispatch event
  */
-RemoteConnection.prototype.dispatchEvent = function f(eventName, ...args) {
+RemoteConnection.prototype.dispatchEvent = function f(
+  this: RemoteConnection,
+  eventName,
+  ...args
+) {
   const handlers = this.eventHandlerList[eventName] ?? [];
 
   this.eventHandlerList[eventName] = handlers.filter(({ handler, once }) => {
-    handler.apply(this, args as any);
+    (handler as any).apply(this, args);
 
-    return once;
+    return !once;
   });
 };
-
-export default EventName;

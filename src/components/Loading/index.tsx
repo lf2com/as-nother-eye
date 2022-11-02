@@ -1,5 +1,7 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, ReactNode, useMemo } from 'react';
+import React, {
+  FunctionComponent, ReactNode, useEffect, useMemo, useState,
+} from 'react';
 
 import styles from './styles.module.scss';
 
@@ -11,10 +13,10 @@ interface LoadingProps {
 }
 
 const Loading: FunctionComponent<LoadingProps> = ({
-  show = true,
-  fullscreen = false,
-  highlight = true,
   children,
+  show = !!children,
+  fullscreen = false,
+  highlight = false,
 }) => {
   const className = useMemo(() => (
     classnames(styles.loading, {
@@ -24,10 +26,18 @@ const Loading: FunctionComponent<LoadingProps> = ({
     })
   ), [fullscreen, highlight, show]);
 
+  const [Message, setMessage] = useState<ReactNode>(children ?? 'Loading');
+
+  useEffect(() => {
+    if (children || show) {
+      setMessage(children);
+    }
+  }, [children, show]);
+
   return (
     <div className={className}>
       <div className={styles.message}>
-        {children ?? 'Loading'}
+        {Message}
       </div>
     </div>
   );

@@ -13,32 +13,34 @@
   align-items: center;
   opacity: 0;
   pointer-events: none;
-  transition: all 0.4s ease 0.2s;
+  transition: all 0.4s ease 1s;
 
   &.fullscreen {
     position: fixed;
   }
 
   &.highlight {
-    backdrop-filter: brightness(0.5);
-
-    .message {
-      animation: anim-shining 0.4s linear infinite;
-    }
-
-    @keyframes anim-shining {
-      0%, 100% {
-        color: inherit;
-      }
-      50% {
-        color: transparent;
-      }
-    }
+    background-color: rgba(0, 0, 0, 0.5);
   }
 
   &.show {
     opacity: 1;
     pointer-events: all;
+    backdrop-filter: blur(0.1rem);
+    transition-delay: 0;
+    
+    .message {
+      animation: anim-shining 0.4s linear infinite;
+      
+      @keyframes anim-shining {
+        0%, 100% {
+          color: inherit;
+        }
+        50% {
+          color: transparent;
+        }
+      }
+    }
   }
 
   .message {

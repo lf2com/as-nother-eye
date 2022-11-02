@@ -27,11 +27,14 @@ const Camera = () => {
   const remoteConnection = useMemo(() => new RemoteConnection(id), [id]);
   const { askYesNo } = useModalContext();
   const majorVideoRef = useRef<HTMLVideoElement>(null);
+  const [photoerId, setPhotoerId] = useState<string>();
   const [loadingMessage, setLoadingMessage] = useState<string>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [localStream, setLocalStream] = useState<MediaStream>();
+  const [localConnStream, setLocalConnStream] = useState<MediaStream>();
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const [handlingPhoto, setHandlingPhoto] = useState<boolean>(false);
+  const [lastPhoto, setLastPhoto] = useState<Blob>();
 
   logger.log('id', id);
 
@@ -58,6 +61,7 @@ const Camera = () => {
     const photoBlob = await imageCapture.takePhoto();
 
     setHandlingPhoto(false);
+    setLastPhoto(photoBlob);
   }, [localStream]);
 
   const onPhoto = takePhoto;
@@ -68,13 +72,13 @@ const Camera = () => {
 
   const onGetData = useCallback<EventHandler['data']>((_, data) => {
     const message = data as string;
-    console.log('DATA', data);
+    logger.log('DATA', data);
 
     if (/^#/.test(message)) {
-      console.log('MESSAGE', message.substring(1));
+      logger.log('MESSAGE', message.substring(1));
       switch (message.substring(1)) {
         case 'photo':
-          console.log('GOTO TAKE PHOTO');
+          logger.log('GOTO TAKE PHOTO');
           takePhoto();
           break;
 
@@ -96,16 +100,32 @@ const Camera = () => {
     }
 
     try {
-      const selfStream = await startStream();
+      const selfStream = await startStream({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 960 },
+        },
+      });
+      const selfConnStream = selfStream.clone();
+
+      selfConnStream.getTracks().forEach((track) => {
+        track.applyConstraints({
+          width: { ideal: 160 },
+          height: { ideal: 120 },
+          frameRate: 15,
+        });
+      });
 
       logger.log('My stream ready', selfStream);
       setLocalStream(selfStream);
+      setLocalConnStream(selfConnStream);
 
-      const peerStream = await answer(true, selfStream) as MediaStream;
+      const peerStream = await answer(true, selfConnStream) as MediaStream;
 
       logger.log('Remote stream', peerStream);
       setLoadingMessage(`Got call from <${sourceId}>`);
       setRemoteStream(peerStream);
+      setPhotoerId(sourceId);
       setLoadingMessage(undefined);
     } catch (error) {
       logger.warn(error);
@@ -113,6 +133,7 @@ const Camera = () => {
   }, [askYesNo]);
 
   useEffect(() => {
+    logger.log('Initializing');
     setLoadingMessage('Initializing');
     remoteConnection.connect()
       .then(() => {
@@ -152,13 +173,19 @@ const Camera = () => {
     }
   }, [holdMajorVideo]);
 
+  useEffect(() => {
+    if (photoerId && lastPhoto) {
+      remoteConnection.sendFile(photoerId, lastPhoto);
+    }
+  }, [lastPhoto, photoerId, remoteConnection]);
+
   logger.log({
     localStream, remoteStream, takingPhoto, handlingPhoto, holdMajorVideo,
   });
 
   return (
     <Frame className={styles.camera}>
-      <Tag>Camera</Tag>
+      <Tag>Camera #{id}</Tag>
       <Loading show={!!loadingMessage}>
         {loadingMessage}
       </Loading>

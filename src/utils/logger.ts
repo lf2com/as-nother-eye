@@ -5,7 +5,7 @@ type OnLogFunc = (
   ...args: unknown[]
 ) => void;
 
-export interface LoggerOptions {
+interface LoggerOptions {
   tag?: string;
   onLog?: OnLogFunc;
 }
@@ -13,9 +13,9 @@ export interface LoggerOptions {
 const { console } = globalThis;
 
 class Logger {
-  protected tag: string;
-
   protected onLog: OnLogFunc;
+
+  tag: string;
 
   constructor(props: LoggerOptions = {}) {
     const {

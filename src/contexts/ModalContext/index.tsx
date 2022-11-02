@@ -3,16 +3,26 @@ import React, {
   ReactElement, ReactNode, useCallback, useContext, useMemo, useState,
 } from 'react';
 
+import { ModalBasicProps } from './components/Modal';
+import NotificationModal from './components/NotificationModal';
+import OkCancelModal from './components/OkCancelModal';
 import YesNoModal from './components/YesNoModal';
 
-type AskFunc = (message: ReactNode, title?: ReactNode) => Promise<boolean>;
+type BaseModalFunc<T = void> = (
+  message: ReactNode,
+  options?: ModalBasicProps,
+) => Promise<T>;
 
 interface ModalContextProps {
-  askYesNo: AskFunc;
+  askYesNo: BaseModalFunc<boolean>;
+  notice: BaseModalFunc;
+  askOkCancel: BaseModalFunc<boolean>;
 }
 
 const ModalContext = createContext<ModalContextProps>({
   askYesNo: async () => true,
+  notice: async () => {},
+  askOkCancel: async () => true,
 });
 
 interface ModalItem {
@@ -28,20 +38,62 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
   }, []);
 
   const contextValue = useMemo<ModalContextProps>(() => ({
-    askYesNo: (message, title) => new Promise((resolve) => {
+    askYesNo: (message, options) => new Promise((resolve) => {
       setModals((prevModals) => {
         const id = Date.now();
         const Modal = (
           <YesNoModal
-            title={title}
             onYes={() => resolve(true)}
             onNo={() => resolve(false)}
             onHidden={() => {
               removeModal(id);
+              options?.onHidden?.();
             }}
+            {...options}
           >
             {message}
           </YesNoModal>
+        );
+
+        return prevModals.concat({ id, Modal });
+      });
+    }),
+
+    notice: (message, options) => new Promise((resolve) => {
+      setModals((prevModals) => {
+        const id = Date.now();
+        const Modal = (
+          <NotificationModal
+            onOk={() => resolve()}
+            onHidden={() => {
+              removeModal(id);
+              options?.onHidden?.();
+            }}
+            {...options}
+          >
+            {message}
+          </NotificationModal>
+        );
+
+        return prevModals.concat({ id, Modal });
+      });
+    }),
+
+    askOkCancel: (message, options) => new Promise<boolean>((resolve) => {
+      setModals((prevModals) => {
+        const id = Date.now();
+        const Modal = (
+          <OkCancelModal
+            onOk={() => resolve(true)}
+            onCancel={() => resolve(false)}
+            onHidden={() => {
+              removeModal(id);
+              options?.onHidden?.();
+            }}
+            {...options}
+          >
+            {message}
+          </OkCancelModal>
         );
 
         return prevModals.concat({ id, Modal });

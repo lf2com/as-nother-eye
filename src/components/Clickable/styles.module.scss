@@ -1,7 +1,7 @@
 .clickable {
   z-index: 1;
 
-  &:not(.disabled):active {
+  &:not(:global(.disabled)):active {
     &:empty,
     &:not(:empty) > * {
       filter: brightness(0.9);

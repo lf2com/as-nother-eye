@@ -21,9 +21,7 @@ const Clickable: FunctionComponent<PropsWithChildren<ClickableProps>> = ({
 }) => {
   const finalClassName = useMemo(() => classnames(
     styles.clickable,
-    {
-      [styles.disabled]: disabled,
-    },
+    { disabled },
     className,
   ), [className, disabled]);
   const handleClick = useCallback<MouseEventHandler>((event) => {

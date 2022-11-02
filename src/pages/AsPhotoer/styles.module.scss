@@ -26,4 +26,12 @@
     grid-area: shutter;
     justify-self: center;
   }
+
+  .photo-list {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20%;
+    box-sizing: border-box;
+  } 
 }
