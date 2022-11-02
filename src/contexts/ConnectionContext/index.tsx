@@ -1,24 +1,42 @@
 import React, {
-  createContext, FunctionComponent, PropsWithChildren, useContext, useMemo,
+  createContext, FunctionComponent, PropsWithChildren, useContext, useEffect, useMemo, useState,
 } from 'react';
 
 import RemoteConnection from '../../utils/RemoteConnection';
 
 interface ConnectionContextProps {
   connector: RemoteConnection;
+  isOnline: boolean;
 }
 
 const ConnectionContext = createContext<ConnectionContextProps>({
   connector: new RemoteConnection(),
+  isOnline: false,
 });
 
 const ConnectionContextProvider: FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
   const connector = useMemo(() => new RemoteConnection(), []);
+  const [isOnline, setIsOnline] = useState(false);
+
   const contextValue = useMemo<ConnectionContextProps>(() => ({
     connector,
-  }), [connector]);
+    isOnline,
+  }), [connector, isOnline]);
+
+  useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+
+    connector.addEventListener('online', onOnline);
+    connector.addEventListener('offline', onOffline);
+
+    return () => {
+      connector.removeEventListener('online', onOnline);
+      connector.removeEventListener('offline', onOffline);
+    };
+  }, [connector]);
 
   return (
     <ConnectionContext.Provider value={contextValue}>

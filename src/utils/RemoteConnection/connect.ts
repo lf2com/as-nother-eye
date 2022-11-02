@@ -42,7 +42,7 @@ function createDataConnection(
 
     dataConnection.off('error');
     dataConnection.on('error', (error) => {
-      this.logger.log('Data connection error', error);
+      this.logger.warn('Data connection error', error);
       delete this.connectionList[targetId];
       reject(error);
     });
@@ -83,7 +83,7 @@ function createMediaConnection(
 
     mediaConnection.off('error');
     mediaConnection.on('error', (error) => {
-      this.logger.log('Peer call connection error', error);
+      this.logger.warn('Peer call connection error', error);
       delete this.connectionList[targetId].mediaConnection;
       reject(error);
     });
@@ -119,12 +119,13 @@ RemoteConnection.prototype.connect = function f(
       this.selfPeer = peer;
       this.selfId = currentId;
       this.selfIsOnline = true;
+      this.dispatchEvent('online');
       resolve(undefined);
     });
 
     peer.off('error');
     peer.on('error', (error) => {
-      this.logger.log('Peer error', error);
+      this.logger.warn('Peer error', error);
       reject(error);
     });
 
@@ -133,6 +134,7 @@ RemoteConnection.prototype.connect = function f(
       this.logger.log('Peer disconnected');
       this.selfIsOnline = false;
       this.connectionList = {};
+      this.dispatchEvent('offline');
     });
 
     peer.off('connection');
@@ -145,6 +147,7 @@ RemoteConnection.prototype.connect = function f(
       this.logger.log('Peer close');
       this.selfIsOnline = false;
       this.connectionList = {};
+      this.dispatchEvent('offline');
     });
 
     peer.off('call');
@@ -174,15 +177,26 @@ RemoteConnection.prototype.connect = function f(
       );
     });
   })
-    .then(() => {
+    .then(() => new Promise((resolve, reject) => {
       if (targetId === undefined || this.connectionList[targetId]) {
-        return Promise.resolve();
+        resolve(undefined);
+        return;
       }
 
-      const dataConnection = this.selfPeer!.connect(targetId);
+      const peer = this.selfPeer!;
 
-      return createDataConnection.call(this, dataConnection);
-    });
+      peer.off('error');
+      peer.on('error', (error) => {
+        this.logger.warn('Peer error', error);
+        reject(error);
+      });
+
+      const dataConnection = peer.connect(targetId);
+
+      resolve(createDataConnection.call(this, dataConnection));
+    }))
+    .then(() => console.log(100))
+    .catch((e) => console.warn(110, e));
 };
 
 /**
@@ -203,6 +217,7 @@ RemoteConnection.prototype.disconnect = function f(
     this.selfPeer = undefined;
     this.selfIsOnline = false;
     this.connectionList = {};
+    this.dispatchEvent('offline');
 
     return;
   }

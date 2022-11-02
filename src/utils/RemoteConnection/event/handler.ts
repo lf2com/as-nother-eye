@@ -1,6 +1,10 @@
 import { DataConnection, MediaConnection } from 'peerjs';
 
 interface EventHandler {
+  online: () => void;
+
+  offline: () => void;
+
   connecteddata: (sourceId: string, connection: DataConnection) => void;
 
   connectedmedia: (sourceId: string, connection: MediaConnection) => void;
