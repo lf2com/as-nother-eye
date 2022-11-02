@@ -1,4 +1,5 @@
 .clickable {
+  user-select: none;
   z-index: 1;
 
   &:not(:global(.disabled)):active {
@@ -6,5 +7,9 @@
     &:not(:empty) > * {
       filter: brightness(0.9);
     }
+  }
+
+  &:global(.disabled) {
+    cursor: not-allowed;
   }
 }
