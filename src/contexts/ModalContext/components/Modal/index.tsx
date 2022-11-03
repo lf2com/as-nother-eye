@@ -4,13 +4,15 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import wait from '../../../../utils/wait';
+import { wait } from '../../../../utils/stdlib';
 
 import ModalButton from '../ModalButton';
 
 import styles from './styles.module.scss';
 
 export interface ModalBasicProps {
+  show?: boolean;
+  className?: string;
   title?: React.ReactNode;
   highlight?: boolean;
   onShown?: () => void;
@@ -24,6 +26,8 @@ export interface ModalProps extends ModalBasicProps {
 }
 
 const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
+  show: propShow = true,
+  className,
   title,
   button,
   buttons = button ? [button] : [],
@@ -35,12 +39,12 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
 }) => {
   const [show, setShow] = useState(false);
 
-  const className = useMemo(() => (
+  const modalClassName = useMemo(() => (
     classnames(styles.modal, {
       [styles.highlight]: highlight,
       [styles.show]: show,
-    })
-  ), [highlight, show]);
+    }, className)
+  ), [highlight, show, className]);
 
   const onClickOutside = useCallback<MouseEventHandler>(() => {
     if (hideOnClickOutside) {
@@ -65,29 +69,29 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   }, [onHidden, onShown, show]);
 
   useEffect(() => {
-    wait(100).then(() => {
-      setShow(true);
+    wait(propShow ? 100 : 0).then(() => {
+      setShow(propShow);
     });
-  }, []);
+  }, [propShow]);
 
   return (
     <div
-      className={className}
+      className={modalClassName}
       onClick={onClickOutside}
     >
       <div
-        className={styles.box}
+        className={classnames(styles.box, 'modal-box')}
         onClick={onClickContainer}
         onTransitionEnd={onTransitionEnd}
       >
         <div>
           {title}
         </div>
-        <div className={styles.body}>
+        <div className={classnames(styles.body, 'modal-body')}>
           {children}
         </div>
         <div
-          className={styles.foot}
+          className={classnames(styles.foot, 'modal-foot')}
           onClick={onClickButton}
         >
           {buttons}
