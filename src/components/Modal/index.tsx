@@ -4,9 +4,9 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import { wait } from '../../../../utils/stdlib';
+import { wait } from '../../utils/stdlib';
 
-import ModalButton from '../ModalButton';
+import ModalButton from './Button';
 
 import styles from './styles.module.scss';
 

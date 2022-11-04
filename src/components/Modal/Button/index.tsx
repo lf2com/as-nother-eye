@@ -3,7 +3,7 @@ import React, {
   FunctionComponent, PropsWithChildren, useCallback, useMemo,
 } from 'react';
 
-import Clickable from '../../../../components/Clickable';
+import Clickable from '../../Clickable';
 
 import styles from './styles.module.scss';
 
