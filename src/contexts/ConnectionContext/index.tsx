@@ -17,7 +17,9 @@ const ConnectionContext = createContext<ConnectionContextProps>({
 const ConnectionContextProvider: FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
-  const connector = useMemo(() => new RemoteConnection(), []);
+  const searchParams = useMemo(() => new URLSearchParams(globalThis.location.search), []);
+  const id = useMemo(() => searchParams.get('id') ?? undefined, [searchParams]);
+  const connector = useMemo(() => new RemoteConnection(id), [id]);
   const [isOnline, setIsOnline] = useState(false);
 
   const contextValue = useMemo<ConnectionContextProps>(() => ({
