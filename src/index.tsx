@@ -27,14 +27,16 @@ const App: FunctionComponent = () => (
     <LoggerContextProvider show={false}>
       <ModalContextProvider>
         <ConnectionContextProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="photoer/:targetId" element={<Photoer />} />
-            <Route path="camera" element={<Camera />} />
-            <Route path="test" element={<Test />} />
-            <Route path="*" element={<Welcome />} />
-          </Routes>
-        </BrowserRouter>
+          <BrowserRouter>
+            <Routes>
+              <Route path="photoer/:targetId" element={<Photoer />} />
+              <Route path="photoer" element={<Photoer />} />
+              <Route path="camera/:targetId" element={<Camera />} />
+              <Route path="camera" element={<Camera />} />
+              <Route path="test" element={<Test />} />
+              <Route path="*" element={<Welcome />} />
+            </Routes>
+          </BrowserRouter>
         </ConnectionContextProvider>
       </ModalContextProvider>
     </LoggerContextProvider>

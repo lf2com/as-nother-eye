@@ -1,5 +1,4 @@
-import React, { FunctionComponent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { FunctionComponent, useMemo } from 'react';
 import styled from 'styled-components';
 
 import randomStr from './utils/random';
@@ -12,14 +11,17 @@ const IframeElem = styled.iframe`
 `;
 
 const Test: FunctionComponent = () => {
-  const [searchParams] = useSearchParams();
-  const cameraId = searchParams.get('camera') ?? randomStr();
-  const photoerId = searchParams.get('photoer') ?? randomStr();
+  const photoerId = useMemo(() => randomStr(), []);
+  const cameraId = useMemo(() => randomStr(), []);
+  console.warn({
+    photoerId,
+    cameraId,
+  });
 
   return (
     <div>
       <IframeElem src={`/photoer/${cameraId}?id=${photoerId}`} />
-      <IframeElem src={`/camera/?id=${cameraId}`} />
+      <IframeElem src={`/camera?id=${cameraId}`} />
     </div>
   );
 };
