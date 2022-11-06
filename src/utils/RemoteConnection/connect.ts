@@ -3,6 +3,10 @@ import Peer, { DataConnection, MediaConnection } from 'peerjs';
 import './event';
 import { RemoteConnection } from './base';
 
+import EventHandler from './event/handler';
+
+const MESSAGE_DECLINE_CALL = '#decline-call';
+
 interface ConnectionItem {
   dataConnection: DataConnection;
   mediaConnection?: MediaConnection;
@@ -68,11 +72,25 @@ function createMediaConnection(
   const targetId = mediaConnection.peer;
 
   return new Promise((resolve, reject) => {
+    const handleDeclineResponse: EventHandler['data'] = (sourceId, data) => {
+      if (sourceId !== targetId) {
+        return;
+      }
+
+      const response = data as string;
+
+      if (response === MESSAGE_DECLINE_CALL) {
+        this.removeEventListener('data', handleDeclineResponse);
+        reject(Error('Declined'));
+      }
+    };
+
     mediaConnection.off('stream');
     mediaConnection.on('stream', (remoteStream) => {
       this.logger.log('Peer call connection stream', remoteStream);
       this.connectionList[targetId].mediaConnection = mediaConnection;
       this.dispatchEvent('connectedmedia', targetId, mediaConnection);
+      this.removeEventListener('data', handleDeclineResponse);
       resolve(remoteStream);
     });
 
@@ -85,6 +103,7 @@ function createMediaConnection(
     mediaConnection.on('error', (error) => {
       this.logger.warn('Peer call connection error', error);
       delete this.connectionList[targetId].mediaConnection;
+      this.removeEventListener('data', handleDeclineResponse);
       reject(error);
     });
 
@@ -93,7 +112,10 @@ function createMediaConnection(
       this.logger.log('Peer call connection close');
       delete this.connectionList[targetId].mediaConnection;
       this.dispatchEvent('hangup', targetId, mediaConnection.metadata);
+      this.removeEventListener('data', handleDeclineResponse);
     });
+
+    this.addEventListener('data', handleDeclineResponse);
   });
 }
 
@@ -113,6 +135,7 @@ RemoteConnection.prototype.connect = function f(
     const peer = new Peer(this.id);
 
     this.disconnect();
+    this.logger.log('Peer connecting', this.id);
 
     peer.off('open');
     peer.on('open', (currentId) => {
@@ -162,11 +185,13 @@ RemoteConnection.prototype.connect = function f(
       this.dispatchEvent(
         'call',
         sourceId,
-        (accept, stream) => {
+        async (accept, stream) => {
           if (!accept) {
-            mediaConnection.answer();
-            mediaConnection.close();
-            return Promise.resolve();
+            await this.sendMessage(sourceId, MESSAGE_DECLINE_CALL);
+            // mediaConnection.answer();
+            // mediaConnection.close();
+
+            return undefined;
           }
 
           answer.call(mediaConnection, stream);
@@ -235,46 +260,42 @@ RemoteConnection.prototype.disconnect = function f(
 /**
  * Send message
  */
-RemoteConnection.prototype.sendMessage = function f(
+RemoteConnection.prototype.sendMessage = async function f(
   this: RemoteConnection,
   targetId,
   message,
 ) {
-  return this.connect(targetId)
-    .then(() => {
-      this.connectionList[targetId].dataConnection.send(message);
-    });
+  await this.connect(targetId);
+  this.connectionList[targetId].dataConnection.send(message);
 };
 
 /**
  * Send file
  */
-RemoteConnection.prototype.sendFile = function f(
+RemoteConnection.prototype.sendFile = async function f(
   this: RemoteConnection,
   targetId,
   file,
 ) {
-  return this.connect(targetId)
-    .then(() => {
-      const { dataConnection } = this.connectionList[targetId];
+  await this.connect(targetId);
 
-      this.logger.log('Send file', file, dataConnection);
-      dataConnection.send(file);
-    });
+  const { dataConnection } = this.connectionList[targetId];
+
+  this.logger.log('Send file', file, dataConnection);
+  dataConnection.send(file);
 };
 
 /**
  * Call
  */
-RemoteConnection.prototype.call = function f(
+RemoteConnection.prototype.call = async function f(
   this: RemoteConnection,
   targetId,
   stream,
 ) {
-  return this.connect(targetId)
-    .then(() => {
-      const mediaConnection = this.peer!.call(targetId, stream);
+  await this.connect(targetId);
 
-      return createMediaConnection.call(this, mediaConnection);
-    });
+  const mediaConnection = this.peer!.call(targetId, stream);
+
+  return createMediaConnection.call(this, mediaConnection);
 };
