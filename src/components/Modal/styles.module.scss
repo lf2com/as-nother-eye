@@ -12,22 +12,6 @@
   align-items: center;
   pointer-events: none;
 
-  &.highlight {
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: brightness(0.75);
-  }
-
-  &.show {
-    opacity: 1;
-    pointer-events: all;
-
-    .box {
-      transform: translateY(0);
-      top: 0;
-      opacity: 1;
-    }
-  }
-
   .box {
     $dur: 0.25s;
 
@@ -85,5 +69,21 @@
     display: flex;
     flex-flow: row;
     justify-content: space-evenly;
+  }
+
+  &.highlight {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: brightness(0.75);
+  }
+
+  &.show {
+    opacity: 1;
+    pointer-events: all;
+
+    .box {
+      transform: translateY(0);
+      top: 0;
+      opacity: 1;
+    }
   }
 }

@@ -2,14 +2,15 @@
   user-select: none;
   z-index: 1;
 
+  &:global(.disabled) {
+    cursor: not-allowed;
+  }
+
   &:not(:global(.disabled)):active {
+
     &:empty,
     &:not(:empty) > * {
       filter: brightness(0.9);
     }
-  }
-
-  &:global(.disabled) {
-    cursor: not-allowed;
   }
 }
