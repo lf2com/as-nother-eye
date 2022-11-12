@@ -9,6 +9,7 @@ import EventHandler from '../../utils/RemoteConnection/event/handler';
 
 interface ConnectionContextProps {
   connector: RemoteConnection;
+  id: string;
   isOnline: boolean;
   isDataConnected: boolean;
   isMediaConnected: boolean;
@@ -17,6 +18,7 @@ interface ConnectionContextProps {
 
 const ConnectionContext = createContext<ConnectionContextProps>({
   connector: new RemoteConnection(),
+  id: '',
   isOnline: false,
   isDataConnected: false,
   isMediaConnected: false,
@@ -49,6 +51,7 @@ const ConnectionContextProvider: FunctionComponent<PropsWithChildren> = ({
 
   const contextValue = useMemo<ConnectionContextProps>(() => ({
     connector,
+    id: connector.id,
     isOnline,
     isDataConnected: !!dataConnection,
     isMediaConnected: !!mediaConnection,
