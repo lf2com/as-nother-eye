@@ -80,7 +80,7 @@
     opacity: 1;
     pointer-events: all;
 
-    .box {
+    > .box {
       transform: translateY(0);
       top: 0;
       opacity: 1;
