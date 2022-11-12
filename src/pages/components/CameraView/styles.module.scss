@@ -1,4 +1,4 @@
-.photoer {
+.camera-view {
   position: relative;
   background-color: #000;
   font-size: 1rem;
@@ -10,6 +10,20 @@
 
   .major {
     grid-area: major;
+    
+    &.taking-photo {
+      animation: anim-shot 0.25s linear forwards;
+  
+      @keyframes anim-shot {
+        0% {
+          filter: contrast(0);
+        }
+
+        100% {
+          filter: contrast(1);
+        }
+      }
+    }
   }
 
   .minor {

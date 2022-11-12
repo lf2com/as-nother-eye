@@ -11,37 +11,7 @@
   flex-flow: row;
   justify-content: center;
   align-items: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.4s ease 1s;
-
-  &.fullscreen {
-    position: fixed;
-  }
-
-  &.highlight {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-
-  &.show {
-    opacity: 1;
-    pointer-events: all;
-    backdrop-filter: blur(0.1rem);
-    transition-delay: 0;
-    
-    .message {
-      animation: anim-shining 0.4s linear infinite;
-      
-      @keyframes anim-shining {
-        0%, 100% {
-          color: inherit;
-        }
-        50% {
-          color: transparent;
-        }
-      }
-    }
-  }
+  transition: all 0.4s ease;
 
   .message {
     width: 100%;
@@ -52,6 +22,36 @@
     align-items: center;
     opacity: inherit;
     pointer-events: inherit;
-    transition: all 0.4s ease;
+    animation: anim-shining 0.4s linear infinite;
+    
+    @keyframes anim-shining {
+
+      0%, 100% {
+        color: inherit;
+      }
+
+      50% {
+        color: transparent;
+      }
+    }
+  }
+
+  &.fullscreen {
+    position: fixed;
+  }
+
+  &.highlight {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  &.hide {
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: blur(0.1rem);
+    transition-delay: 1s;
+
+    .message {
+      animation: none;
+    }
   }
 }

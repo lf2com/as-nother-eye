@@ -22,7 +22,7 @@ const PhotoItem: FunctionComponent<PhotoItemProps> = React.memo(
 
     const style = useMemo(() => ({
       '--x-deg': `${rotateDegree}deg`,
-      '--heightPerc': `${Math.round(100 * heightRatio)}%`,
+      '--height-perc': `${Math.round(100 * heightRatio)}%`,
     } as React.CSSProperties), [heightRatio, rotateDegree]);
 
     const onLoad = useCallback<React.ReactEventHandler<HTMLImageElement>>((event) => {

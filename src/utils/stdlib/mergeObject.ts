@@ -1,6 +1,6 @@
 type IterableObject = Record<string, any>;
 
-export const mergeObject = <A extends IterableObject, B extends IterableObject>(
+const mergeObject = <A extends IterableObject, B extends IterableObject>(
   a: A,
   refB?: B,
 ): A & B => {
@@ -33,4 +33,4 @@ export const mergeObject = <A extends IterableObject, B extends IterableObject>(
   return result as A & B;
 };
 
-export default {};
+export default mergeObject;

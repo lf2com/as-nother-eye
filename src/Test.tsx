@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
+import Logger from './utils/logger';
 import randomStr from './utils/random';
 
 const IframeElem = styled.iframe`
@@ -11,15 +11,23 @@ const IframeElem = styled.iframe`
   border: 1px solid #333;
 `;
 
+const logger = new Logger({
+  tag: '[Test]',
+});
+
+const photoerId = randomStr();
+const cameraId = randomStr();
+
 const Test: FunctionComponent = () => {
-  const [searchParams] = useSearchParams();
-  const cameraId = searchParams.get('camera') ?? randomStr();
-  const photoerId = searchParams.get('photoer') ?? randomStr();
+  const leftUrl = `/photoer/${cameraId}?id=${photoerId}`;
+  const rightUrl = `/camera?id=${cameraId}`;
+
+  logger.log({ photoerId, cameraId });
 
   return (
     <div>
-      <IframeElem src={`/photoer/${cameraId}?id=${photoerId}`} />
-      <IframeElem src={`/camera/?id=${cameraId}`} />
+      <IframeElem src={leftUrl} />
+      <IframeElem src={rightUrl} />
     </div>
   );
 };

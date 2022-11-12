@@ -3,10 +3,10 @@ import React, {
   ReactElement, ReactNode, useCallback, useContext, useMemo, useState,
 } from 'react';
 
-import { ModalBasicProps } from './components/Modal';
-import NotificationModal from './components/NotificationModal';
-import OkCancelModal from './components/OkCancelModal';
-import YesNoModal from './components/YesNoModal';
+import { ModalBasicProps } from '../../components/Modal';
+import NotificationModal from '../../components/Modal/NotificationModal';
+import OkCancelModal from '../../components/Modal/OkCancelModal';
+import YesNoModal from '../../components/Modal/YesNoModal';
 
 type BaseModalFunc<T = void> = (
   message: ReactNode,

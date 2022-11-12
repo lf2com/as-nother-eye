@@ -18,26 +18,26 @@ const Loading: FunctionComponent<LoadingProps> = ({
   fullscreen = false,
   highlight = false,
 }) => {
+  const [lastContent, setLastContent] = useState(children);
+
   const className = useMemo(() => (
     classnames(styles.loading, {
       [styles.fullscreen]: fullscreen,
       [styles.highlight]: highlight,
-      [styles.show]: show,
+      [styles.hide]: !show,
     })
   ), [fullscreen, highlight, show]);
 
-  const [Message, setMessage] = useState<ReactNode>(children ?? 'Loading');
-
   useEffect(() => {
-    if (children || show) {
-      setMessage(children);
+    if (children !== undefined) {
+      setLastContent(children);
     }
-  }, [children, show]);
+  }, [children]);
 
   return (
     <div className={className}>
       <div className={styles.message}>
-        {Message}
+        {lastContent}
       </div>
     </div>
   );

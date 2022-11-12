@@ -60,7 +60,7 @@ const LoggerContextProvider: FunctionComponent<PropsWithChildren<LoggerContextPr
     },
   }), [tag]);
 
-  const contextValue = useMemo(() => ({
+  const contextValue = useMemo<LoggerContextProps>(() => ({
     logger,
     showLog: () => setShow(true),
     hideLog: () => setShow(false),

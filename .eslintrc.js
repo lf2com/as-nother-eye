@@ -63,6 +63,7 @@ module.exports = {
     'import/extensions': ['error', 'never'],
 
     // method overload
+    'comma-spacing': ['error', { before: false, after: true }],
     'no-dupe-class-members': 'off',
 
     'object-curly-spacing': ['error', 'always'],

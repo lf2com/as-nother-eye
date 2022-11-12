@@ -1,7 +1,8 @@
 import React, { FunctionComponent, PropsWithChildren } from 'react';
 
-import Modal, { ModalBasicProps } from './Modal';
-import ModalButton from './ModalButton';
+import ModalButton from './Button';
+
+import Modal, { ModalBasicProps } from '.';
 
 interface NotificationModalProps extends ModalBasicProps {
   onOk: () => void;

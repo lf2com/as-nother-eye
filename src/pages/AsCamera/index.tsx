@@ -1,77 +1,58 @@
-import classnames from 'classnames';
-import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
-} from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { FunctionComponent, useCallback, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-import { useModalContext } from '../../contexts/ModalContext';
+import { useConnectionContext } from '../../contexts/ConnectionContext';
 
-import Shutter from '../../components/CameraShutter';
-import Frame from '../../components/Frame';
-import Loading from '../../components/Loading';
+import PhotoList from '../../components/PhotoList';
 import Tag from '../../components/Tag';
-import Video from '../../components/Video';
+import CameraView, { CameraViewProps } from '../components/CameraView';
 
 import Logger from '../../utils/logger';
-import RemoteConnection from '../../utils/RemoteConnection';
-import EventHandler from '../../utils/RemoteConnection/event/handler';
-import { startStream, stopStream } from '../../utils/userMedia';
+import { getCameras, startStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
 
+interface CameraProps {
+}
+
 const logger = new Logger({ tag: '[Camera]' });
 
-const Camera = () => {
-  const [searchParams] = useSearchParams();
-  const id = searchParams.get('id') as string;
-  const remoteConnection = useMemo(() => new RemoteConnection(id), [id]);
-  const { askYesNo } = useModalContext();
-  const majorVideoRef = useRef<HTMLVideoElement>(null);
-  const [photoerId, setPhotoerId] = useState<string>();
-  const [loadingMessage, setLoadingMessage] = useState<string>();
-  const [remoteStream, setRemoteStream] = useState<MediaStream>();
+const Camera: FunctionComponent<CameraProps> = () => {
+  const params = useParams();
+  const { targetId } = params;
+  const {
+    id: connectorId,
+  } = useConnectionContext();
   const [localStream, setLocalStream] = useState<MediaStream>();
-  const [localConnStream, setLocalConnStream] = useState<MediaStream>();
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
-  const [handlingPhoto, setHandlingPhoto] = useState<boolean>(false);
-  const [lastPhoto, setLastPhoto] = useState<Blob>();
+  const [photos, setPhotos] = useState<Blob[]>([]);
 
-  logger.log('id', id);
-
-  const majorClassName = useMemo(() => classnames(styles.major, {
-    [styles['taking-photo']]: takingPhoto,
-  }), [takingPhoto]);
-
-  const holdMajorVideo = useMemo(() => (
-    takingPhoto || handlingPhoto
-  ), [handlingPhoto, takingPhoto]);
+  const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
+    new URL(`/photoer/${id}`, globalThis.location.href).toString()
+  ), []);
 
   const takePhoto = useCallback(async () => {
-    const track = localStream?.getVideoTracks()[0];
-    console.log('TRACK', track);
-
-    if (!track) {
+    if (!localStream) {
       return;
     }
 
-    setHandlingPhoto(true);
+    const track = localStream?.getVideoTracks()[0];
+
+    logger.log('TRACK', track);
     setTakingPhoto(true);
 
     const imageCapture = new ImageCapture(track);
     const photoBlob = await imageCapture.takePhoto();
 
-    setHandlingPhoto(false);
-    setLastPhoto(photoBlob);
+    setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
+    setTakingPhoto(false);
   }, [localStream]);
 
   const onPhoto = takePhoto;
 
-  const afterTakingPhoto = useCallback(() => {
-    setTakingPhoto(false);
-  }, []);
-
-  const onGetData = useCallback<EventHandler['data']>((_, data) => {
+  const onData = useCallback<CameraViewProps['onData']>((data) => {
     const message = data as string;
+
     logger.log('DATA', data);
 
     if (/^#/.test(message)) {
@@ -88,126 +69,65 @@ const Camera = () => {
     }
   }, [takePhoto]);
 
-  const onCall = useCallback<EventHandler['call']>(async (sourceId, answer) => {
-    logger.log(`Get call from <${sourceId}>`);
+  const onCall: CameraViewProps['onCall'] = () => true;
 
-    const acceptPeerCall = await askYesNo(`Accept photoer from <${sourceId}>?`);
+  const onHangUp = useCallback<CameraViewProps['onHangUp']>(() => {
+    logger.log('Closed');
+  }, []);
 
-    if (!acceptPeerCall) {
-      setLoadingMessage(undefined);
-      answer(false);
-      return;
-    }
+  const getStream = useCallback<Required<CameraViewProps>['mediaStreamGenerator']>(async () => {
+    const cameras = await getCameras();
+    const camera = cameras.find((info) => /^microsoft/i.test(info.label));
 
-    try {
-      const selfStream = await startStream({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 960 },
-        },
-      });
-      const selfConnStream = selfStream.clone();
+    return startStream({
+      video: {
+        deviceId: camera?.deviceId,
+        // facingMode: 'environment',
+      },
+    });
+  }, []);
 
-      selfConnStream.getTracks().forEach((track) => {
-        track.applyConstraints({
-          width: { ideal: 160 },
-          height: { ideal: 120 },
-          frameRate: 15,
-        });
-      });
+  const convertStream = useCallback<Required<CameraViewProps>['mediaStreamConverter']>(({
+    local,
+    remote,
+  }) => {
+    setLocalStream(local);
 
-      logger.log('My stream ready', selfStream);
-      setLocalStream(selfStream);
-      setLocalConnStream(selfConnStream);
-
-      const peerStream = await answer(true, selfConnStream) as MediaStream;
-
-      logger.log('Remote stream', peerStream);
-      setLoadingMessage(`Got call from <${sourceId}>`);
-      setRemoteStream(peerStream);
-      setPhotoerId(sourceId);
-      setLoadingMessage(undefined);
-    } catch (error) {
-      logger.warn(error);
-    }
-  }, [askYesNo]);
-
-  useEffect(() => {
-    logger.log('Initializing');
-    setLoadingMessage('Initializing');
-    remoteConnection.connect()
-      .then(() => {
-        logger.log('Connected to server');
-        setLoadingMessage('Connected to server');
-
-        remoteConnection.addEventListener('call', onCall);
-        remoteConnection.addEventListener('data', onGetData);
-      })
-      .catch((error) => {
-        logger.warn('Failed to init remote connection', error);
-      });
-
-    return () => {
-      remoteConnection.removeEventListener('call', onCall);
-      remoteConnection.removeEventListener('data', onGetData);
+    return {
+      major: local,
+      minor: remote,
     };
-  }, [onCall, onGetData, remoteConnection]);
+  }, []);
 
-  useEffect(() => (
-    () => {
-      if (localStream) {
-        stopStream(localStream);
-      }
-    }
-  ), [localStream]);
-
-  useEffect(() => {
-    const majorVideo = majorVideoRef.current;
-
-    if (majorVideo) {
-      if (holdMajorVideo) {
-        majorVideo.pause();
-      } else {
-        majorVideo.play();
-      }
-    }
-  }, [holdMajorVideo]);
-
-  useEffect(() => {
-    if (photoerId && lastPhoto) {
-      remoteConnection.sendFile(photoerId, lastPhoto);
-    }
-  }, [lastPhoto, photoerId, remoteConnection]);
-
-  logger.log({
-    localStream, remoteStream, takingPhoto, handlingPhoto, holdMajorVideo,
-  });
+  // useEffect(() => {
+  //   if (photoerId && lastPhoto) {
+  //     remoteConnection.sendFile(photoerId, lastPhoto);
+  //   }
+  // }, [lastPhoto, photoerId, remoteConnection]);
 
   return (
-    <Frame className={styles.camera}>
-      <Tag>Camera #{id}</Tag>
-      <Loading show={!!loadingMessage}>
-        {loadingMessage}
-      </Loading>
-      <Frame
-        className={majorClassName}
-        onAnimationEnd={afterTakingPhoto}
-      >
-        <Video
-          ref={majorVideoRef}
-          srcObject={localStream}
-        />
-      </Frame>
-      <Video
-        className={styles.minor}
-        srcObject={remoteStream}
+    <CameraView
+      className={styles.camera}
+      targetId={targetId}
+      shareText="Share Camera"
+      connectText="Connect Photoer"
+      askConnectText="Connect to photoer"
+      waitingConnectionText="Waiting for photoer to connect"
+      mediaStreamGenerator={getStream}
+      mediaStreamConverter={convertStream}
+      shareUrlGenerator={createShareUrl}
+      onShot={onPhoto}
+      onCall={onCall}
+      onData={onData}
+      onHangUp={onHangUp}
+      showTakePhotoAnimation={takingPhoto}
+    >
+      <Tag>Camera #{connectorId}</Tag>
+      <PhotoList
+        className={styles['photo-list']}
+        photos={photos}
       />
-      <Shutter
-        disabled={holdMajorVideo}
-        className={styles.shutter}
-        onShot={onPhoto}
-      />
-    </Frame>
+    </CameraView>
   );
 };
 

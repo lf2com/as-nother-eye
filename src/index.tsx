@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
+import ConnectionContextProvider from './contexts/ConnectionContext';
 import LoggerContextProvider from './contexts/LoggerContext';
 import ModalContextProvider from './contexts/ModalContext';
 
@@ -25,14 +26,18 @@ const App: FunctionComponent = () => (
   <AppElem>
     <LoggerContextProvider show={false}>
       <ModalContextProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="photoer/:targetId" element={<Photoer />} />
-            <Route path="camera" element={<Camera />} />
-            <Route path="test" element={<Test />} />
-            <Route path="*" element={<Welcome />} />
-          </Routes>
-        </BrowserRouter>
+        <ConnectionContextProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="photoer/:targetId" element={<Photoer />} />
+              <Route path="photoer" element={<Photoer />} />
+              <Route path="camera/:targetId" element={<Camera />} />
+              <Route path="camera" element={<Camera />} />
+              <Route path="test" element={<Test />} />
+              <Route path="*" element={<Welcome />} />
+            </Routes>
+          </BrowserRouter>
+        </ConnectionContextProvider>
       </ModalContextProvider>
     </LoggerContextProvider>
   </AppElem>

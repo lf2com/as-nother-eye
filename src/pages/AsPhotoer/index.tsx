@@ -1,19 +1,13 @@
-import React, {
-  FunctionComponent, useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { FunctionComponent, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 
-import Shutter from '../../components/CameraShutter';
-import Frame from '../../components/Frame';
-import Loading from '../../components/Loading';
-import PhotoList from '../../components/PhotoList';
+import { useConnectionContext } from '../../contexts/ConnectionContext';
+
 import Tag from '../../components/Tag';
-import Video from '../../components/Video';
+import CameraView, { CameraViewProps } from '../components/CameraView';
 
 import Logger from '../../utils/logger';
-import RemoteConnection from '../../utils/RemoteConnection';
-import EventHandler from '../../utils/RemoteConnection/event/handler';
-import { startStream, stopStream } from '../../utils/userMedia';
+import { getCameras, startStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
 
@@ -24,110 +18,71 @@ const logger = new Logger({ tag: '[Photoer]' });
 
 const Photoer: FunctionComponent<PhotoerProps> = () => {
   const params = useParams();
-  const targetId = useMemo(() => params.targetId as string, [params]);
-  const remoteConnection = useMemo(() => new RemoteConnection(), []);
-  const [loadingMessage, setLoadingMessage] = useState<string>();
-  const [remoteStream, setRemoteStream] = useState<MediaStream>();
-  const [localStream, setLocalStream] = useState<MediaStream>();
-  const [photos, setPhotos] = useState<Blob[]>([]);
+  const { targetId } = params;
+  const {
+    connector,
+    id: connectorId,
+    peerId,
+  } = useConnectionContext();
 
-  logger.log('target id', targetId);
+  const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
+    new URL(`/camera/${id}`, globalThis.location.href).toString()
+  ), []);
 
   const onPhoto = useCallback(() => {
-    remoteConnection.sendMessage(targetId, '#photo');
-  }, [remoteConnection, targetId]);
+    connector.sendMessage(peerId!, '#photo');
+  }, [connector, peerId]);
 
-  const onGetData = useCallback<EventHandler['data']>((_, data) => {
+  const onData = useCallback<CameraViewProps['onData']>((data) => {
     logger.log('DATA', data);
 
-    const blob = new Blob([data as ArrayBuffer]);
-
-    setPhotos((prevPhotos) => [...prevPhotos, blob]);
+    // const blob = new Blob([data as ArrayBuffer]);
   }, []);
 
-  useEffect(() => {
-    logger.log('Initializing');
-    setLoadingMessage('Initializing');
-    remoteConnection.connect()
-      .then(async () => {
-        logger.log('Connected to server');
-        setLoadingMessage('Connected to server');
+  const onCall: CameraViewProps['onCall'] = () => true;
 
-        return startStream();
-      })
-      .then(async (selfStream) => {
-        try {
-          const peerStream = await remoteConnection.call(targetId, selfStream);
+  const onHangUp = useCallback<CameraViewProps['onHangUp']>(() => {
+    logger.log('Closed');
+  }, []);
 
-          setLocalStream(selfStream);
-          logger.log(`Connection to <${targetId}>`, selfStream);
-          setLoadingMessage(`Connected to <${targetId}>. Calling peer`);
-          logger.log('Peer stream ready', peerStream);
-          setLoadingMessage(`Called <${targetId}>`);
-          setRemoteStream(peerStream);
-          setLoadingMessage(undefined);
+  const getStream = useCallback<Required<CameraViewProps>['mediaStreamGenerator']>(async () => {
+    const cameras = await getCameras();
+    const camera = cameras.find((info) => /front$/i.test(info.label));
 
-          remoteConnection.addEventListener('data', onGetData);
-          remoteConnection.addEventListener('hangup', () => {
-            logger.log('Closed');
-            selfStream.getTracks().forEach((track) => {
-              track.stop();
-            });
-          });
-        } catch (error) {
-          stopStream(selfStream);
+    return startStream({
+      video: {
+        deviceId: camera?.deviceId,
+        // facingMode: 'user',
+      },
+    });
+  }, []);
 
-          throw error;
-        }
-      })
-      .catch((error) => {
-        logger.warn('Failed to init remote connection', error);
-      })
-      .finally(() => {
-        setLoadingMessage(undefined);
-      });
-
-    return () => {
-      remoteConnection.removeEventListener('data', onGetData);
-    };
-  }, [onGetData, remoteConnection, targetId]);
-
-  useEffect(() => (
-    () => {
-      if (localStream) {
-        stopStream(localStream);
-      }
-    }
-  ), [localStream]);
-
-  useEffect(() => {
-    logger.log('PHOTOS', photos);
-  }, [photos]);
+  const convertStream = useCallback<Required<CameraViewProps>['mediaStreamConverter']>(({
+    local,
+    remote,
+  }) => ({
+    major: remote,
+    minor: local,
+  }), []);
 
   return (
-    <Frame className={styles.photoer}>
-      <Tag>Photoer #{remoteConnection.id}</Tag>
-      <Loading show={!!loadingMessage}>
-        {loadingMessage}
-      </Loading>
-      <Frame className={styles.major}>
-        <Video srcObject={remoteStream} />
-      </Frame>
-      <Video
-        className={styles.minor}
-        srcObject={localStream}
-      />
-      <Shutter
-        className={styles.shutter}
-        disabled={!remoteConnection.isOnline}
-        onShot={onPhoto}
-      />
-      <PhotoList
-        className={styles['photo-list']}
-        photos={photos}
-        size={5}
-      />
-    </Frame>
+    <CameraView
+      className={styles.photoer}
+      targetId={targetId}
+      shareText="Share Photoer"
+      connectText="Connect Camera"
+      askConnectText="Connect to camera"
+      waitingConnectionText="Waiting for camera to connect"
+      mediaStreamGenerator={getStream}
+      mediaStreamConverter={convertStream}
+      shareUrlGenerator={createShareUrl}
+      onShot={onPhoto}
+      onCall={onCall}
+      onData={onData}
+      onHangUp={onHangUp}
+    >
+      <Tag>Photoer #{connectorId}</Tag>
+    </CameraView>
   );
 };
 
