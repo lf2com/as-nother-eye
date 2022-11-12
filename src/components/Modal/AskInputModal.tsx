@@ -1,24 +1,34 @@
 import React, {
-  ChangeEventHandler, FunctionComponent, PropsWithChildren, useCallback, useState,
+  ChangeEventHandler, FunctionComponent, KeyboardEventHandler,
+  PropsWithChildren, useCallback, useEffect, useRef, useState,
 } from 'react';
 
 import OkCancelModal from './OkCancelModal';
 
-interface AskInputModalProps {
+export interface AskInputModalProps {
   show: boolean;
   onConfirm: (input: string) => void;
   onCancel: () => void;
   onChange?: (input: string) => void;
+  onKeyDown?: (input: {
+    key: string;
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
+  }) => void;
 }
 
 const AskInputModal: FunctionComponent<PropsWithChildren<AskInputModalProps>> = ({
   show,
-  onChange,
   onConfirm,
   onCancel,
+  onChange,
+  onKeyDown,
   children,
 }) => {
   const [inputValue, setInputValue] = useState('');
+  const refInput = useRef<HTMLInputElement>(null);
 
   const onOk = useCallback(() => {
     onConfirm(inputValue);
@@ -35,6 +45,29 @@ const AskInputModal: FunctionComponent<PropsWithChildren<AskInputModalProps>> = 
     onChange?.(value);
   }, [onChange]);
 
+  const handleKeyDown = useCallback<KeyboardEventHandler<HTMLInputElement>>((event) => {
+    const { key } = event;
+
+    if (onKeyDown) {
+      const {
+        altKey, ctrlKey, metaKey, shiftKey,
+      } = event;
+
+      onKeyDown?.({
+        key, altKey, ctrlKey, metaKey, shiftKey,
+      });
+    }
+    if (key === 'Enter') {
+      onOk();
+    }
+  }, [onKeyDown, onOk]);
+
+  useEffect(() => {
+    if (show) {
+      refInput.current?.focus();
+    }
+  }, [show]);
+
   return (
     <OkCancelModal
       show={show}
@@ -44,7 +77,11 @@ const AskInputModal: FunctionComponent<PropsWithChildren<AskInputModalProps>> = 
       <p>
         {children}
       </p>
-      <input onChange={handleChange} />
+      <input
+        ref={refInput}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+      />
     </OkCancelModal>
   );
 };
