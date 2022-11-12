@@ -1,4 +1,4 @@
-.camera {
+.camera-view {
   position: relative;
   background-color: #000;
   font-size: 1rem;
@@ -10,7 +10,7 @@
 
   .major {
     grid-area: major;
-
+    
     &.taking-photo {
       animation: anim-shot 0.25s linear forwards;
   
@@ -40,7 +40,7 @@
     grid-area: shutter;
     justify-self: center;
   }
-  
+
   .photo-list {
     position: absolute;
     top: 0;
