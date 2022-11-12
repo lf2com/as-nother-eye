@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React, {
- FunctionComponent, ReactNode, useEffect, useMemo, useState 
+  FunctionComponent, ReactNode, useEffect, useMemo, useState,
 } from 'react';
 
 import styles from './styles.module.scss';
