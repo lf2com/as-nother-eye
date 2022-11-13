@@ -255,6 +255,23 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     setLoadingMessage('Initializing camera');
 
     const stream = await createMediaStream();
+
+    stream.getVideoTracks().forEach((track) => {
+      const capabilities = track.getCapabilities();
+      const { width, height } = capabilities;
+
+      track.applyConstraints({
+        width: {
+          min: width?.max,
+          ideal: width?.max,
+        },
+        height: {
+          min: height?.max,
+          ideal: height?.max,
+        },
+      });
+    });
+
     const { major, minor } = mediaStreamConverter({
       local: stream,
     });

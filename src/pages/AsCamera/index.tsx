@@ -36,13 +36,15 @@ const Camera: FunctionComponent<CameraProps> = () => {
       return;
     }
 
-    const track = localStream?.getVideoTracks()[0];
+    const track = localStream.getVideoTracks()[0];
+    const imageCapture = new ImageCapture(track);
 
-    logger.log('TRACK', track);
     setTakingPhoto(true);
 
-    const imageCapture = new ImageCapture(track);
-    const photoBlob = await imageCapture.takePhoto();
+    const photoBlob = await imageCapture.takePhoto({
+      fillLightMode: 'auto', // 'auto' | 'off' | 'flash'
+      redEyeReduction: true,
+    });
 
     setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
     setTakingPhoto(false);
@@ -98,12 +100,6 @@ const Camera: FunctionComponent<CameraProps> = () => {
       minor: remote,
     };
   }, []);
-
-  // useEffect(() => {
-  //   if (photoerId && lastPhoto) {
-  //     remoteConnection.sendFile(photoerId, lastPhoto);
-  //   }
-  // }, [lastPhoto, photoerId, remoteConnection]);
 
   return (
     <CameraView
