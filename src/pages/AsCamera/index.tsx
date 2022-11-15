@@ -1,4 +1,6 @@
-import React, { FunctionComponent, useCallback, useState } from 'react';
+import React, {
+  FunctionComponent, useCallback, useMemo, useState,
+} from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useConnectionContext } from '../../contexts/ConnectionContext';
@@ -27,6 +29,22 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const [photos, setPhotos] = useState<Blob[]>([]);
 
+  const photoAspectRatio = useMemo<number>(() => {
+    if (!localStream) {
+      return 1;
+    }
+
+    const videoTracks = localStream.getVideoTracks();
+
+    if (videoTracks.length === 0) {
+      return 1;
+    }
+
+    const { width, height } = videoTracks[0].getCapabilities();
+
+    return (width?.max ?? 1) / (height?.max ?? 1);
+  }, [localStream]);
+
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
     new URL(`/photoer/${id}`, globalThis.location.href).toString()
   ), []);
@@ -36,13 +54,15 @@ const Camera: FunctionComponent<CameraProps> = () => {
       return;
     }
 
-    const track = localStream?.getVideoTracks()[0];
+    const track = localStream.getVideoTracks()[0];
+    const imageCapture = new ImageCapture(track);
 
-    logger.log('TRACK', track);
     setTakingPhoto(true);
 
-    const imageCapture = new ImageCapture(track);
-    const photoBlob = await imageCapture.takePhoto();
+    const photoBlob = await imageCapture.takePhoto({
+      fillLightMode: 'auto', // 'auto' | 'off' | 'flash'
+      redEyeReduction: true,
+    });
 
     setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
     setTakingPhoto(false);
@@ -99,12 +119,6 @@ const Camera: FunctionComponent<CameraProps> = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (photoerId && lastPhoto) {
-  //     remoteConnection.sendFile(photoerId, lastPhoto);
-  //   }
-  // }, [lastPhoto, photoerId, remoteConnection]);
-
   return (
     <CameraView
       className={styles.camera}
@@ -123,10 +137,12 @@ const Camera: FunctionComponent<CameraProps> = () => {
       showTakePhotoAnimation={takingPhoto}
     >
       <Tag>Camera #{connectorId}</Tag>
-      <PhotoList
-        className={styles['photo-list']}
-        photos={photos}
-      />
+      <div className={styles['photo-list']}>
+        <PhotoList
+          aspectRatio={photoAspectRatio}
+          photos={photos}
+        />
+      </div>
     </CameraView>
   );
 };

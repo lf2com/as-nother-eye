@@ -1,25 +1,10 @@
 .photo-list {
-  --border-size: 0.2em;
-  --margin: calc(2 * var(--border-size));
-
   position: relative;
-  padding: var(--margin);
+  padding-block-end: calc(100% / var(--aspect-ratio, 1));
   width: 100%;
+  height: 0;
+  box-sizing: border-box;
   font-size: 1em;
   display: flex;
   flex-direction: column-reverse;
-
-  .photo {
-    transform: rotate(var(--deg, 0));
-    margin-block-end: 0.75em;
-    padding-block-end: var(--height-perc, 100%);
-    width: 100%;
-    height: 0;
-    outline: var(--border-size) solid #fff;
-    z-index: 1;
-
-    img {
-      width: 100%;
-    }
-  }
 }

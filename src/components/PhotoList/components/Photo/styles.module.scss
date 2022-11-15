@@ -1,0 +1,36 @@
+.photo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  outline: 0.2em solid #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+
+  img {
+    width: 100%;
+  }
+
+  &.loaded {
+    opacity: 1;
+    pointer-events: all;
+    animation: anim-show 0.5s ease forwards;
+    z-index: 10;
+
+    @keyframes anim-show {
+      0% {
+        transform: scale(0);
+      }
+
+      95% {
+        transform: scale(1.25);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+  }
+}
