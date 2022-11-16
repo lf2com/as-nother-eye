@@ -1,5 +1,5 @@
 import React, {
-  FunctionComponent, useCallback, useMemo, useState,
+  FunctionComponent, useCallback, useEffect, useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -28,22 +28,7 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const [photos, setPhotos] = useState<Blob[]>([]);
-
-  const photoAspectRatio = useMemo<number>(() => {
-    if (!localStream) {
-      return 1;
-    }
-
-    const videoTracks = localStream.getVideoTracks();
-
-    if (videoTracks.length === 0) {
-      return 1;
-    }
-
-    const { width, height } = videoTracks[0].getCapabilities();
-
-    return (width?.max ?? 1) / (height?.max ?? 1);
-  }, [localStream]);
+  const [photoAspectRatio, setPhotoAspectRatio] = useState(1);
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
     new URL(`/photoer/${id}`, globalThis.location.href).toString()
@@ -118,6 +103,23 @@ const Camera: FunctionComponent<CameraProps> = () => {
       minor: remote,
     };
   }, []);
+
+  useEffect(() => {
+    const [photoBlob] = photos;
+
+    if (photoBlob) {
+      const image = new Image();
+      const url = URL.createObjectURL(photoBlob);
+
+      image.addEventListener('load', () => {
+        const { naturalWidth, naturalHeight } = image;
+
+        setPhotoAspectRatio(naturalWidth / naturalHeight);
+        URL.revokeObjectURL(url);
+      });
+      image.src = url;
+    }
+  }, [photos]);
 
   return (
     <CameraView
