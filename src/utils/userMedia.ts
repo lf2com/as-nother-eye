@@ -27,5 +27,4 @@ export const startStream = async (
 
 export const stopStream = (stream: MediaStream) => {
   stream.getTracks().forEach((track) => track.stop());
-  stream.stop();
 };

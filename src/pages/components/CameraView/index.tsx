@@ -291,6 +291,12 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     setLoadingMessage(undefined);
   }, [callPeer, connector, createMediaStream, logger, mediaStreamConverter, targetId]);
 
+  const onOffline = useCallback<EventHandler['offline']>(() => {
+    logger.warn('offline');
+    setMajorStream(undefined);
+    setMinorStream(undefined);
+  }, [logger]);
+
   useEffect(() => {
     try {
       initConnector();
@@ -302,11 +308,12 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
 
   useEffect(() => {
     if (isDataConnected) {
-      connector.addEventListener('call', onPeerCall);
+      connector.addEventListener('call', onPeerCall, { once: true });
       connector.addEventListener('data', onPeerData);
     }
     if (isMediaConnected) {
-      connector.addEventListener('hangup', onPeerHangUp);
+      connector.addEventListener('hangup', onPeerHangUp, { once: true });
+      connector.addEventListener('offline', onOffline, { once: true });
     }
 
     return () => {
@@ -316,11 +323,12 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
       }
       if (isMediaConnected) {
         connector.removeEventListener('hangup', onPeerHangUp);
+        connector.removeEventListener('offline', onOffline);
       }
     };
   }, [
     connector, isDataConnected, isMediaConnected,
-    onPeerData, onPeerCall, onPeerHangUp,
+    onPeerData, onPeerCall, onPeerHangUp, onOffline,
   ]);
 
   useEffect(() => (

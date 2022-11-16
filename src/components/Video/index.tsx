@@ -12,6 +12,8 @@ const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   srcObject,
   ...restProps
 }, ref) => {
+  const hasContent = !!srcObject;
+
   const handleRef = useCallback<RefCallback<HTMLVideoElement>>((node) => {
     if (node) {
       if (srcObject) {
@@ -28,7 +30,9 @@ const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   }, [ref, srcObject]);
 
   return (
-    <div className={classnames(styles.video, className)}>
+    <div className={classnames(styles.video, className, {
+      [styles.show]: hasContent,
+    })}>
       <video
         {...restProps}
         ref={handleRef}
