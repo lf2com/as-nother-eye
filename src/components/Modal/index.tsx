@@ -27,7 +27,7 @@ export interface ModalProps extends ModalBasicProps {
 }
 
 const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
-  show: propShow = true,
+  show: propShow,
   className,
   title,
   button,
@@ -59,8 +59,10 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   }, []);
 
   const onClickButton = useCallback(() => {
-    setShow(false);
-  }, []);
+    if (propShow === undefined) {
+      setShow(false);
+    }
+  }, [propShow]);
 
   const onTransitionEnd = useCallback<TransitionEventHandler>(() => {
     if (show) {
@@ -71,8 +73,10 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   }, [onHidden, onShown, show]);
 
   useEffect(() => {
-    wait(propShow ? 100 : 0).then(() => {
-      setShow(propShow);
+    const nextShow = propShow ?? true;
+
+    wait(nextShow ? 100 : 0).then(() => {
+      setShow(nextShow);
     });
   }, [propShow]);
 

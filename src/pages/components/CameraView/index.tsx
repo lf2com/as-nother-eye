@@ -181,7 +181,7 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
       return;
     }
 
-    const acceptPeerCall = await askYesNo(`Accept camera from <${peerId}>?`);
+    const acceptPeerCall = await askYesNo(`Accept peer from <${peerId}>?`);
 
     try {
       if (!acceptPeerCall) {
@@ -256,21 +256,21 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
 
     const stream = await createMediaStream();
 
-    stream.getVideoTracks().forEach((track) => {
-      const capabilities = track.getCapabilities();
-      const { width, height } = capabilities;
+    // stream.getVideoTracks().forEach((track) => {
+    //   const capabilities = track.getCapabilities();
+    //   const { width, height } = capabilities;
 
-      track.applyConstraints({
-        width: {
-          min: width?.max,
-          ideal: width?.max,
-        },
-        height: {
-          min: height?.max,
-          ideal: height?.max,
-        },
-      });
-    });
+    //   track.applyConstraints({
+    //     width: {
+    //       min: width?.max,
+    //       ideal: width?.max,
+    //     },
+    //     height: {
+    //       min: height?.max,
+    //       ideal: height?.max,
+    //     },
+    //   });
+    // });
 
     const { major, minor } = mediaStreamConverter({
       local: stream,
