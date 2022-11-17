@@ -1,5 +1,6 @@
 .button {
   --theme-color: #36f;
+  --disabled-color: #ccc;
 
   margin: 0 1em;
   padding: 0.35em 1em;
@@ -21,6 +22,12 @@
   }
 
   &.disabled {
-    pointer-events: none;
+    border-color: var(--disabled-color);
+    color: var(--disabled-color);
+    cursor: not-allowed;
+
+    &.highlight {
+      background-color: var(--disabled-color);
+    }
   }
 }

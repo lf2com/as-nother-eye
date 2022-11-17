@@ -27,17 +27,18 @@ const ModalButton: FunctionComponent<PropsWithChildren<ModalButtonProps>> = ({
   ), [disabled, highlight]);
 
   const handleClick = useCallback(() => {
-    onClick();
-  }, [onClick]);
+    if (!disabled) {
+      onClick();
+    }
+  }, [disabled, onClick]);
 
   return (
     <Clickable
+      className={className}
       stopPropagation={disabled}
       onClick={handleClick}
     >
-      <div className={className}>
-        {children}
-      </div>
+      {children}
     </Clickable>
   );
 };
