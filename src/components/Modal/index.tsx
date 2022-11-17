@@ -17,6 +17,7 @@ export interface ModalBasicProps {
   highlight?: boolean;
   onShown?: () => void;
   onHidden?: () => void;
+  onClickOutside?: () => boolean | void;
   hideOnClickOutside?: boolean;
 }
 
@@ -34,6 +35,7 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   highlight = false,
   onShown,
   onHidden,
+  onClickOutside,
   hideOnClickOutside = true,
   children,
 }) => {
@@ -46,11 +48,11 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
     }, className)
   ), [highlight, show, className]);
 
-  const onClickOutside = useCallback<MouseEventHandler>(() => {
-    if (hideOnClickOutside) {
+  const handleClickOutside = useCallback<MouseEventHandler>(() => {
+    if (onClickOutside?.() !== false && hideOnClickOutside) {
       setShow(false);
     }
-  }, [hideOnClickOutside]);
+  }, [hideOnClickOutside, onClickOutside]);
 
   const onClickContainer = useCallback<MouseEventHandler>((event) => {
     event.stopPropagation();
@@ -77,7 +79,7 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   return (
     <div
       className={modalClassName}
-      onClick={onClickOutside}
+      onClick={handleClickOutside}
     >
       <div
         className={classnames(styles.box, 'modal-box')}
