@@ -4,8 +4,9 @@ import React, {
 
 import { useConnectionContext } from '../../../contexts/ConnectionContext';
 
+import useShareData from '../../../hooks/useShareData';
+
 import Button from '../../Button';
-import ShareButton from '../../ShareButton';
 import AskInputModal, { AskInputModalProps } from '../AskInputModal';
 
 import Modal from '..';
@@ -33,6 +34,7 @@ const ShareAndConnectModal: FunctionComponent<PropsWithChildren<ShareAndConnectM
   const [showIdModal, setShowIdModal] = useState(false);
   const hideIdModal = useCallback(() => setShowIdModal(false), []);
   const onClickConnectButton = useCallback(() => setShowIdModal(true), []);
+  const { canShare, share } = useShareData({ url: shareUrl });
 
   const handleConnect = useCallback<AskInputModalProps['onConfirm']>((id) => {
     setShowIdModal(false);
@@ -48,12 +50,12 @@ const ShareAndConnectModal: FunctionComponent<PropsWithChildren<ShareAndConnectM
       <p>
         {children}
       </p>
-      <ShareButton
-        disabled={!isOnline}
-        url={shareUrl}
+      <Button
+        disabled={!isOnline || !canShare}
+        onClick={share}
       >
         {shareText}
-      </ShareButton>
+      </Button>
       <Button
         disabled={!isOnline}
         onClick={onClickConnectButton}
