@@ -1,5 +1,6 @@
 .clickable {
   user-select: none;
+  background-color: rgba(0, 0, 0, 0);
   z-index: 1;
 
   &:global(.disabled) {
@@ -7,10 +8,6 @@
   }
 
   &:not(:global(.disabled)):active {
-
-    &:empty,
-    &:not(:empty) > * {
-      filter: brightness(0.9);
-    }
+    filter: brightness(0.9);
   }
 }
