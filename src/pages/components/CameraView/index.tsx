@@ -12,10 +12,11 @@ import Loading from '../../../components/Loading';
 import ShareAndConnectModal from '../../../components/Modal/ShareAndConnectModal';
 import Video from '../../../components/Video';
 
+import delayAwaitResult from '../../../utils/delayAwaitResult';
 import Logger from '../../../utils/logger';
 import EventHandler from '../../../utils/RemoteConnection/event/handler';
-import { delayAwaitResult, wait } from '../../../utils/stdlib';
 import { startStream, stopStream } from '../../../utils/userMedia';
+import wait from '../../../utils/wait';
 
 import styles from './styles.module.scss';
 

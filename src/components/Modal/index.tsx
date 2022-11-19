@@ -4,7 +4,7 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import { wait } from '../../utils/stdlib';
+import wait from '../../utils/wait';
 
 import ModalButton from './Button';
 
