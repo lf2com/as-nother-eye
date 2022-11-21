@@ -4,6 +4,8 @@ import React, {
 
 import Photo from './components/Photo';
 
+import dateToStr from '../../../utils/dateToStr';
+
 import ModalButton from '../Button';
 
 import Modal, { ModalBasicProps } from '..';
@@ -13,8 +15,8 @@ export interface PhotoManagementModalProps {
   show: boolean;
   photos: Blob[];
   onClickOutside: Required<ModalBasicProps>['onClickOutside'];
-  onShare: (photos: Blob[]) => void;
-  onSave: (photos: Blob[]) => void;
+  onShare: (photos: File[]) => void;
+  onSave: (photos: File[]) => void;
 }
 
 const PhotoManagementModal: FunctionComponent<PhotoManagementModalProps> = ({
@@ -26,11 +28,24 @@ const PhotoManagementModal: FunctionComponent<PhotoManagementModalProps> = ({
 }) => {
   const [selectedPhotoIndexs, setSelectedPhotoIndexs] = useState<number[]>([]);
 
-  const selectedPhotos = useMemo(() => (selectedPhotoIndexs
-    .slice()
-    .sort((a, b) => a - b)
-    .map((photoIndex) => new File([photos[photoIndex]], ''))
-  ), [photos, selectedPhotoIndexs]);
+  const selectedPhotos = useMemo(() => {
+    const dateStr = dateToStr(new Date(), {
+      ymdSplit: '',
+      hmsSplit: '',
+      ymdHmsSplit: '_',
+    });
+
+    return selectedPhotoIndexs
+      .slice()
+      .sort((a, b) => a - b)
+      .map((photoIndex, index) => {
+        const blob = photos[photoIndex];
+        const { type } = blob;
+        const filename = `photo_${dateStr}_${(index + 1).toString().padStart(2, '0')}.png`;
+
+        return new File([blob], filename, { type });
+      });
+  }, [photos, selectedPhotoIndexs]);
 
   const togglePhoto = useCallback((photoIndex: number) => {
     const index = selectedPhotoIndexs.indexOf(photoIndex);
