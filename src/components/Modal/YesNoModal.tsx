@@ -1,6 +1,6 @@
 import React, { FunctionComponent, PropsWithChildren } from 'react';
 
-import ModalButton from './Button';
+import ModalButton from './components/Button';
 
 import Modal, { ModalBasicProps } from '.';
 

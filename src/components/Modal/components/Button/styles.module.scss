@@ -1,6 +1,4 @@
 .button {
-  --theme-color: #36f;
-
   margin: 0 1em;
   padding: 0.35em 1em;
   min-width: 3em;
@@ -12,7 +10,6 @@
   font-size: 0.95em;
   text-align: center;
   display: block;
-  cursor: pointer;
   user-select: none;
 
   &.highlight {
@@ -20,7 +17,13 @@
     color: #fff;
   }
 
-  &.disabled {
-    pointer-events: none;
+  &:global(.disabled) {
+    border-color: var(--disabled-color);
+    color: var(--disabled-color);
+
+    &.highlight {
+      background-color: var(--disabled-color);
+      color: #fff;
+    }
   }
 }

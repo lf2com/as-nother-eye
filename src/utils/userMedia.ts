@@ -1,4 +1,4 @@
-import { mergeObject } from './stdlib';
+import mergeObject from './mergeObject';
 
 type MediaStreamConstraints = Parameters<MediaDevices['getUserMedia']>[0];
 

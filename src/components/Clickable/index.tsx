@@ -24,15 +24,14 @@ const Clickable: FunctionComponent<PropsWithChildren<ClickableProps>> = ({
     { disabled },
     className,
   ), [className, disabled]);
+
   const handleClick = useCallback<MouseEventHandler>((event) => {
     if (stopPropagation) {
       event.stopPropagation();
     }
-    if (disabled) {
-      return;
+    if (!disabled) {
+      onClick?.(event);
     }
-
-    onClick?.(event);
   }, [disabled, onClick, stopPropagation]);
 
   return (

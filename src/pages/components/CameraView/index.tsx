@@ -12,10 +12,11 @@ import Loading from '../../../components/Loading';
 import ShareAndConnectModal from '../../../components/Modal/ShareAndConnectModal';
 import Video from '../../../components/Video';
 
+import delayAwaitResult from '../../../utils/delayAwaitResult';
 import Logger from '../../../utils/logger';
 import EventHandler from '../../../utils/RemoteConnection/event/handler';
-import { delayAwaitResult, wait } from '../../../utils/stdlib';
 import { startStream, stopStream } from '../../../utils/userMedia';
+import wait from '../../../utils/wait';
 
 import styles from './styles.module.scss';
 
@@ -181,7 +182,7 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
       return;
     }
 
-    const acceptPeerCall = await askYesNo(`Accept camera from <${peerId}>?`);
+    const acceptPeerCall = await askYesNo(`Accept peer from <${peerId}>?`);
 
     try {
       if (!acceptPeerCall) {
@@ -256,21 +257,21 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
 
     const stream = await createMediaStream();
 
-    stream.getVideoTracks().forEach((track) => {
-      const capabilities = track.getCapabilities();
-      const { width, height } = capabilities;
+    // stream.getVideoTracks().forEach((track) => {
+    //   const capabilities = track.getCapabilities();
+    //   const { width, height } = capabilities;
 
-      track.applyConstraints({
-        width: {
-          min: width?.max,
-          ideal: width?.max,
-        },
-        height: {
-          min: height?.max,
-          ideal: height?.max,
-        },
-      });
-    });
+    //   track.applyConstraints({
+    //     width: {
+    //       min: width?.max,
+    //       ideal: width?.max,
+    //     },
+    //     height: {
+    //       min: height?.max,
+    //       ideal: height?.max,
+    //     },
+    //   });
+    // });
 
     const { major, minor } = mediaStreamConverter({
       local: stream,
@@ -291,6 +292,12 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     setLoadingMessage(undefined);
   }, [callPeer, connector, createMediaStream, logger, mediaStreamConverter, targetId]);
 
+  const onOffline = useCallback<EventHandler['offline']>(() => {
+    logger.warn('offline');
+    setMajorStream(undefined);
+    setMinorStream(undefined);
+  }, [logger]);
+
   useEffect(() => {
     try {
       initConnector();
@@ -302,11 +309,12 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
 
   useEffect(() => {
     if (isDataConnected) {
-      connector.addEventListener('call', onPeerCall);
+      connector.addEventListener('call', onPeerCall, { once: true });
       connector.addEventListener('data', onPeerData);
     }
     if (isMediaConnected) {
-      connector.addEventListener('hangup', onPeerHangUp);
+      connector.addEventListener('hangup', onPeerHangUp, { once: true });
+      connector.addEventListener('offline', onOffline, { once: true });
     }
 
     return () => {
@@ -316,11 +324,12 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
       }
       if (isMediaConnected) {
         connector.removeEventListener('hangup', onPeerHangUp);
+        connector.removeEventListener('offline', onOffline);
       }
     };
   }, [
     connector, isDataConnected, isMediaConnected,
-    onPeerData, onPeerCall, onPeerHangUp,
+    onPeerData, onPeerCall, onPeerHangUp, onOffline,
   ]);
 
   useEffect(() => (

@@ -1,0 +1,10 @@
+.photo {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #fff;
+  object-fit: contain;
+
+  &.selected {
+    outline: 0.2em solid #69f;
+  }
+}

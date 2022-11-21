@@ -10,8 +10,8 @@ import Button from '../../components/Button';
 import Frame from '../../components/Frame';
 import Loading from '../../components/Loading';
 
+import delayAwaitResult from '../../utils/delayAwaitResult';
 import Logger from '../../utils/logger';
-import { delayAwaitResult } from '../../utils/stdlib';
 
 import styles from './styles.module.scss';
 
