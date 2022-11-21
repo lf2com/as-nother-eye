@@ -1,4 +1,7 @@
 .modal {
+  --theme-color: #36f;
+  --disabled-color: #ccc;
+
   position: fixed;
   top: 0;
   right: 0;
@@ -19,7 +22,8 @@
     transform: translateY(0.35em);
     top: -2em;
     margin: 1em;
-    padding: 1em 0;
+    max-height: 80%;
+    box-sizing: border-box;
     box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
     border-radius: 0.25em;
     background-color: #fff;
@@ -37,9 +41,24 @@
     }
   }
 
-  .body {
-    margin: 1em 0;
+  .head {
+    padding: 0.5em 1em;
+    background-color: var(--theme-color);
+    color: #fff;
+    font-weight: bold;
     text-align: center;
+
+    &:empty {
+      padding: 0;
+    }
+  }
+
+  .body {
+    padding: 1em;
+    text-align: center;
+    overflow: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
 
     input {
       --blur-color: #999;
@@ -66,9 +85,14 @@
   }
 
   .foot {
+    margin: 1em 0;
     display: flex;
     flex-flow: row;
     justify-content: space-evenly;
+
+    &:empty {
+      margin: 0;
+    }
   }
 
   &.highlight {

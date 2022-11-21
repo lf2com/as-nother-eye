@@ -90,7 +90,7 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
         onClick={onClickContainer}
         onTransitionEnd={onTransitionEnd}
       >
-        <div>
+        <div className={classnames(styles.head, 'modal-head')}>
           {title}
         </div>
         <div className={classnames(styles.body, 'modal-body')}>
