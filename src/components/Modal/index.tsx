@@ -4,9 +4,11 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import wait from '../../utils/wait';
+import ModalButtonContextProvider from './contexts/ModalButtonContext';
 
-import ModalButton from './Button';
+import ModalButton from './components/Button';
+
+import wait from '../../utils/wait';
 
 import styles from './styles.module.scss';
 
@@ -24,6 +26,7 @@ export interface ModalBasicProps {
 export interface ModalProps extends ModalBasicProps {
   button?: ReturnType<typeof ModalButton>;
   buttons?: ReturnType<typeof ModalButton>[];
+  buttonOnlyOnce?: boolean;
 }
 
 const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
@@ -33,6 +36,7 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   button,
   buttons = button ? [button] : [],
   highlight = false,
+  buttonOnlyOnce = true,
   onShown,
   onHidden,
   onClickOutside,
@@ -40,6 +44,7 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   children,
 }) => {
   const [show, setShow] = useState(false);
+  const [disabledAll, setDisabledAll] = useState(false);
 
   const modalClassName = useMemo(() => (
     classnames(styles.modal, {
@@ -59,10 +64,14 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
   }, []);
 
   const onClickButton = useCallback(() => {
+    if (buttonOnlyOnce) {
+      setDisabledAll(true);
+    }
+
     if (propShow === undefined) {
       setShow(false);
     }
-  }, [propShow]);
+  }, [buttonOnlyOnce, propShow, setDisabledAll]);
 
   const onTransitionEnd = useCallback<TransitionEventHandler>(() => {
     if (show) {
@@ -77,33 +86,39 @@ const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
 
     wait(nextShow ? 100 : 0).then(() => {
       setShow(nextShow);
+
+      if (nextShow) {
+        setDisabledAll(false);
+      }
     });
   }, [propShow]);
 
   return (
-    <div
-      className={modalClassName}
-      onClick={handleClickOutside}
-    >
+    <ModalButtonContextProvider disabledAll={disabledAll}>
       <div
-        className={classnames(styles.box, 'modal-box')}
-        onClick={onClickContainer}
-        onTransitionEnd={onTransitionEnd}
+        className={modalClassName}
+        onClick={handleClickOutside}
       >
-        <div className={classnames(styles.head, 'modal-head')}>
-          {title}
-        </div>
-        <div className={classnames(styles.body, 'modal-body')}>
-          {children}
-        </div>
         <div
-          className={classnames(styles.foot, 'modal-foot')}
-          onClick={onClickButton}
+          className={classnames(styles.box, 'modal-box')}
+          onClick={onClickContainer}
+          onTransitionEnd={onTransitionEnd}
         >
-          {buttons}
+          <div className={classnames(styles.head, 'modal-head')}>
+            {title}
+          </div>
+          <div className={classnames(styles.body, 'modal-body')}>
+            {children}
+          </div>
+          <div
+            className={classnames(styles.foot, 'modal-foot')}
+            onClick={onClickButton}
+          >
+            {buttons}
+          </div>
         </div>
       </div>
-    </div>
+    </ModalButtonContextProvider>
   );
 };
 

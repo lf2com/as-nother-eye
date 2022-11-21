@@ -2,11 +2,10 @@ import React, {
   FunctionComponent, useCallback, useMemo, useState,
 } from 'react';
 
+import ModalButton from '../components/Button';
 import Photo from './components/Photo';
 
 import dateToStr from '../../../utils/dateToStr';
-
-import ModalButton from '../Button';
 
 import Modal, { ModalBasicProps } from '..';
 import styles from './styles.module.scss';
@@ -92,6 +91,7 @@ const PhotoManagementModal: FunctionComponent<PhotoManagementModalProps> = ({
       hideOnClickOutside={false}
       onClickOutside={onClickOutside}
       buttons={buttons}
+      buttonOnlyOnce={false}
     >
       {photos.map((photoBlob, photoIndex) => (
         <Photo

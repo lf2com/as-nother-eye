@@ -1,7 +1,9 @@
 import classnames from 'classnames';
 import React, { FunctionComponent, PropsWithChildren, useMemo } from 'react';
 
-import Clickable from '../../Clickable';
+import { useModalButtonContext } from '../../contexts/ModalButtonContext';
+
+import Clickable from '../../../Clickable';
 
 import styles from './styles.module.scss';
 
@@ -17,13 +19,14 @@ const ModalButton: FunctionComponent<PropsWithChildren<ModalButtonProps>> = ({
   onClick,
   children,
 }) => {
+  const { disabledAll } = useModalButtonContext();
   const className = useMemo(() => classnames(styles.button, {
     [styles.highlight]: highlight,
   }), [highlight]);
 
   return (
     <Clickable
-      disabled={disabled}
+      disabled={disabledAll || disabled}
       className={className}
       stopPropagation={disabled}
       onClick={onClick}
