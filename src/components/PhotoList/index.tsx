@@ -44,11 +44,6 @@ const PhotoList: FunctionComponent<PhotoListProps> = ({
     };
   }, [lastPhotoUrl]);
 
-  console.log(100, {
-    photoUrls,
-    lastPhotoUrl,
-  });
-
   return (
     <div
       className={classnames(styles['photo-list'], className)}

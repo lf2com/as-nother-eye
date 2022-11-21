@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import React, { FunctionComponent, PropsWithChildren, useMemo } from 'react';
 
-import { LogType } from '../../hooks/useLogger';
+import { LogType } from '../../../../utils/logger';
 
 import styles from './styles.module.scss';
 

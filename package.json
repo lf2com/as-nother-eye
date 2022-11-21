@@ -7,9 +7,9 @@
     "start": "webpack serve --mode development",
     "start:public": "npm run dev -- --env public=true",
     "build": "webpack --mode production",
-    "lint:js": "eslint src/**/* --ext .ts,.tsx",
-    "lint:css": "stylelint **/*.scss",
-    "lint": "npm run lint:js && npm run lint:css"
+    "lint:ts": "eslint --ext .ts,.tsx src/",
+    "lint:scss": "stylelint **/*.scss",
+    "lint": "npm run lint:ts && npm run lint:scss"
   },
   "keywords": [
     "camera",

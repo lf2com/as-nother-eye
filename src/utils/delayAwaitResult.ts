@@ -4,13 +4,9 @@ const delayAwaitResult = async <P>(
   promise: P,
   msec: number = 0,
 ): Promise<Awaited<P>> => {
-  const results = await Promise.all([promise, wait(msec)])
-    .catch((e) => {
-      console.warn(310, e);
-    });
+  const [result] = await Promise.all([promise, wait(msec)]);
 
-  console.log(300, results);
-  return results[0];
+  return result;
 };
 
 export default delayAwaitResult;

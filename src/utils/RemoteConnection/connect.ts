@@ -226,7 +226,10 @@ RemoteConnection.prototype.connect = function f(
       resolve(createDataConnection.call(this, dataConnection));
     }))
     .then(() => console.log(100))
-    .catch((e) => console.warn(110, e));
+    .catch((e) => {
+      console.warn(110, e);
+      throw e;
+    });
 };
 
 /**
