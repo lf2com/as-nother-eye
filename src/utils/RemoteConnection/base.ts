@@ -1,4 +1,4 @@
-import Peer, { DataConnection } from 'peerjs';
+import Peer from 'peerjs';
 
 import Logger from '../logger';
 import randomStr from '../random';
@@ -11,8 +11,6 @@ export class RemoteConnection {
   protected selfIsOnline = false;
 
   protected selfPeer?: Peer;
-
-  protected connection?: DataConnection;
 
   constructor(id: string = randomStr()) {
     this.selfId = id;

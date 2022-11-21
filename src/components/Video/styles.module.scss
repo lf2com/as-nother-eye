@@ -12,6 +12,11 @@
     left: 50%;
     transform: translate(-50%, -50%);
     height: 100%;
+    background-color: #999;
     pointer-events: none;
+  }
+
+  &:not(.show) video {
+    display: none;
   }
 }

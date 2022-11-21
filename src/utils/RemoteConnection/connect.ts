@@ -60,7 +60,7 @@ function createDataConnection(
     dataConnection.off('close');
     dataConnection.on('close', () => {
       this.logger.log('Data connection close');
-      delete this.connectionList[targetId];
+      this.disconnect(targetId);
     });
   });
 }
@@ -102,9 +102,12 @@ function createMediaConnection(
     mediaConnection.off('error');
     mediaConnection.on('error', (error) => {
       this.logger.warn('Peer call connection error', error);
-      delete this.connectionList[targetId].mediaConnection;
       this.removeEventListener('data', handleDeclineResponse);
       reject(error);
+
+      if (this.connectionList?.[targetId].mediaConnection) {
+        delete this.connectionList[targetId].mediaConnection;
+      }
     });
 
     mediaConnection.off('close');
@@ -118,6 +121,8 @@ function createMediaConnection(
     this.addEventListener('data', handleDeclineResponse);
   });
 }
+
+RemoteConnection.prototype.connectionList = {};
 
 /**
  * Connect
@@ -231,30 +236,35 @@ RemoteConnection.prototype.disconnect = function f(
   this: RemoteConnection,
   targetId,
 ) {
-  if (targetId === undefined) {
-    const peer = this.selfPeer;
+  if (targetId) {
+    const connection = this.connectionList[targetId];
 
-    if (peer) {
-      peer.disconnect();
-      peer.destroy();
+    if (connection) {
+      const { dataConnection, mediaConnection } = connection;
+
+      dataConnection.close();
+      mediaConnection?.close();
+      delete this.connectionList[targetId];
     }
-
-    this.selfPeer = undefined;
-    this.selfIsOnline = false;
-    this.connectionList = {};
-    this.dispatchEvent('offline');
 
     return;
   }
 
-  const connection = this.connectionList[targetId];
+  Object.keys(this.connectionList).forEach((peerId) => {
+    this.disconnect(peerId);
+  });
 
-  if (connection) {
-    const { dataConnection, mediaConnection } = connection;
+  const peer = this.selfPeer;
 
-    dataConnection.close();
-    mediaConnection?.close();
+  if (peer) {
+    peer.disconnect();
+    peer.destroy();
   }
+
+  this.selfPeer = undefined;
+  this.selfIsOnline = false;
+  this.connectionList = {};
+  this.dispatchEvent('offline');
 };
 
 /**

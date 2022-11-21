@@ -1,15 +1,20 @@
 import React, {
-  FunctionComponent, useCallback, useMemo, useState,
+  FunctionComponent, useCallback, useEffect, useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useConnectionContext } from '../../contexts/ConnectionContext';
+import { useModalContext } from '../../contexts/ModalContext';
 
+import Clickable from '../../components/Clickable';
+import PhotoManagementModal, { PhotoManagementModalProps } from '../../components/Modal/PhotoManagementModal';
 import PhotoList from '../../components/PhotoList';
 import Tag from '../../components/Tag';
 import CameraView, { CameraViewProps } from '../components/CameraView';
 
+import { downloadFiles } from '../../utils/downloadFile';
 import Logger from '../../utils/logger';
+import shareData from '../../utils/shareData';
 import { getCameras, startStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
@@ -25,25 +30,14 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const {
     id: connectorId,
   } = useConnectionContext();
+  const { notice } = useModalContext();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const [photos, setPhotos] = useState<Blob[]>([]);
-
-  const photoAspectRatio = useMemo<number>(() => {
-    if (!localStream) {
-      return 1;
-    }
-
-    const videoTracks = localStream.getVideoTracks();
-
-    if (videoTracks.length === 0) {
-      return 1;
-    }
-
-    const { width, height } = videoTracks[0].getCapabilities();
-
-    return (width?.max ?? 1) / (height?.max ?? 1);
-  }, [localStream]);
+  const [photoAspectRatio, setPhotoAspectRatio] = useState(1);
+  const [showPhotoManagement, setShowPhotoManagement] = useState(false);
+  const toShowPhotoManagement = useCallback(() => setShowPhotoManagement(true), []);
+  const hidePhotoManagement = useCallback(() => setShowPhotoManagement(false), []);
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
     new URL(`/photoer/${id}`, globalThis.location.href).toString()
@@ -119,6 +113,37 @@ const Camera: FunctionComponent<CameraProps> = () => {
     };
   }, []);
 
+  const onSaveSelectedPhotos = useCallback<PhotoManagementModalProps['onSave']>((selectedPhotos) => {
+    downloadFiles(selectedPhotos);
+  }, []);
+
+  const onShareSelectedPhotos = useCallback<PhotoManagementModalProps['onShare']>(async (selectedPhotos) => {
+    try {
+      await shareData({
+        files: selectedPhotos,
+      });
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [notice]);
+
+  useEffect(() => {
+    const [photoBlob] = photos;
+
+    if (photoBlob) {
+      const image = new Image();
+      const url = URL.createObjectURL(photoBlob);
+
+      image.addEventListener('load', () => {
+        const { naturalWidth, naturalHeight } = image;
+
+        setPhotoAspectRatio(naturalWidth / naturalHeight);
+        URL.revokeObjectURL(url);
+      });
+      image.src = url;
+    }
+  }, [photos]);
+
   return (
     <CameraView
       className={styles.camera}
@@ -137,12 +162,23 @@ const Camera: FunctionComponent<CameraProps> = () => {
       showTakePhotoAnimation={takingPhoto}
     >
       <Tag>Camera #{connectorId}</Tag>
-      <div className={styles['photo-list']}>
+      <Clickable
+        className={styles['photo-list']}
+        onClick={toShowPhotoManagement}
+      >
         <PhotoList
           aspectRatio={photoAspectRatio}
           photos={photos}
         />
-      </div>
+      </Clickable>
+
+      <PhotoManagementModal
+        show={showPhotoManagement}
+        photos={photos}
+        onClickOutside={hidePhotoManagement}
+        onShare={onShareSelectedPhotos}
+        onSave={onSaveSelectedPhotos}
+      />
     </CameraView>
   );
 };
