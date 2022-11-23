@@ -1,6 +1,6 @@
 {
   "name": "@lf2com/as-nother-eye",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "As-nother-eye is an web app for us taking photo by camera of another mobile",
   "main": "src/index.tsx",
   "scripts": {
