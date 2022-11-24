@@ -29,28 +29,20 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - if: ${{ steps.cache-npm.outputs.cache-hit == 'false' }}
-        name: List the state of node modules
+        name: List NPM Modules
         continue-on-error: true
         run: npm list
 
       - name: Build
         run: |
+          git checkout origin/deploy
           npm ci
           npm run build
-          
-      - name: Init Deploy Branch
-        uses: peterjgrainger/action-create-branch@master
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          branch: deploy
 
       - name: Commit Changes
         run: |
           git config --local user.email "github-actions[bot]@noreply.github.com"
           git config --local user.name "Github Actions [bot]"
-          git checkout origin/deploy
-          git merge origin main
           git commit -am "Deployment"
 
       - name: Deploy
