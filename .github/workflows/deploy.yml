@@ -42,7 +42,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@noreply.github.com"
           git config --local user.name "Github Actions [bot]"
-          git checkout deploy
           git merge origin/main
           git commit -am "Deployment"
 
