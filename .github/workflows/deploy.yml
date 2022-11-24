@@ -56,6 +56,6 @@ jobs:
       - name: Deploy
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secret.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           force_with_lease: true
           branch: deploy
