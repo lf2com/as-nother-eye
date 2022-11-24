@@ -61,6 +61,7 @@ const PhotoManagementModal: FunctionComponent<PhotoManagementModalProps> = ({
 
   const shareButton = useMemo(() => (
     <ModalButton
+      key="share-button"
       disabled={selectedPhotoIndexs.length === 0}
       onClick={() => {
         onShare(selectedPhotos);
@@ -73,6 +74,7 @@ const PhotoManagementModal: FunctionComponent<PhotoManagementModalProps> = ({
   const saveButton = useMemo(() => (
     <ModalButton
       highlight
+      key="save-button"
       disabled={selectedPhotoIndexs.length === 0}
       onClick={() => {
         onSave(selectedPhotos);

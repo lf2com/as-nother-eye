@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
 import ConnectionContextProvider from './contexts/ConnectionContext';
@@ -27,16 +27,16 @@ const App: FunctionComponent = () => (
     <LoggerContextProvider show={false}>
       <ModalContextProvider>
         <ConnectionContextProvider>
-          <BrowserRouter>
+          <HashRouter>
             <Routes>
-              <Route path="photoer/:targetId" element={<Photoer />} />
-              <Route path="photoer" element={<Photoer />} />
-              <Route path="camera/:targetId" element={<Camera />} />
-              <Route path="camera" element={<Camera />} />
-              <Route path="test" element={<Test />} />
-              <Route path="*" element={<Welcome />} />
+              <Route path="/photoer/:targetId" element={<Photoer />} />
+              <Route path="/photoer" element={<Photoer />} />
+              <Route path="/camera/:targetId" element={<Camera />} />
+              <Route path="/camera" element={<Camera />} />
+              <Route path="/test" element={<Test />} />
+              <Route path="/" element={<Welcome />} />
             </Routes>
-          </BrowserRouter>
+          </HashRouter>
         </ConnectionContextProvider>
       </ModalContextProvider>
     </LoggerContextProvider>

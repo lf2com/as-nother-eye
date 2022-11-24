@@ -40,7 +40,7 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const hidePhotoManagement = useCallback(() => setShowPhotoManagement(false), []);
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
-    new URL(`/photoer/${id}`, globalThis.location.href).toString()
+    new URL(`/#/photoer/${id}`, globalThis.location.href).toString()
   ), []);
 
   const takePhoto = useCallback(async () => {

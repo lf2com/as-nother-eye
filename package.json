@@ -6,7 +6,7 @@
   "homepage": "https://lf2com.github.io/as-nother-eye/",
   "scripts": {
     "start": "webpack serve --mode development",
-    "start:public": "npm run dev -- --env public=true",
+    "start:public": "npm run start -- --env public=true",
     "build": "webpack --mode production",
     "lint:ts": "eslint --ext .ts,.tsx src/",
     "lint:scss": "stylelint **/*.scss",

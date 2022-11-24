@@ -26,7 +26,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   } = useConnectionContext();
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
-    new URL(`/camera/${id}`, globalThis.location.href).toString()
+    new URL(`/#/camera/${id}`, globalThis.location.href).toString()
   ), []);
 
   const onPhoto = useCallback(() => {
