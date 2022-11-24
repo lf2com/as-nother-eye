@@ -1,0 +1,61 @@
+name: "Deploy"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v3
+      
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Cache NPM Modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - if: ${{ steps.cache-npm.outputs.cache-hit == 'false' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+          
+      - name: Init Deploy Branch
+        uses: peterjgrainger/action-create-branch@v1.0.0
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: deploy
+
+      - name: Commit Changes
+        run: |
+          git config --local user.email "github-actions[bot]@noreply.github.com"
+          git config --local user.name "Github Actions [bot]"
+          git checkout deploy
+          git merge origin main
+          git commit -am "Deployment"
+
+      - name: Deploy
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secret.GITHUB_TOKEN }}
+          force_with_lease: true
+          branch: deploy
