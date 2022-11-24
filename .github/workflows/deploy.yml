@@ -35,7 +35,8 @@ jobs:
 
       - name: Build
         run: |
-          git checkout -b deploy origin/deploy
+          git fetch
+          git checkout origin/deploy
           npm ci
           npm run build
 
