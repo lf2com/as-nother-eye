@@ -2,7 +2,7 @@ name: "Deploy"
 on:
   push:
     branches:
-      - main
+      - deploy
 
 jobs:
   Deploy:
@@ -37,13 +37,6 @@ jobs:
         run: |
           npm ci
           npm run build
-          
-      - name: Init Deploy Branch
-        uses: peterjgrainger/action-create-branch@v1.0.0
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          branch: deploy
 
       - name: Commit Changes
         run: |
@@ -56,6 +49,6 @@ jobs:
       - name: Deploy
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secret.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           force_with_lease: true
           branch: deploy
