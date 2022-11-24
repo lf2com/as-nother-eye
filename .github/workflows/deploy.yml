@@ -39,7 +39,7 @@ jobs:
           npm run build
           
       - name: Init Deploy Branch
-        uses: peterjgrainger/action-create-branch@v1.0.0
+        uses: peterjgrainger/action-create-branch@master
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
