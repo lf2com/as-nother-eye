@@ -23,7 +23,7 @@ export default (env: any, options: any): WebpackConfig & WebpackDevServerConfig 
       filename: '[name].[contenthash].js',
       path: distPath,
       clean: true,
-      publicPath: '/',
+      publicPath: './',
     },
     target: ['web'],
     module: {
