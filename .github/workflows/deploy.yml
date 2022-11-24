@@ -44,7 +44,8 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@noreply.github.com"
           git config --local user.name "Github Actions [bot]"
-          git commit -am "Deployment"
+          git add dist
+          git commit -m "Deployment"
 
       - name: Deploy
         uses: ad-m/github-push-action@master
