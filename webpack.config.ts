@@ -7,12 +7,11 @@ const distPath = path.resolve(__dirname, 'dist');
 
 export default (env: any, options: any): WebpackConfig & WebpackDevServerConfig => {
   const isProduction = options.mode === 'production';
-  const isDevToPublic = true;
-  // const isDevToPublic = (
-  //   !isProduction
-  //   && env.public !== undefined
-  //   && !/^false$/.test(env.public)
-  // );
+  const isDevToPublic = (
+    !isProduction
+    && env.public !== undefined
+    && !/^false$/.test(env.public)
+  );
 
   return {
     entry: path.resolve(__dirname, 'src/index.tsx'),
@@ -73,8 +72,6 @@ export default (env: any, options: any): WebpackConfig & WebpackDevServerConfig 
     devServer: {
       https: true,
       host: isDevToPublic ? 'local-ip' : 'localhost',
-      // host: '192.168.1.105',
-      // host: '192.168.2.107',
       port: 8080,
       compress: true,
       open: '/',

@@ -1,6 +1,6 @@
 import React, {
-  cloneElement, createContext, FunctionComponent, PropsWithChildren,
-  ReactElement, ReactNode, useCallback, useContext, useMemo, useState,
+  createContext, FunctionComponent, PropsWithChildren, ReactElement,
+  ReactNode, useCallback, useContext, useMemo, useState,
 } from 'react';
 
 import { ModalBasicProps } from '../../components/Modal';
@@ -43,6 +43,7 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
         const id = Date.now();
         const Modal = (
           <YesNoModal
+            key={id}
             onYes={() => resolve(true)}
             onNo={() => resolve(false)}
             onHidden={() => {
@@ -64,6 +65,7 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
         const id = Date.now();
         const Modal = (
           <NotificationModal
+            key={id}
             onOk={() => resolve()}
             onHidden={() => {
               removeModal(id);
@@ -84,6 +86,7 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
         const id = Date.now();
         const Modal = (
           <OkCancelModal
+            key={id}
             onOk={() => resolve(true)}
             onCancel={() => resolve(false)}
             onHidden={() => {
@@ -106,9 +109,7 @@ const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }
       <ModalContext.Provider value={contextValue}>
         {children}
       </ModalContext.Provider>
-      {modals.map(({ id, Modal }) => (
-        cloneElement(Modal, { key: id })
-      ))}
+      {modals.map(({ Modal }) => Modal)}
     </>
   );
 };
