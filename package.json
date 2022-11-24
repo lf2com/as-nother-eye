@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "As-nother-eye is an web app for us taking photo by camera of another mobile",
   "main": "src/index.tsx",
-  "homepage": "https://lf2com.github.io/as-nother-eye/dist/",
+  "homepage": "https://lf2com.github.io/as-nother-eye/",
   "scripts": {
     "start": "webpack serve --mode development",
     "start:public": "npm run dev -- --env public=true",
