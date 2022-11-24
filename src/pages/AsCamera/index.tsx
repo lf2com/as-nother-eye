@@ -12,6 +12,7 @@ import PhotoList from '../../components/PhotoList';
 import Tag from '../../components/Tag';
 import CameraView, { CameraViewProps } from '../components/CameraView';
 
+import createRoutePath from '../../utils/createRoutePath';
 import { downloadFiles } from '../../utils/downloadFile';
 import Logger from '../../utils/logger';
 import shareData from '../../utils/shareData';
@@ -40,7 +41,7 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const hidePhotoManagement = useCallback(() => setShowPhotoManagement(false), []);
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
-    new URL(`/#/photoer/${id}`, globalThis.location.href).toString()
+    createRoutePath(`/photoer/${id}`)
   ), []);
 
   const takePhoto = useCallback(async () => {

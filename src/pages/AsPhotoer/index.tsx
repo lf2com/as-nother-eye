@@ -6,6 +6,7 @@ import { useConnectionContext } from '../../contexts/ConnectionContext';
 import Tag from '../../components/Tag';
 import CameraView, { CameraViewProps } from '../components/CameraView';
 
+import createRoutePath from '../../utils/createRoutePath';
 import Logger from '../../utils/logger';
 import { getCameras, startStream } from '../../utils/userMedia';
 
@@ -26,7 +27,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   } = useConnectionContext();
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
-    new URL(`/#/camera/${id}`, globalThis.location.href).toString()
+    createRoutePath(`/camera/${id}`)
   ), []);
 
   const onPhoto = useCallback(() => {
