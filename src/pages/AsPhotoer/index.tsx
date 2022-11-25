@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback } from 'react';
+import React, { FunctionComponent, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useConnectionContext } from '../../contexts/ConnectionContext';
@@ -8,7 +8,7 @@ import CameraView, { CameraViewProps } from '../components/CameraView';
 
 import createRoutePath from '../../utils/createRoutePath';
 import Logger from '../../utils/logger';
-import { getCameras, startStream } from '../../utils/userMedia';
+import { startStream } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
 
@@ -25,6 +25,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
     id: connectorId,
     peerId,
   } = useConnectionContext();
+  const [disabledSwitchCamera, setDisabledSwitchCamera] = useState(false);
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
     createRoutePath(`/camera/${id}`)
@@ -35,7 +36,22 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   }, [connector, peerId]);
 
   const onData = useCallback<CameraViewProps['onData']>((data) => {
+    const message = data as string;
+
     logger.log('DATA', data);
+
+    if (/^#/.test(message)) {
+      logger.log('MESSAGE', message.substring(1));
+      switch (message.substring(1)) {
+        case 'switchcamera':
+          logger.log('SWITCHED CAMERA');
+          setDisabledSwitchCamera(false);
+          break;
+
+        default:
+          break;
+      }
+    }
 
     // const blob = new Blob([data as ArrayBuffer]);
   }, []);
@@ -46,17 +62,11 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
     logger.log('Closed');
   }, []);
 
-  const getStream = useCallback<Required<CameraViewProps>['mediaStreamGenerator']>(async () => {
-    const cameras = await getCameras();
-    const camera = cameras.find((info) => /front$/i.test(info.label));
-
-    return startStream({
-      video: {
-        deviceId: camera?.deviceId,
-        // facingMode: 'user',
-      },
-    });
-  }, []);
+  const getStream = useCallback<Required<CameraViewProps>['mediaStreamGenerator']>(async () => (
+    startStream({
+      video: true,
+    })
+  ), []);
 
   const convertStream = useCallback<Required<CameraViewProps>['mediaStreamConverter']>(({
     local,
@@ -65,6 +75,11 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
     major: remote,
     minor: local,
   }), []);
+
+  const handleSwitchCamera = useCallback(async () => {
+    setDisabledSwitchCamera(true);
+    connector.sendMessage(peerId!, '#switchcamera');
+  }, [connector, peerId]);
 
   return (
     <CameraView
@@ -81,6 +96,8 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
       onCall={onCall}
       onData={onData}
       onHangUp={onHangUp}
+      onSwitchCamera={handleSwitchCamera}
+      disabledSwitchCamera={disabledSwitchCamera}
     >
       <Tag>Photoer #{connectorId}</Tag>
     </CameraView>

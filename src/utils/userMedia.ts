@@ -28,3 +28,30 @@ export const startStream = async (
 export const stopStream = (stream: MediaStream) => {
   stream.getTracks().forEach((track) => track.stop());
 };
+
+export const switchCamera = async (stream: MediaStream) => {
+  const constraints = stream.getVideoTracks()[0]?.getConstraints();
+
+  if (!constraints) {
+    return;
+  }
+
+  const { deviceId } = constraints;
+  const cameras = await getCameras();
+  const currentCameraIndex = cameras.findIndex((camera) => deviceId === camera.deviceId);
+  const nextCameraIndex = (currentCameraIndex + 1) % cameras.length;
+  const nextCamera = cameras[nextCameraIndex];
+  const camera = await startStream({
+    video: {
+      deviceId: nextCamera.deviceId,
+    },
+  });
+
+  stopStream(stream);
+  stream.getTracks().forEach((track) => {
+    stream.removeTrack(track);
+  });
+  camera.getTracks().forEach((track) => {
+    stream.addTrack(track);
+  });
+};

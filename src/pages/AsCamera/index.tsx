@@ -16,7 +16,7 @@ import createRoutePath from '../../utils/createRoutePath';
 import { downloadFiles } from '../../utils/downloadFile';
 import Logger from '../../utils/logger';
 import shareData from '../../utils/shareData';
-import { getCameras, startStream } from '../../utils/userMedia';
+import { startStream, switchCamera } from '../../utils/userMedia';
 
 import styles from './styles.module.scss';
 
@@ -29,9 +29,12 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const params = useParams();
   const { targetId } = params;
   const {
+    connector,
     id: connectorId,
+    peerId,
   } = useConnectionContext();
   const { notice } = useModalContext();
+  const [disabledSwitchCamera, setDisabledSwitchCamera] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const [photos, setPhotos] = useState<Blob[]>([]);
@@ -63,6 +66,26 @@ const Camera: FunctionComponent<CameraProps> = () => {
     setTakingPhoto(false);
   }, [localStream]);
 
+  const handleSwitchCamera = useCallback<Required<CameraViewProps>['onSwitchCamera']>(async () => {
+    if (!localStream) {
+      return;
+    }
+
+    setDisabledSwitchCamera(true);
+
+    try {
+      await switchCamera(localStream);
+
+      if (peerId) {
+        await connector.call(peerId, localStream);
+      }
+    } catch (error) {
+      notice(`${error}`);
+    }
+
+    setDisabledSwitchCamera(false);
+  }, [connector, localStream, notice, peerId]);
+
   const onPhoto = takePhoto;
 
   const onData = useCallback<CameraViewProps['onData']>((data) => {
@@ -78,11 +101,17 @@ const Camera: FunctionComponent<CameraProps> = () => {
           takePhoto();
           break;
 
+        case 'switchcamera':
+          handleSwitchCamera({}).finally(() => {
+            connector.sendMessage(peerId!, '#switchcamera');
+          });
+          break;
+
         default:
           break;
       }
     }
-  }, [takePhoto]);
+  }, [connector, handleSwitchCamera, peerId, takePhoto]);
 
   const onCall: CameraViewProps['onCall'] = () => true;
 
@@ -90,17 +119,11 @@ const Camera: FunctionComponent<CameraProps> = () => {
     logger.log('Closed');
   }, []);
 
-  const getStream = useCallback<Required<CameraViewProps>['mediaStreamGenerator']>(async () => {
-    const cameras = await getCameras();
-    const camera = cameras.find((info) => /^microsoft/i.test(info.label));
-
-    return startStream({
-      video: {
-        deviceId: camera?.deviceId,
-        // facingMode: 'environment',
-      },
-    });
-  }, []);
+  const getStream = useCallback<Required<CameraViewProps>['mediaStreamGenerator']>(async () => (
+    startStream({
+      video: true,
+    })
+  ), []);
 
   const convertStream = useCallback<Required<CameraViewProps>['mediaStreamConverter']>(({
     local,
@@ -160,6 +183,8 @@ const Camera: FunctionComponent<CameraProps> = () => {
       onCall={onCall}
       onData={onData}
       onHangUp={onHangUp}
+      onSwitchCamera={handleSwitchCamera}
+      disabledSwitchCamera={disabledSwitchCamera}
       showTakePhotoAnimation={takingPhoto}
     >
       <Tag>Camera #{connectorId}</Tag>
