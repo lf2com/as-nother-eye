@@ -9,6 +9,7 @@
   grid-template-rows: 1fr auto;
 
   .major {
+    position: relative;
     grid-area: major;
     
     &.taking-photo {
@@ -47,5 +48,18 @@
     right: 0;
     width: 20%;
     box-sizing: border-box;
+  }
+  
+  .switch-camera {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 0.25em;
+    color: #fff;
+    font-size: 3em;
+
+    &:global(.disabled) {
+      color: #ccc;
+    }
   }
 }

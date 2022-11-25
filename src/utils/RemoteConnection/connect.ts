@@ -308,7 +308,30 @@ RemoteConnection.prototype.call = async function f(
 ) {
   await this.connect(targetId);
 
-  const mediaConnection = this.peer!.call(targetId, stream);
+  const prevMediaConnection = this.connectionList[targetId]?.mediaConnection;
 
-  return createMediaConnection.call(this, mediaConnection);
+  if (!prevMediaConnection) {
+    const mediaConnection = this.peer!.call(targetId, stream);
+
+    return createMediaConnection.call(this, mediaConnection);
+  }
+
+  const [videoTrack] = stream.getVideoTracks();
+
+  if (videoTrack) {
+    const { peerConnection } = prevMediaConnection;
+
+    peerConnection.getSenders().forEach((sender) => {
+      const { track } = sender;
+
+      if (!track) {
+        return;
+      }
+      if (track.kind === 'video') {
+        sender.replaceTrack(videoTrack);
+      }
+    });
+  }
+
+  return prevMediaConnection.remoteStream;
 };

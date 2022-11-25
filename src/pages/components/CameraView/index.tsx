@@ -1,3 +1,5 @@
+import { faCameraRotate } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classnames from 'classnames';
 import React, {
   FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState,
@@ -7,6 +9,7 @@ import { useConnectionContext } from '../../../contexts/ConnectionContext';
 import { useModalContext } from '../../../contexts/ModalContext';
 
 import Shutter from '../../../components/CameraShutter';
+import Clickable from '../../../components/Clickable';
 import Frame from '../../../components/Frame';
 import Loading from '../../../components/Loading';
 import ShareAndConnectModal from '../../../components/Modal/ShareAndConnectModal';
@@ -20,12 +23,12 @@ import wait from '../../../utils/wait';
 
 import styles from './styles.module.scss';
 
-interface MediaStreamInput {
+interface StreamLocalRemote {
   local?: MediaStream;
   remote?: MediaStream;
 }
 
-interface MediaStreamOutput {
+interface StreamMajorMinor {
   major?: MediaStream;
   minor?: MediaStream;
 }
@@ -35,7 +38,7 @@ export interface CameraViewProps {
   targetId?: string;
   logger?: Logger;
   mediaStreamGenerator?: () => Promise<MediaStream>;
-  mediaStreamConverter?: (input: MediaStreamInput) => MediaStreamOutput;
+  mediaStreamConverter?: (streams: StreamLocalRemote) => StreamMajorMinor;
   showTakePhotoAnimation?: boolean;
   afterTakePhotoAnimation?: () => void;
   shareUrlGenerator: (id: string) => string;
@@ -43,16 +46,20 @@ export interface CameraViewProps {
   connectText: string;
   askConnectText: string;
   waitingConnectionText: string;
-  onShot: (sources: MediaStreamOutput) => void;
+  onShot: (sources: StreamMajorMinor) => void;
   onData: (data: unknown) => void | boolean;
   onCall: (id: string) => void | boolean;
   onHangUp: EventHandler['hangup'];
+  disabledSwitchCamera?: boolean;
+  onSwitchCamera?: (streams: StreamMajorMinor) => Promise<void>;
 }
 
 const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
   className,
   targetId,
   mediaStreamGenerator,
+  disabledSwitchCamera,
+  onSwitchCamera,
   shareUrlGenerator,
   shareText,
   connectText,
@@ -78,7 +85,7 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     tag: `[${id}]`,
   }), [id]);
   const [loadingMessage, setLoadingMessage] = useState<string>();
-  const streamSources = useRef<MediaStreamInput>({});
+  const streamSources = useRef<StreamLocalRemote>({});
   const [minorStream, setMinorStream] = useState<MediaStream>();
   const [majorStream, setMajorStream] = useState<MediaStream>();
   const [minLocalStream, setMinLocalStream] = useState<MediaStream>();
@@ -117,13 +124,13 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     return minStream;
   }, []);
 
-  const callPeer = useCallback(async (peerId: string) => {
+  const callPeer = useCallback(async (targetPeerId: string) => {
     const {
       local: localStream,
     } = streamSources.current;
 
-    logger.log(`Calling peer <${peerId}>`);
-    setLoadingMessage(`Calling to <${peerId}>`);
+    logger.log(`Calling peer <${targetPeerId}>`);
+    setLoadingMessage(`Calling to <${targetPeerId}>`);
 
     try {
       if (!localStream) {
@@ -133,9 +140,9 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
       const minStream = getMinLocalStream();
 
       setMinLocalStream(minStream);
-      await connector.connect(peerId);
+      await connector.connect(targetPeerId);
 
-      const peerStream = await connector.call(peerId, minStream);
+      const peerStream = await connector.call(targetPeerId, minStream);
       const { major, minor } = mediaStreamConverter({
         local: streamSources.current.local,
         remote: peerStream,
@@ -151,13 +158,13 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     }
   }, [logger, getMinLocalStream, connector, mediaStreamConverter]);
 
-  const onConnect = useCallback(async (peerId: string) => {
-    if (peerId.length === 0) {
+  const onConnect = useCallback(async (targetPeerId: string) => {
+    if (targetPeerId.length === 0) {
       throw ReferenceError('No ID for connection');
     }
 
     try {
-      await callPeer(peerId);
+      await callPeer(targetPeerId);
     } catch (error) {
       logger.warn(`${error}`);
       notice(`${error}`);
@@ -173,20 +180,20 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     logger.log('DATA', data);
   }, [logger, onData]);
 
-  const onPeerCall = useCallback<EventHandler['call']>(async (peerId, answer) => {
-    logger.log(`Get call from <${peerId}>`);
-    setLoadingMessage(`Get call from <${peerId}>`);
+  const onPeerCall = useCallback<EventHandler['call']>(async (targetPeerId, answer) => {
+    logger.log(`Get call from <${targetPeerId}>`);
+    setLoadingMessage(`Get call from <${targetPeerId}>`);
 
-    if (onCall(peerId) === false) {
+    if (onCall(targetPeerId) === false) {
       logger.log('Ignored call');
       return;
     }
 
-    const acceptPeerCall = await askYesNo(`Accept peer from <${peerId}>?`);
+    const acceptPeerCall = await askYesNo(`Accept peer from <${targetPeerId}>?`);
 
     try {
       if (!acceptPeerCall) {
-        logger.log(`Declined call from <${peerId}>`);
+        logger.log(`Declined call from <${targetPeerId}>`);
         notice('Declined call');
         answer(false);
 
@@ -222,12 +229,12 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     }
   }, [askYesNo, getMinLocalStream, logger, mediaStreamConverter, notice, onCall]);
 
-  const onPeerHangUp = useCallback<EventHandler['hangup']>((peerId) => {
+  const onPeerHangUp = useCallback<EventHandler['hangup']>((targetPeerId) => {
     logger.log('HANGUP');
     setMinorStream(undefined);
     setMajorStream(undefined);
     streamSources.current = {};
-    onHangUp(peerId);
+    onHangUp(targetPeerId);
   }, [logger, onHangUp]);
 
   const handleShot = useCallback(() => {
@@ -291,6 +298,15 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     await wait(0);
     setLoadingMessage(undefined);
   }, [callPeer, connector, createMediaStream, logger, mediaStreamConverter, targetId]);
+
+  const handleSwitchCamera = useCallback(async () => {
+    if (onSwitchCamera) {
+      await onSwitchCamera({
+        major: majorStream,
+        minor: minorStream,
+      });
+    }
+  }, [majorStream, minorStream, onSwitchCamera]);
 
   const onOffline = useCallback<EventHandler['offline']>(() => {
     logger.warn('offline');
@@ -404,6 +420,15 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
         disabled={!isOnline}
         onShot={handleShot}
       />
+      {onSwitchCamera && (
+        <Clickable
+          className={styles['switch-camera']}
+          disabled={disabledSwitchCamera}
+          onClick={handleSwitchCamera}
+        >
+          <FontAwesomeIcon icon={faCameraRotate} />
+        </Clickable>
+      )}
 
       <Loading>
         {loadingMessage}
