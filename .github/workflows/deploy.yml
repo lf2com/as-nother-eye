@@ -42,7 +42,9 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@noreply.github.com"
           git config --local user.name "Github Actions [bot]"
+          git rm --cached -r .
           git add dist
+          git mv dist/* .
           git commit -m "Deployment"
 
       - name: Deploy
