@@ -3,8 +3,8 @@
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": true,
   },
-  "stylelint.validate": ["css", "scss"],
-  "eslint.validate": ["ts", "tsx"],
   "scss.validate": false,
   "stylelint.config": null,
+  "stylelint.validate": ["css", "scss"],
+  "eslint.validate": ["ts", "tsx"],
 }
