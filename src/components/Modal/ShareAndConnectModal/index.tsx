@@ -48,7 +48,6 @@ const ShareAndConnectModal: FunctionComponent<PropsWithChildren<ShareAndConnectM
     <Modal
       show={show}
       className={styles['share-and-connect-modal']}
-      hideOnClickOutside={false}
     >
       <p>
         {children}

@@ -1,16 +1,12 @@
-import React, {
-  FunctionComponent, useCallback, useEffect, useState,
-} from 'react';
+import React, { FunctionComponent, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useConnectionContext } from '../../contexts/ConnectionContext';
 import { useModalContext } from '../../contexts/ModalContext';
 
-import Clickable from '../../components/Clickable';
-import PhotoManagementModal, { PhotoManagementModalProps } from '../../components/Modal/PhotoManagementModal';
-import PhotoList from '../../components/PhotoList';
 import Tag from '../../components/Tag';
 import CameraView, { CameraViewProps } from '../components/CameraView';
+import PhotoManagement, { PhotoManagementProps } from '../components/PhotoManagement';
 
 import createRoutePath from '../../utils/createRoutePath';
 import { downloadFiles } from '../../utils/downloadFile';
@@ -38,10 +34,6 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const [photos, setPhotos] = useState<Blob[]>([]);
-  const [photoAspectRatio, setPhotoAspectRatio] = useState(1);
-  const [showPhotoManagement, setShowPhotoManagement] = useState(false);
-  const toShowPhotoManagement = useCallback(() => setShowPhotoManagement(true), []);
-  const hidePhotoManagement = useCallback(() => setShowPhotoManagement(false), []);
 
   const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
     createRoutePath(`/photoer/${id}`)
@@ -137,11 +129,11 @@ const Camera: FunctionComponent<CameraProps> = () => {
     };
   }, []);
 
-  const onSaveSelectedPhotos = useCallback<PhotoManagementModalProps['onSave']>((selectedPhotos) => {
+  const onSaveSelectedPhotos = useCallback<PhotoManagementProps['onSave']>((selectedPhotos) => {
     downloadFiles(selectedPhotos);
   }, []);
 
-  const onShareSelectedPhotos = useCallback<PhotoManagementModalProps['onShare']>(async (selectedPhotos) => {
+  const onShareSelectedPhotos = useCallback<PhotoManagementProps['onShare']>(async (selectedPhotos) => {
     try {
       await shareData({
         files: selectedPhotos,
@@ -150,23 +142,6 @@ const Camera: FunctionComponent<CameraProps> = () => {
       notice(`${error}`);
     }
   }, [notice]);
-
-  useEffect(() => {
-    const [photoBlob] = photos;
-
-    if (photoBlob) {
-      const image = new Image();
-      const url = URL.createObjectURL(photoBlob);
-
-      image.addEventListener('load', () => {
-        const { naturalWidth, naturalHeight } = image;
-
-        setPhotoAspectRatio(naturalWidth / naturalHeight);
-        URL.revokeObjectURL(url);
-      });
-      image.src = url;
-    }
-  }, [photos]);
 
   return (
     <CameraView
@@ -188,20 +163,10 @@ const Camera: FunctionComponent<CameraProps> = () => {
       showTakePhotoAnimation={takingPhoto}
     >
       <Tag>Camera #{connectorId}</Tag>
-      <Clickable
-        className={styles['photo-list']}
-        onClick={toShowPhotoManagement}
-      >
-        <PhotoList
-          aspectRatio={photoAspectRatio}
-          photos={photos}
-        />
-      </Clickable>
 
-      <PhotoManagementModal
-        show={showPhotoManagement}
+      <PhotoManagement
+        className={styles['photo-list']}
         photos={photos}
-        onClickOutside={hidePhotoManagement}
         onShare={onShareSelectedPhotos}
         onSave={onSaveSelectedPhotos}
       />
