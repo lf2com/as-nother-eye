@@ -1,6 +1,14 @@
 .share-camera {
+  --shadow-color: #000;
+  --font-color: #fff;
+
   font-size: 1.75em;
-  color: #fff;
+  color: var(--font-color);
+  filter:
+    drop-shadow(1px 0 0 var(--shadow-color)) 
+    drop-shadow(-1px 0 0 var(--shadow-color)) 
+    drop-shadow(0 -1px 0 var(--shadow-color)) 
+    drop-shadow(0 1px 0 var(--shadow-color));
 
   &:global(.disabled) {
     opacity: 0.5;

@@ -105,15 +105,14 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
       onSwitchCamera={handleSwitchCamera}
       disabledSwitchCamera={disabledSwitchCamera}
     >
-      <Tag className={styles.tag}>
-        Photoer #{connectorId}
+      <div className={styles.title}>
+        <Tag>Photoer #{connectorId}</Tag>
 
         <ConnectCamera
           ask
-          className={styles['connect-camera']}
           onConnectCamera={onConnectCamera}
         />
-      </Tag>
+      </div>
     </CameraView>
   );
 };
