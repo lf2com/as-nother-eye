@@ -1,18 +1,22 @@
-import React, { FunctionComponent, useCallback, useState } from 'react';
+import React, {
+  FunctionComponent, useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useConnectionContext } from '../../contexts/ConnectionContext';
 import { useModalContext } from '../../contexts/ModalContext';
 
+import CameraView, { CameraViewProps } from '../../components/CameraView';
 import Tag from '../../components/Tag';
-import CameraView, { CameraViewProps } from '../components/CameraView';
 import PhotoManagement, { PhotoManagementProps } from '../components/PhotoManagement';
+import ShareCamera from './components/ShareCamera';
 
 import createRoutePath from '../../utils/createRoutePath';
 import { downloadFiles } from '../../utils/downloadFile';
 import Logger from '../../utils/logger';
 import shareData from '../../utils/shareData';
 import { startStream, switchCamera } from '../../utils/userMedia';
+import wait from '../../utils/wait';
 
 import styles from './styles.module.scss';
 
@@ -32,31 +36,43 @@ const Camera: FunctionComponent<CameraProps> = () => {
   const { notice } = useModalContext();
   const [disabledSwitchCamera, setDisabledSwitchCamera] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream>();
-  const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
+  const [takingPhoto, setTakingPhoto] = useState(false);
+  const [isSwitchingCamera, setIsSwitchingCamera] = useState(false);
   const [photos, setPhotos] = useState<Blob[]>([]);
+  const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectorId}`), [connectorId]);
 
-  const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
-    createRoutePath(`/photoer/${id}`)
-  ), []);
-
-  const takePhoto = useCallback(async () => {
+  const captureCamera = useCallback(async () => {
     if (!localStream) {
-      return;
+      return null;
     }
 
     const track = localStream.getVideoTracks()[0];
     const imageCapture = new ImageCapture(track);
-
-    setTakingPhoto(true);
-
     const photoBlob = await imageCapture.takePhoto({
       fillLightMode: 'auto', // 'auto' | 'off' | 'flash'
       redEyeReduction: true,
     });
 
-    setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
-    setTakingPhoto(false);
+    await wait(1000);
+
+    return photoBlob;
   }, [localStream]);
+
+  const takePhoto = useCallback(async () => {
+    if (!localStream || isSwitchingCamera || takingPhoto) {
+      return;
+    }
+
+    setTakingPhoto(true);
+
+    const photoBlob = await captureCamera();
+
+    setTakingPhoto(false);
+
+    if (photoBlob) {
+      setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
+    }
+  }, [localStream, isSwitchingCamera, takingPhoto, captureCamera]);
 
   const handleSwitchCamera = useCallback<Required<CameraViewProps>['onSwitchCamera']>(async () => {
     if (!localStream) {
@@ -66,7 +82,9 @@ const Camera: FunctionComponent<CameraProps> = () => {
     setDisabledSwitchCamera(true);
 
     try {
+      setIsSwitchingCamera(true);
       await switchCamera(localStream);
+      setIsSwitchingCamera(false);
 
       if (peerId) {
         await connector.call(peerId, localStream);
@@ -143,17 +161,16 @@ const Camera: FunctionComponent<CameraProps> = () => {
     }
   }, [notice]);
 
+  useEffect(() => {
+
+  });
+
   return (
     <CameraView
       className={styles.camera}
       targetId={targetId}
-      shareText="Share Camera"
-      connectText="Connect Photoer"
-      askConnectText="Connect to photoer"
-      waitingConnectionText="Waiting for photoer to connect"
       mediaStreamGenerator={getStream}
       mediaStreamConverter={convertStream}
-      shareUrlGenerator={createShareUrl}
       onShot={onPhoto}
       onCall={onCall}
       onData={onData}
@@ -162,7 +179,15 @@ const Camera: FunctionComponent<CameraProps> = () => {
       disabledSwitchCamera={disabledSwitchCamera}
       showTakePhotoAnimation={takingPhoto}
     >
-      <Tag>Camera #{connectorId}</Tag>
+      <Tag className={styles.tag}>
+        Camera #{connectorId}
+
+        <ShareCamera
+          ask
+          className={styles['share-camera']}
+          cameraUrl={cameraUrl}
+        />
+      </Tag>
 
       <PhotoManagement
         className={styles['photo-list']}

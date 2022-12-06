@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React, {
-  FunctionComponent, useCallback, useEffect, useMemo, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 import Clickable from '../../../components/Clickable';
@@ -11,17 +11,17 @@ import Photo from './components/Photo';
 
 import dateToStr from '../../../utils/dateToStr';
 
+import { FunctionComponentWithClassName } from '../../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 export interface PhotoManagementProps {
   photos: Blob[];
   onShare: (photos: File[]) => void;
   onSave: (photos: File[]) => void;
-  className?: string;
   show?: boolean;
 }
 
-const PhotoManagement: FunctionComponent<PhotoManagementProps> = ({
+const PhotoManagement: FunctionComponentWithClassName<PhotoManagementProps> = ({
   show: defShowModal = false,
   className,
   photos,

@@ -1,14 +1,21 @@
-import React, { FunctionComponent } from 'react';
+import classnames from 'classnames';
+import React from 'react';
 
+import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 interface TagProps {
   children: React.ReactNode;
 }
 
-const Tag: FunctionComponent<TagProps> = ({ children }) => (
-  <div className={styles.tag}>
-    {children}
+const Tag: FunctionComponentWithClassNameAndChildren<TagProps> = ({
+  className,
+  children,
+}) => (
+  <div className={classnames(styles.tag, className)}>
+    <span className={styles.text}>
+      {children}
+    </span>
   </div>
 );
 

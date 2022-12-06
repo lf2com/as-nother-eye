@@ -36,8 +36,10 @@ export const switchCamera = async (stream: MediaStream) => {
     return;
   }
 
-  const { deviceId } = constraints;
   const cameras = await getCameras();
+  const {
+    deviceId = cameras[0]?.deviceId,
+  } = constraints;
   const currentCameraIndex = cameras.findIndex((camera) => deviceId === camera.deviceId);
   const nextCameraIndex = (currentCameraIndex + 1) % cameras.length;
   const nextCamera = cameras[nextCameraIndex];

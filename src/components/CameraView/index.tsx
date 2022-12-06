@@ -2,25 +2,24 @@ import { faCameraRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classnames from 'classnames';
 import React, {
-  FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 
-import { useConnectionContext } from '../../../contexts/ConnectionContext';
-import { useModalContext } from '../../../contexts/ModalContext';
+import { useConnectionContext } from '../../contexts/ConnectionContext';
+import { useModalContext } from '../../contexts/ModalContext';
 
-import Shutter from '../../../components/CameraShutter';
-import Clickable from '../../../components/Clickable';
-import Frame from '../../../components/Frame';
-import Loading from '../../../components/Loading';
-import ShareAndConnectModal from '../../../components/Modal/ShareAndConnectModal';
-import Video from '../../../components/Video';
+import delayAwaitResult from '../../utils/delayAwaitResult';
+import Logger from '../../utils/logger';
+import EventHandler from '../../utils/RemoteConnection/event/handler';
+import { startStream, stopStream } from '../../utils/userMedia';
+import wait from '../../utils/wait';
 
-import delayAwaitResult from '../../../utils/delayAwaitResult';
-import Logger from '../../../utils/logger';
-import EventHandler from '../../../utils/RemoteConnection/event/handler';
-import { startStream, stopStream } from '../../../utils/userMedia';
-import wait from '../../../utils/wait';
+import Clickable from '../Clickable';
+import Frame from '../Frame';
+import Loading from '../Loading';
+import Video from '../Video';
 
+import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 interface StreamLocalRemote {
@@ -34,18 +33,12 @@ interface StreamMajorMinor {
 }
 
 export interface CameraViewProps {
-  className?: string;
   targetId?: string;
   logger?: Logger;
   mediaStreamGenerator?: () => Promise<MediaStream>;
   mediaStreamConverter?: (streams: StreamLocalRemote) => StreamMajorMinor;
   showTakePhotoAnimation?: boolean;
   afterTakePhotoAnimation?: () => void;
-  shareUrlGenerator: (id: string) => string;
-  shareText: string;
-  connectText: string;
-  askConnectText: string;
-  waitingConnectionText: string;
   onShot: (sources: StreamMajorMinor) => void;
   onData: (data: unknown) => void | boolean;
   onCall: (id: string) => void | boolean;
@@ -54,17 +47,12 @@ export interface CameraViewProps {
   onSwitchCamera?: (streams: StreamMajorMinor) => Promise<void>;
 }
 
-const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
+const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = ({
   className,
   targetId,
   mediaStreamGenerator,
   disabledSwitchCamera,
   onSwitchCamera,
-  shareUrlGenerator,
-  shareText,
-  connectText,
-  askConnectText,
-  waitingConnectionText,
   onShot,
   onData,
   onCall,
@@ -90,7 +78,6 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
   const [majorStream, setMajorStream] = useState<MediaStream>();
   const [minLocalStream, setMinLocalStream] = useState<MediaStream>();
   const refMajorVideo = useRef<HTMLVideoElement>(null);
-  const shareUrl = useMemo(() => shareUrlGenerator(id), [shareUrlGenerator, id]);
 
   const createMediaStream = useCallback(async () => (
     mediaStreamGenerator ? mediaStreamGenerator() : startStream()
@@ -157,19 +144,6 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
       setLoadingMessage(undefined);
     }
   }, [logger, getMinLocalStream, connector, mediaStreamConverter]);
-
-  const onConnect = useCallback(async (targetPeerId: string) => {
-    if (targetPeerId.length === 0) {
-      throw ReferenceError('No ID for connection');
-    }
-
-    try {
-      await callPeer(targetPeerId);
-    } catch (error) {
-      logger.warn(`${error}`);
-      notice(`${error}`);
-    }
-  }, [callPeer, logger, notice]);
 
   const onPeerData = useCallback<EventHandler['data']>((_, data) => {
     if (onData(data) === false) {
@@ -389,17 +363,6 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
     <Frame className={classnames(styles['camera-view'], className)}>
       {children}
 
-      <ShareAndConnectModal
-        show={!isMediaConnected}
-        shareUrl={shareUrl}
-        onConnect={onConnect}
-        shareText={shareText}
-        connectText={connectText}
-        askConnectText={askConnectText}
-      >
-        {waitingConnectionText}
-      </ShareAndConnectModal>
-
       <Frame
         className={classnames(styles.major, {
           [styles['taking-photo']]: showTakePhotoAnimation,
@@ -415,11 +378,14 @@ const CameraView: FunctionComponent<PropsWithChildren<CameraViewProps>> = ({
         className={styles.minor}
         srcObject={minorStream}
       />
-      <Shutter
-        className={styles.shutter}
+
+      <Clickable
         disabled={!isOnline}
-        onShot={handleShot}
+        className={styles.shutter}
+        stopPropagation
+        onClick={handleShot}
       />
+
       {onSwitchCamera && (
         <Clickable
           className={styles['switch-camera']}

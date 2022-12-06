@@ -2,11 +2,13 @@ import React, { FunctionComponent, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useConnectionContext } from '../../contexts/ConnectionContext';
+import { useModalContext } from '../../contexts/ModalContext';
 
+import CameraView, { CameraViewProps } from '../../components/CameraView';
+import { AskInputModalProps } from '../../components/Modal/AskInputModal';
 import Tag from '../../components/Tag';
-import CameraView, { CameraViewProps } from '../components/CameraView';
+import ConnectCamera from './components/ConnectCamera';
 
-import createRoutePath from '../../utils/createRoutePath';
 import Logger from '../../utils/logger';
 import { startStream } from '../../utils/userMedia';
 
@@ -19,17 +21,14 @@ const logger = new Logger({ tag: '[Photoer]' });
 
 const Photoer: FunctionComponent<PhotoerProps> = () => {
   const params = useParams();
-  const { targetId } = params;
   const {
     connector,
     id: connectorId,
     peerId,
   } = useConnectionContext();
+  const { notice } = useModalContext();
   const [disabledSwitchCamera, setDisabledSwitchCamera] = useState(false);
-
-  const createShareUrl = useCallback<CameraViewProps['shareUrlGenerator']>((id) => (
-    createRoutePath(`/camera/${id}`)
-  ), []);
+  const [targetId, setTargetId] = useState(params.targetId);
 
   const onPhoto = useCallback(() => {
     connector.sendMessage(peerId!, '#photo');
@@ -76,6 +75,18 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
     minor: local,
   }), []);
 
+  const onConnectCamera = useCallback<AskInputModalProps['onConfirm']>((id) => {
+    try {
+      if (id.length === 0) {
+        throw ReferenceError('No Camera ID');
+      }
+
+      setTargetId(id);
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [notice]);
+
   const handleSwitchCamera = useCallback(async () => {
     setDisabledSwitchCamera(true);
     connector.sendMessage(peerId!, '#switchcamera');
@@ -85,13 +96,8 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
     <CameraView
       className={styles.photoer}
       targetId={targetId}
-      shareText="Share Photoer"
-      connectText="Connect Camera"
-      askConnectText="Connect to camera"
-      waitingConnectionText="Waiting for camera to connect"
       mediaStreamGenerator={getStream}
       mediaStreamConverter={convertStream}
-      shareUrlGenerator={createShareUrl}
       onShot={onPhoto}
       onCall={onCall}
       onData={onData}
@@ -99,7 +105,15 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
       onSwitchCamera={handleSwitchCamera}
       disabledSwitchCamera={disabledSwitchCamera}
     >
-      <Tag>Photoer #{connectorId}</Tag>
+      <Tag className={styles.tag}>
+        Photoer #{connectorId}
+
+        <ConnectCamera
+          ask
+          className={styles['connect-camera']}
+          onConnectCamera={onConnectCamera}
+        />
+      </Tag>
     </CameraView>
   );
 };
