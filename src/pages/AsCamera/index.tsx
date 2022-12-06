@@ -179,15 +179,14 @@ const Camera: FunctionComponent<CameraProps> = () => {
       disabledSwitchCamera={disabledSwitchCamera}
       showTakePhotoAnimation={takingPhoto}
     >
-      <Tag className={styles.tag}>
-        Camera #{connectorId}
+      <div className={styles.title}>
+        <Tag>Camera #{connectorId}</Tag>
 
         <ShareCamera
           ask
-          className={styles['share-camera']}
           cameraUrl={cameraUrl}
         />
-      </Tag>
+      </div>
 
       <PhotoManagement
         className={styles['photo-list']}

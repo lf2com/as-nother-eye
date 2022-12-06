@@ -8,10 +8,14 @@
     'shutter';
   grid-template-rows: 1fr auto;
 
-  .tag {
+  .title {
     position: absolute;
     top: 0;
     left: 0;
+    margin: 0.25em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     z-index: 1;
   }
   
@@ -54,9 +58,5 @@
     right: 0;
     margin: 0.5em;
     width: 30%;
-  }
-
-  .share-camera {
-    margin: 0 0.25em;
   }
 }

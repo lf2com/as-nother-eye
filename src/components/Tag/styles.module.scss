@@ -1,21 +1,13 @@
 .tag {
-  .text {
-    --shadow-color: #000;
-    --font-color: #fff;
+  --shadow-color: #000;
+  --font-color: #fff;
 
-    padding: 0.5em;
-    font-size: 1rem;
-    color: var(--font-color);
-    text-shadow:
-      0 1px 0 var(--shadow-color),
-      0 -1px 0 var(--shadow-color),
-      1px 0 0 var(--shadow-color),
-      -1px 0 0 var(--shadow-color),
-      1px 1px 0 var(--shadow-color),
-      1px -1px 0 var(--shadow-color),
-      -1px 1px 0 var(--shadow-color),
-      -1px -1px 0 var(--shadow-color);
-    display: flex;
-    align-items: center;
-  }
+  padding: 0.5em;
+  font-size: 1rem;
+  color: var(--font-color);
+  filter:
+    drop-shadow(1px 0 0 var(--shadow-color)) 
+    drop-shadow(-1px 0 0 var(--shadow-color)) 
+    drop-shadow(0 -1px 0 var(--shadow-color)) 
+    drop-shadow(0 1px 0 var(--shadow-color));
 }

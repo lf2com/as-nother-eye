@@ -1,7 +1,8 @@
 import { faShareNodes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import classnames from 'classnames';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, {
+  FunctionComponent, useCallback, useEffect, useMemo,
+} from 'react';
 
 import { useConnectionContext } from '../../../../contexts/ConnectionContext';
 import { useModalContext } from '../../../../contexts/ModalContext';
@@ -10,7 +11,6 @@ import Clickable from '../../../../components/Clickable';
 
 import shareData from '../../../../utils/shareData';
 
-import { FunctionComponentWithClassName } from '../../../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 interface ShareCameraProps {
@@ -18,9 +18,8 @@ interface ShareCameraProps {
   cameraUrl?: string;
 }
 
-const ShareCamera: FunctionComponentWithClassName<ShareCameraProps> = ({
+const ShareCamera: FunctionComponent<ShareCameraProps> = ({
   ask = false,
-  className,
   cameraUrl,
 }) => {
   const { isOnline, isMediaConnected } = useConnectionContext();
@@ -52,7 +51,7 @@ const ShareCamera: FunctionComponentWithClassName<ShareCameraProps> = ({
 
   return (
     <Clickable
-      className={classnames(styles['share-camera'], className)}
+      className={styles['share-camera']}
       disabled={disabled}
       onClick={askToShare}
     >
