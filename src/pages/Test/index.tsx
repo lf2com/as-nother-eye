@@ -1,15 +1,9 @@
 import React, { FunctionComponent } from 'react';
-import styled from 'styled-components';
 
-import Logger from './utils/logger';
-import randomStr from './utils/random';
+import Logger from '../../utils/logger';
+import randomStr from '../../utils/random';
 
-const IframeElem = styled.iframe`
-  margin: 1rem;
-  width: 30vw;
-  height: calc(30vw * 16 / 10);
-  border: 1px solid #333;
-`;
+import styles from './styles.module.scss';
 
 const logger = new Logger({
   tag: '[Test]',
@@ -26,8 +20,8 @@ const Test: FunctionComponent = () => {
 
   return (
     <div>
-      <IframeElem src={leftUrl} />
-      <IframeElem src={rightUrl} />
+      <iframe className={styles['inner-view']} src={leftUrl} />
+      <iframe className={styles['inner-view']} src={rightUrl} />
     </div>
   );
 };
