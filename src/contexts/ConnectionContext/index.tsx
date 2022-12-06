@@ -1,11 +1,12 @@
 import { DataConnection, MediaConnection } from 'peerjs';
 import React, {
-  createContext, FunctionComponent, PropsWithChildren, useCallback,
-  useContext, useEffect, useMemo, useState,
+  createContext, useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 
 import RemoteConnection from '../../utils/RemoteConnection';
 import EventHandler from '../../utils/RemoteConnection/event/handler';
+
+import { FunctionComponentWithChildren } from '../../types/ComponentProps';
 
 interface ConnectionContextProps {
   connector: RemoteConnection;
@@ -25,9 +26,7 @@ const ConnectionContext = createContext<ConnectionContextProps>({
   peerId: null,
 });
 
-const ConnectionContextProvider: FunctionComponent<PropsWithChildren> = ({
-  children,
-}) => {
+const ConnectionContextProvider: FunctionComponentWithChildren = ({ children }) => {
   const searchParams = useMemo(() => new URLSearchParams(globalThis.location.search), []);
   const id = useMemo(() => searchParams.get('id') ?? undefined, [searchParams]);
   const connector = useMemo(() => new RemoteConnection(id), [id]);

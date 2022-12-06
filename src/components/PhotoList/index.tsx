@@ -1,20 +1,19 @@
 import classnames from 'classnames';
 import React, {
-  CSSProperties,
-  FunctionComponent, useCallback, useEffect, useMemo, useState,
+  CSSProperties, useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 import Photo from './components/Photo';
 
+import { FunctionComponentWithClassName } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 interface PhotoListProps {
-  className?: string;
   aspectRatio?: number;
   photos: (Blob | File)[];
 }
 
-const PhotoList: FunctionComponent<PhotoListProps> = ({
+const PhotoList: FunctionComponentWithClassName<PhotoListProps> = ({
   photos,
   className,
   aspectRatio = 1,
