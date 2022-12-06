@@ -1,29 +1,19 @@
 import React, { FunctionComponent } from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
-import styled from 'styled-components';
 
 import ConnectionContextProvider from './contexts/ConnectionContext';
 import LoggerContextProvider from './contexts/LoggerContext';
 import ModalContextProvider from './contexts/ModalContext';
 
-import Test from './Test';
-
 import Camera from './pages/AsCamera';
 import Photoer from './pages/AsPhotoer';
+import Test from './pages/Test';
 import Welcome from './pages/Welcome';
-
-const AppElem = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  font-family: Arial, Helvetica, sans-serif;
-`;
+import styles from './styles.module.scss';
 
 const App: FunctionComponent = () => (
-  <AppElem>
+  <div className={styles.app}>
     <LoggerContextProvider show={false}>
       <ModalContextProvider>
         <ConnectionContextProvider>
@@ -40,7 +30,7 @@ const App: FunctionComponent = () => (
         </ConnectionContextProvider>
       </ModalContextProvider>
     </LoggerContextProvider>
-  </AppElem>
+  </div>
 );
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);

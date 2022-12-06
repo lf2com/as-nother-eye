@@ -1,9 +1,11 @@
 import React, {
-  ChangeEventHandler, FunctionComponent, KeyboardEventHandler,
-  PropsWithChildren, useCallback, useEffect, useRef, useState,
+  ChangeEventHandler, KeyboardEventHandler, useCallback, useEffect, useRef, useState,
 } from 'react';
 
 import OkCancelModal from './OkCancelModal';
+
+import { FunctionComponentWithChildren } from '../../types/ComponentProps';
+import { ModalBasicProps } from '.';
 
 export interface AskInputModalProps {
   show: boolean;
@@ -17,14 +19,16 @@ export interface AskInputModalProps {
     metaKey: boolean;
     shiftKey: boolean;
   }) => void;
+  onClickOutside?: ModalBasicProps['onClickOutside'];
 }
 
-const AskInputModal: FunctionComponent<PropsWithChildren<AskInputModalProps>> = ({
+const AskInputModal: FunctionComponentWithChildren<AskInputModalProps> = ({
   show,
   onConfirm,
   onCancel,
   onChange,
   onKeyDown,
+  onClickOutside,
   children,
 }) => {
   const [inputValue, setInputValue] = useState('');
@@ -73,6 +77,7 @@ const AskInputModal: FunctionComponent<PropsWithChildren<AskInputModalProps>> = 
       show={show}
       onOk={onOk}
       onCancel={onCancel}
+      onClickOutside={onClickOutside}
     >
       <p>
         {children}

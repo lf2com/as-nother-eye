@@ -1,0 +1,8 @@
+.share-camera {
+  font-size: 1.75em;
+  color: #fff;
+
+  &:global(.disabled) {
+    opacity: 0.5;
+  }
+}

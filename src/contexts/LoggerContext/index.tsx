@@ -1,13 +1,13 @@
 import classnames from 'classnames';
 import React, {
-  createContext, FunctionComponent, PropsWithChildren, Reducer,
-  useContext, useMemo, useReducer, useState,
+  createContext, Reducer, useContext, useMemo, useReducer, useState,
 } from 'react';
 
 import LogMessage, { LogMessageProps } from './components/LogMessage';
 
 import Logger from '../../utils/logger';
 
+import { FunctionComponentWithChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 interface LoggerContextProps {
@@ -31,7 +31,7 @@ interface LoggerContextProviderProps {
   show?: boolean;
 }
 
-const LoggerContextProvider: FunctionComponent<PropsWithChildren<LoggerContextProviderProps>> = ({
+const LoggerContextProvider: FunctionComponentWithChildren<LoggerContextProviderProps> = ({
   tag,
   show: defaultShow = true,
   children,

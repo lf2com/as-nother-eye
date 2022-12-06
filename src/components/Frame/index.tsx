@@ -1,13 +1,13 @@
 import classnames from 'classnames';
-import React, { AllHTMLAttributes, FunctionComponent, PropsWithChildren } from 'react';
+import React, { AllHTMLAttributes } from 'react';
 
+import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 interface FrameProps extends AllHTMLAttributes<HTMLDivElement> {
-  className?: string;
 }
 
-const Frame: FunctionComponent<PropsWithChildren<FrameProps>> = ({
+const Frame: FunctionComponentWithClassNameAndChildren<FrameProps> = ({
   className,
   children,
   ...restProps

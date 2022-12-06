@@ -1,18 +1,16 @@
 import classnames from 'classnames';
-import React, {
-  FunctionComponent, MouseEventHandler, PropsWithChildren, useCallback, useMemo,
-} from 'react';
+import React, { MouseEventHandler, useCallback, useMemo } from 'react';
 
+import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 interface ClickableProps {
   disabled?: boolean;
-  className?: string;
   onClick?: MouseEventHandler;
   stopPropagation?: boolean;
 }
 
-const Clickable: FunctionComponent<PropsWithChildren<ClickableProps>> = ({
+const Clickable: FunctionComponentWithClassNameAndChildren<ClickableProps> = ({
   disabled = false,
   className,
   onClick,

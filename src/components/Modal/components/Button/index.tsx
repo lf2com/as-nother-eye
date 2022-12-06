@@ -1,10 +1,11 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, PropsWithChildren, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { useModalButtonContext } from '../../contexts/ModalButtonContext';
 
 import Clickable from '../../../Clickable';
 
+import { FunctionComponentWithChildren } from '../../../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 export interface ModalButtonProps {
@@ -13,7 +14,7 @@ export interface ModalButtonProps {
   onClick: () => void;
 }
 
-const ModalButton: FunctionComponent<PropsWithChildren<ModalButtonProps>> = ({
+const ModalButton: FunctionComponentWithChildren<ModalButtonProps> = ({
   disabled = false,
   highlight = false,
   onClick,

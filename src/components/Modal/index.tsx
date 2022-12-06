@@ -1,7 +1,6 @@
 import classnames from 'classnames';
 import React, {
-  FunctionComponent, MouseEventHandler, PropsWithChildren, TransitionEventHandler,
-  useCallback, useEffect, useMemo, useState,
+  MouseEventHandler, TransitionEventHandler, useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 import ModalButtonContextProvider from './contexts/ModalButtonContext';
@@ -10,11 +9,11 @@ import ModalButton from './components/Button';
 
 import wait from '../../utils/wait';
 
+import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 export interface ModalBasicProps {
   show?: boolean;
-  className?: string;
   title?: React.ReactNode;
   highlight?: boolean;
   onShown?: () => void;
@@ -29,7 +28,7 @@ export interface ModalProps extends ModalBasicProps {
   buttonOnlyOnce?: boolean;
 }
 
-const Modal: FunctionComponent<PropsWithChildren<ModalProps>> = ({
+const Modal: FunctionComponentWithClassNameAndChildren<ModalProps> = ({
   show: propShow,
   className,
   title,

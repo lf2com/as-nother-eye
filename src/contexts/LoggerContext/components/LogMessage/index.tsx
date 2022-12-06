@@ -1,8 +1,9 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, PropsWithChildren, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { LogType } from '../../../../utils/logger';
 
+import { FunctionComponentWithChildren } from '../../../../types/ComponentProps';
 import styles from './styles.module.scss';
 
 export interface LogMessageProps {
@@ -10,7 +11,7 @@ export interface LogMessageProps {
   timestamp: number;
 }
 
-const LogMessage: FunctionComponent<PropsWithChildren<LogMessageProps>> = ({
+const LogMessage: FunctionComponentWithChildren<LogMessageProps> = ({
   type = 'log',
   // timestamp,
   children,

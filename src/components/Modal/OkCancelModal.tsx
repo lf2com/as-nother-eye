@@ -1,7 +1,8 @@
-import React, { FunctionComponent, PropsWithChildren } from 'react';
+import React from 'react';
 
 import ModalButton from './components/Button';
 
+import { FunctionComponentWithChildren } from '../../types/ComponentProps';
 import Modal, { ModalBasicProps } from '.';
 
 interface OkCancelModalProps extends ModalBasicProps {
@@ -9,7 +10,7 @@ interface OkCancelModalProps extends ModalBasicProps {
   onCancel: () => void;
 }
 
-const OkCancelModal: FunctionComponent<PropsWithChildren<OkCancelModalProps>> = ({
+const OkCancelModal: FunctionComponentWithChildren<OkCancelModalProps> = ({
   onOk,
   onCancel,
   children,

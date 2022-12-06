@@ -1,12 +1,13 @@
 import React, {
-  createContext, FunctionComponent, PropsWithChildren, ReactElement,
-  ReactNode, useCallback, useContext, useMemo, useState,
+  createContext, ReactElement, ReactNode, useCallback, useContext, useMemo, useState,
 } from 'react';
 
 import { ModalBasicProps } from '../../components/Modal';
 import NotificationModal from '../../components/Modal/NotificationModal';
 import OkCancelModal from '../../components/Modal/OkCancelModal';
 import YesNoModal from '../../components/Modal/YesNoModal';
+
+import { FunctionComponentWithChildren } from '../../types/ComponentProps';
 
 type BaseModalFunc<T = void> = (
   message: ReactNode,
@@ -30,7 +31,7 @@ interface ModalItem {
   Modal: ReactElement,
 }
 
-const ModalContextProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
+const ModalContextProvider: FunctionComponentWithChildren = ({ children }) => {
   const [modals, setModals] = useState<ModalItem[]>([]);
 
   const removeModal = useCallback((id: ModalItem['id']) => {
