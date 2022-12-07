@@ -1,14 +1,15 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 
+import ShadowWrapper from '../ShadowWrapper';
+
+import { FunctionComponentWithChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
-interface TagProps {
-  children: React.ReactNode;
-}
-
-const Tag: FunctionComponent<TagProps> = ({ children }) => (
+const Tag: FunctionComponentWithChildren = ({ children }) => (
   <div className={styles.tag}>
-    {children}
+    <ShadowWrapper>
+      {children}
+    </ShadowWrapper>
   </div>
 );
 

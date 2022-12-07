@@ -1,24 +1,24 @@
 .button {
-  --float-width: 0.5em;
-  --bg-color: #69f;
-  --light-color: transparent;
-  --shadow-color: rgba(0, 0, 0, 0.25);
-  --color: #fff;
+  $light-color: rgba(255, 255, 255, 0.25);
+  $dark-color: rgba(0, 0, 0, 0.25);
+  $bg-color: var(--btn-color, #69f);
+  $color: var(--btn-bg-color, #fff);
+  $disabled-color: var(--btn-disabled-color, #ccc);
 
   padding: 1em;
   border-radius: 0.5em;
-  border-width: var(--float-width);
+  border-width: 0.5em;
   border-style: solid;
-  border-color: var(--light-color) var(--shadow-color) var(--shadow-color) var(--light-color);
-  background-color: var(--bg-color);
-  color: var(--color);
+  border-color: $light-color $dark-color $dark-color $light-color;
+  background-color: $bg-color;
+  color: $color;
   display: inline-block;
 
   &:active {
-    border-color: var(--shadow-color) var(--light-color) var(--light-color) var(--shadow-color);
+    border-color: $dark-color $light-color $light-color $dark-color;
   }
   
   &:global(.disabled) {
-    background-color: #ccc;
+    background-color: $disabled-color;
   }
 }

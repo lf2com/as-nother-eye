@@ -1,29 +1,33 @@
 .button {
+  $theme-color: var(--theme-color, #36f);
+  $disabled-color: var(--disabled-color, #ccc);
+  $bg-color: var(--bg-color, #fff);
+
   margin: 0 1em;
   padding: 0.35em 1em;
   min-width: 3em;
   max-width: 100%;
   border-radius: 0.25em;
-  border: 0.05em solid var(--theme-color);
-  background-color: #fff;
-  color: var(--theme-color);
+  border: 0.05em solid $theme-color;
+  background-color: $bg-color;
+  color: $theme-color;
   font-size: 0.95em;
   text-align: center;
   display: block;
   user-select: none;
 
   &.highlight {
-    background-color: var(--theme-color);
-    color: #fff;
+    background-color: $theme-color;
+    color: $bg-color;
   }
 
   &:global(.disabled) {
-    border-color: var(--disabled-color);
-    color: var(--disabled-color);
+    border-color: $disabled-color;
+    color: $disabled-color;
 
     &.highlight {
-      background-color: var(--disabled-color);
-      color: #fff;
+      background-color: $disabled-color;
+      color: $bg-color;
     }
   }
 }

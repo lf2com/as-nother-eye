@@ -1,0 +1,9 @@
+.shadow-wrapper {
+  $color: var(--edge-color, #000);
+
+  filter:
+    drop-shadow(1px 0 0 $color) 
+    drop-shadow(-1px 0 0 $color) 
+    drop-shadow(0 -1px 0 $color) 
+    drop-shadow(0 1px 0 $color);
+}

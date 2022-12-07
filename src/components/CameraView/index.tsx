@@ -361,8 +361,6 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
 
   return (
     <Frame className={classnames(styles['camera-view'], className)}>
-      {children}
-
       <Frame
         className={classnames(styles.major, {
           [styles['taking-photo']]: showTakePhotoAnimation,
@@ -371,6 +369,7 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
       >
         <Video
           ref={refMajorVideo}
+          className={styles.video}
           srcObject={majorStream}
         />
       </Frame>
@@ -395,6 +394,8 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
           <FontAwesomeIcon icon={faCameraRotate} />
         </Clickable>
       )}
+
+      {children}
 
       <Loading>
         {loadingMessage}

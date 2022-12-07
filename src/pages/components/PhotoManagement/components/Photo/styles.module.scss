@@ -1,10 +1,13 @@
 .photo {
+  $border-color: var(--camera-border-color, #fff);
+  $selected-border-color: var(--photo-selected-border-color, #69f);
+
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #fff;
+  border: 1px solid $border-color;
   object-fit: contain;
 
   &.selected {
-    outline: 0.2em solid #69f;
+    outline: 0.2em solid $selected-border-color;
   }
 }
