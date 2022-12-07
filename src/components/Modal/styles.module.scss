@@ -1,6 +1,14 @@
 .modal {
-  --theme-color: #36f;
-  --disabled-color: #ccc;
+  --theme-color: var(--modal-color, #36f);
+  --bg-color: var(--modal-bg-color, #fff);
+  --disabled-color: var(--font-disabled-color, #ccc);
+
+  $theme-color: var(--theme-color);
+  $bg-color: var(--bg-color);
+  $shadow-color: var(--shadow-color, rgba(0, 0, 0, 0.5));
+  $input-focus-color: var(--form-focus-border-color, #333);
+  $input-blur-color: var(--form-blur-border-color, #999);
+  $color: var(--font-color, #000);
 
   position: fixed;
   top: 0;
@@ -8,7 +16,7 @@
   bottom: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0);
-  color: #000;
+  color: $color;
   font-size: 1rem;
   z-index: 1000;
   display: flex;
@@ -25,9 +33,9 @@
     margin: 1em;
     max-height: 80%;
     box-sizing: border-box;
-    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0.5em $shadow-color;
     border-radius: 0.25em;
-    background-color: #fff;
+    background-color: $bg-color;
     display: flex;
     flex-flow: column;
     overflow: hidden;
@@ -44,8 +52,8 @@
 
   .head {
     padding: 0.5em 1em;
-    background-color: var(--theme-color);
-    color: #fff;
+    background-color: $theme-color;
+    color: $bg-color;
     font-weight: bold;
     text-align: center;
 
@@ -62,25 +70,22 @@
     flex-shrink: 1;
 
     input {
-      --blur-color: #999;
-      --focus-color: #333;
-
       margin: 0 0.25em;
       padding: 0.25em 0.35em;
       outline: none;
       border-radius: 0.5em;
-      border: 1px solid var(--blur-color);
-      color: var(--blur-color);
+      border: 1px solid $input-blur-color;
+      color: $input-blur-color;
       font-size: 1em;
       font-family: monospace;
 
       &:hover,
       &:focus {
-        border-color: var(--focus-color);
+        border-color: $input-focus-color;
       }
 
       &:focus {
-        color: var(--focus-color);
+        color: $input-focus-color;
       }
     }
   }

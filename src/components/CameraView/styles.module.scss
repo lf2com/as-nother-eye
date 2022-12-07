@@ -1,6 +1,8 @@
 .camera-view {
+  $bg-color: var(--camera-bg-color);
+
   position: relative;
-  background-color: #000;
+  background-color: $bg-color;
   font-size: 1rem;
   display: grid;
   grid-template-areas:
@@ -28,29 +30,32 @@
   }
 
   .minor {
+    $border-color: var(--camera-border-color, #fff);
+    $shadow-color: var(--camera-shadow-color, #000);
+
     position: absolute;
     right: 0;
     bottom: 0;
     margin: 0.5em;
     max-width: 30%;
     max-height: 30%;
-    border: 1px solid #fff;
-    outline: 1px solid #000;
+    border: 1px solid $border-color;
+    outline: 1px solid $shadow-color;
   }
 
   .shutter {
-    --size: 20vmin;
-    --color: #fff;
+    $size: 20vmin;
+    $color: var(--shutter-color, #fff);
     
     margin: 1em;
     left: 50%;
     padding: 0.5em;
-    width: var(--size);
-    height: var(--size);
+    width: $size;
+    height: $size;
     box-sizing: border-box;
     border-radius: 50%;
-    border: 0.2em solid var(--color);
-    background-color: var(--color);
+    border: 0.2em solid $color;
+    background-color: $color;
     background-clip: content-box;
     grid-area: shutter;
     justify-self: center;
@@ -66,15 +71,18 @@
   }
   
   .switch-camera {
+    $color: var(--bg-color, #fff);
+    $disabled-color: var(--font-disabled-color, #ccc);
+
     position: absolute;
     bottom: 0;
     left: 0;
     margin: 0.25em;
-    color: #fff;
+    color: $color;
     font-size: 3em;
 
     &:global(.disabled) {
-      color: #ccc;
+      color: $disabled-color;
     }
   }
 }

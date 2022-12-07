@@ -1,7 +1,7 @@
 .tag {
-  --color: var(--font-color, #fff);
+  $color: var(--bg-color, #fff);
 
   padding: 0.5em;
   font-size: 1rem;
-  color: var(--color);
+  color: $color;
 }

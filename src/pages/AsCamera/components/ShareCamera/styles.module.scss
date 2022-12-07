@@ -1,8 +1,8 @@
 .share-camera {
-  --color: var(--btn-font-color, #fff);
+  $color: var(--bg-color, #fff);
 
   font-size: 1.75em;
-  color: var(--color);
+  color: $color;
 
   &:global(.disabled) {
     opacity: 0.5;

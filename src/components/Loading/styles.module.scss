@@ -1,11 +1,15 @@
 .loading {
+  $bg-color: var(--loading-bg-color, rgba(0, 0, 0, 0));
+  $msg-bg-color: var(--loading-msg-bg-color, rgba(255, 255, 255, 0.85));
+  $msg-font-color: var(--loading-msg-font-color, #000);
+
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   z-index: 1000;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: $bg-color;
   font-size: 1rem;
   display: flex;
   flex-flow: row;
@@ -16,7 +20,8 @@
   .message {
     width: 100%;
     padding: 1em;
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: $msg-bg-color;
+    color: $msg-font-color;
     display: flex;
     flex-flow: column;
     align-items: center;
@@ -40,7 +45,9 @@
   }
 
   &.highlight {
-    background-color: rgba(0, 0, 0, 0.5);
+    $hl-bg-color: var(--loading-hl-bg-color, rgba(0, 0, 0, 0.5));
+
+    background-color: $hl-bg-color;
   }
 
   &.hide {
