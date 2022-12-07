@@ -1,5 +1,6 @@
 .camera-view {
   $bg-color: var(--camera-bg-color);
+  $grid-size: calc(100% / 3);
 
   position: relative;
   background-color: $bg-color;
@@ -26,6 +27,37 @@
           filter: contrast(1);
         }
       }
+    }
+
+    &::before,
+    &::after {
+      $grid-color: var(--bg-color, #fff);
+
+      content: '';
+      position: absolute;
+      box-sizing: border-box;
+      border: 0 solid $grid-color;
+      z-index: 1;
+    }
+
+    &::before {
+      transform: translateY(-50%);
+      top: 50%;
+      width: 100%;
+      height: $grid-size;
+      border-width: 1px 0;
+    }
+
+    &::after {
+      transform: translateX(-50%);
+      left: 50%;
+      width: $grid-size;
+      height: 100%;
+      border-width: 0 1px;
+    }
+
+    .video {
+      position: absolute;
     }
   }
 
