@@ -1,18 +1,9 @@
 .connect-camera {
-  --shadow-color: #000;
-  --font-color: #fff;
+  --color: var(--btn-font-color, #fff);
 
   .button {
     font-size: 1.75em;
-    color: var(--font-color);
-
-    svg {
-      filter:
-        drop-shadow(1px 0 0 var(--shadow-color)) 
-        drop-shadow(-1px 0 0 var(--shadow-color)) 
-        drop-shadow(0 -1px 0 var(--shadow-color)) 
-        drop-shadow(0 1px 0 var(--shadow-color));
-    }
+    color: var(--color);
 
     &:global(.disabled) {
       opacity: 0.5;

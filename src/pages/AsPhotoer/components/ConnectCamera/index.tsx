@@ -8,6 +8,7 @@ import { useConnectionContext } from '../../../../contexts/ConnectionContext';
 
 import Clickable from '../../../../components/Clickable';
 import AskInputModal from '../../../../components/Modal/AskInputModal';
+import ShadowWrapper from '../../../../components/ShadowWrapper';
 
 import styles from './styles.module.scss';
 
@@ -46,7 +47,9 @@ const ConnectCamera: FunctionComponent<ConnectCameraProps> = ({
         disabled={disabled}
         onClick={showConnectCameraModal}
       >
-        <FontAwesomeIcon icon={faLink} />
+        <ShadowWrapper>
+          <FontAwesomeIcon icon={faLink} />
+        </ShadowWrapper>
       </Clickable>
 
       <AskInputModal

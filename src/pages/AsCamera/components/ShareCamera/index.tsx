@@ -8,6 +8,7 @@ import { useConnectionContext } from '../../../../contexts/ConnectionContext';
 import { useModalContext } from '../../../../contexts/ModalContext';
 
 import Clickable from '../../../../components/Clickable';
+import ShadowWrapper from '../../../../components/ShadowWrapper';
 
 import shareData from '../../../../utils/shareData';
 
@@ -55,7 +56,9 @@ const ShareCamera: FunctionComponent<ShareCameraProps> = ({
       disabled={disabled}
       onClick={askToShare}
     >
-      <FontAwesomeIcon icon={faShareNodes} />
+      <ShadowWrapper>
+        <FontAwesomeIcon icon={faShareNodes} />
+      </ShadowWrapper>
     </Clickable>
   );
 };

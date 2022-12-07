@@ -1,13 +1,7 @@
 .tag {
-  --shadow-color: #000;
-  --font-color: #fff;
+  --color: var(--font-color, #fff);
 
   padding: 0.5em;
   font-size: 1rem;
-  color: var(--font-color);
-  filter:
-    drop-shadow(1px 0 0 var(--shadow-color)) 
-    drop-shadow(-1px 0 0 var(--shadow-color)) 
-    drop-shadow(0 -1px 0 var(--shadow-color)) 
-    drop-shadow(0 1px 0 var(--shadow-color));
+  color: var(--color);
 }
