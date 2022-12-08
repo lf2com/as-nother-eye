@@ -24,6 +24,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
   const {
     connector,
     id: connectorId,
+    isMediaConnected,
     peerId,
   } = useConnectionContext();
   const { notice } = useModalContext();
@@ -109,7 +110,7 @@ const Photoer: FunctionComponent<PhotoerProps> = () => {
         <Tag>Photoer #{connectorId}</Tag>
 
         <ConnectCamera
-          ask
+          ask={!isMediaConnected}
           onConnectCamera={onConnectCamera}
         />
       </div>
