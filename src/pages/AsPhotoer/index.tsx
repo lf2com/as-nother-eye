@@ -96,9 +96,7 @@ const Photoer: FunctionComponent = () => {
   }, [notice]);
 
   useEffect(() => {
-    startStream({
-      video: true,
-    })
+    startStream()
       .then((stream) => {
         setLocalStream(stream);
         setLocalMinStream(minifyCameraStream(stream));
