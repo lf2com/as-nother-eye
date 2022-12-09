@@ -23,12 +23,12 @@ const ShareCamera: FunctionComponent<ShareCameraProps> = ({
   ask = false,
   cameraUrl,
 }) => {
-  const { isOnline, isMediaConnected } = useConnectionContext();
+  const { isMediaConnected } = useConnectionContext();
   const { askYesNo } = useModalContext();
 
   const disabled = useMemo(() => (
-    isMediaConnected || !isOnline || !cameraUrl
-  ), [isMediaConnected, isOnline, cameraUrl]);
+    isMediaConnected || !cameraUrl
+  ), [isMediaConnected, cameraUrl]);
 
   const askToShare = useCallback(async () => {
     if (!cameraUrl) {

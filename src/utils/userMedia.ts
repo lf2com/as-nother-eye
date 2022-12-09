@@ -29,11 +29,11 @@ export const stopStream = (stream: MediaStream) => {
   stream.getTracks().forEach((track) => track.stop());
 };
 
-export const switchCamera = async (stream: MediaStream) => {
-  const constraints = stream.getVideoTracks()[0]?.getConstraints();
+export const getNextCamera = async (prevStream?: MediaStream): Promise<MediaDeviceInfo | null> => {
+  const constraints = prevStream?.getVideoTracks()[0]?.getConstraints();
 
   if (!constraints) {
-    return;
+    return null;
   }
 
   const cameras = await getCameras();
@@ -42,24 +42,61 @@ export const switchCamera = async (stream: MediaStream) => {
   } = constraints;
   const currentCameraIndex = cameras.findIndex((camera) => deviceId === camera.deviceId);
   const nextCameraIndex = (currentCameraIndex + 1) % cameras.length;
-  const nextCamera = cameras[nextCameraIndex];
 
   if (currentCameraIndex === nextCameraIndex) {
-    return;
+    return null;
   }
 
-  stopStream(stream);
-  stream.getTracks().forEach((track) => {
-    stream.removeTrack(track);
+  return cameras[nextCameraIndex];
+};
+
+export const minifyCameraStream = (stream: MediaStream) => {
+  const minStream = stream.clone();
+
+  minStream.getTracks().forEach((track) => {
+    const { width, height } = track.getCapabilities();
+
+    track.applyConstraints({
+      width: {
+        max: Math.round(Number(width?.max ?? 0) / 3),
+      },
+      height: {
+        max: Math.round(Number(height?.max ?? 0) / 3),
+      },
+      frameRate: 15,
+    });
   });
 
-  const camera = await startStream({
+  return minStream;
+};
+
+export const switchCamera = async (stream: MediaStream) => {
+  const nextCamera = await getNextCamera(stream);
+
+  if (!nextCamera) {
+    return stream;
+  }
+
+  if (stream) {
+    stream.getTracks().forEach((track) => {
+      stream.removeTrack(track);
+      track.stop();
+    });
+  }
+
+  const nextStream = await startStream({
     video: {
       deviceId: nextCamera.deviceId,
     },
   });
 
-  camera.getTracks().forEach((track) => {
+  if (!stream) {
+    return nextStream;
+  }
+
+  nextStream.getTracks().forEach((track) => {
     stream.addTrack(track);
   });
+
+  return stream;
 };

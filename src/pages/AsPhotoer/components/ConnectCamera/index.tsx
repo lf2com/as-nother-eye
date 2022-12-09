@@ -1,8 +1,6 @@
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, {
-  FunctionComponent, useEffect, useMemo, useState,
-} from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 
 import { useConnectionContext } from '../../../../contexts/ConnectionContext';
 
@@ -21,12 +19,8 @@ const ConnectCamera: FunctionComponent<ConnectCameraProps> = ({
   ask = false,
   onConnectCamera,
 }) => {
-  const { isOnline, isMediaConnected } = useConnectionContext();
+  const { isMediaConnected } = useConnectionContext();
   const [showModal, setShowModal] = useState(false);
-
-  const disabled = useMemo(() => (
-    isMediaConnected || !isOnline
-  ), [isMediaConnected, isOnline]);
 
   const showConnectCameraModal = () => {
     setShowModal(true);
@@ -44,7 +38,7 @@ const ConnectCamera: FunctionComponent<ConnectCameraProps> = ({
     <span className={styles['connect-camera']}>
       <Clickable
         className={styles.button}
-        disabled={disabled}
+        disabled={isMediaConnected}
         onClick={showConnectCameraModal}
       >
         <ShadowWrapper>

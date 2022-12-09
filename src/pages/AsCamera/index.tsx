@@ -1,12 +1,13 @@
 import React, {
   FunctionComponent, useCallback, useEffect, useMemo, useState,
 } from 'react';
-import { useParams } from 'react-router-dom';
 
-import { useConnectionContext } from '../../contexts/ConnectionContext';
+import {
+  OnCall, OnHangUp, OnMessage, useConnectionContext,
+} from '../../contexts/ConnectionContext';
 import { useModalContext } from '../../contexts/ModalContext';
 
-import CameraView, { CameraViewProps } from '../../components/CameraView';
+import CameraView from '../../components/CameraView';
 import Tag from '../../components/Tag';
 import PhotoManagement, { PhotoManagementProps } from '../components/PhotoManagement';
 import ShareCamera from './components/ShareCamera';
@@ -15,137 +16,64 @@ import createRoutePath from '../../utils/createRoutePath';
 import { downloadFiles } from '../../utils/downloadFile';
 import Logger from '../../utils/logger';
 import shareData from '../../utils/shareData';
-import { startStream, switchCamera } from '../../utils/userMedia';
+import {
+  getCameras,
+  getNextCamera, minifyCameraStream, startStream, stopStream,
+} from '../../utils/userMedia';
 import wait from '../../utils/wait';
 
 import styles from './styles.module.scss';
 
-interface CameraProps {
-}
-
 const logger = new Logger({ tag: '[Camera]' });
 
-const Camera: FunctionComponent<CameraProps> = () => {
-  const params = useParams();
-  const { targetId } = params;
+const Camera: FunctionComponent = () => {
   const {
-    connector,
-    id: connectorId,
+    id: connectionId,
+    isOnline,
+    isDataConnected,
+    isMediaConnected,
     peerId,
+    call,
+    sendMessage,
+    setOnMessage,
+    setOnCall,
+    setOnHangUp,
   } = useConnectionContext();
-  const { notice } = useModalContext();
-  const [disabledSwitchCamera, setDisabledSwitchCamera] = useState(false);
+  const { notice, askYesNo } = useModalContext();
+  const [disableShutter, setDisableShutter] = useState<boolean>();
+  const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
+  const [shutterAnimationId, setShutterAnimationId] = useState<number>();
   const [localStream, setLocalStream] = useState<MediaStream>();
-  const [takingPhoto, setTakingPhoto] = useState(false);
-  const [isSwitchingCamera, setIsSwitchingCamera] = useState(false);
+  const [localMinStream, setLocalMinStream] = useState<MediaStream>();
+  const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [photos, setPhotos] = useState<Blob[]>([]);
-  const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectorId}`), [connectorId]);
-
-  const captureCamera = useCallback(async () => {
-    if (!localStream) {
-      return null;
-    }
-
-    const track = localStream.getVideoTracks()[0];
-    const imageCapture = new ImageCapture(track);
-    const photoBlob = await imageCapture.takePhoto({
-      fillLightMode: 'auto', // 'auto' | 'off' | 'flash'
-      redEyeReduction: true,
-    });
-
-    await wait(1000);
-
-    return photoBlob;
-  }, [localStream]);
+  const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectionId}`), [connectionId]);
 
   const takePhoto = useCallback(async () => {
-    if (!localStream || isSwitchingCamera || takingPhoto) {
+    if (!localStream || disableSwitchCamera || disableShutter) {
       return;
     }
 
-    setTakingPhoto(true);
-
-    const photoBlob = await captureCamera();
-
-    setTakingPhoto(false);
-
-    if (photoBlob) {
-      setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
-    }
-  }, [localStream, isSwitchingCamera, takingPhoto, captureCamera]);
-
-  const handleSwitchCamera = useCallback<Required<CameraViewProps>['onSwitchCamera']>(async () => {
-    if (!localStream) {
-      return;
-    }
-
-    setDisabledSwitchCamera(true);
+    setDisableShutter(true);
 
     try {
-      setIsSwitchingCamera(true);
-      await switchCamera(localStream);
-      setIsSwitchingCamera(false);
+      const track = localStream.getVideoTracks()[0];
+      const imageCapture = new ImageCapture(track);
+      const photoBlob = await imageCapture.takePhoto({
+        fillLightMode: 'auto', // 'auto' | 'off' | 'flash'
+        redEyeReduction: true,
+      });
 
-      if (peerId) {
-        await connector.call(peerId, localStream);
+      if (photoBlob) {
+        setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
       }
     } catch (error) {
       notice(`${error}`);
     }
 
-    setDisabledSwitchCamera(false);
-  }, [connector, localStream, notice, peerId]);
-
-  const onPhoto = takePhoto;
-
-  const onData = useCallback<CameraViewProps['onData']>((data) => {
-    const message = data as string;
-
-    logger.log('DATA', data);
-
-    if (/^#/.test(message)) {
-      logger.log('MESSAGE', message.substring(1));
-      switch (message.substring(1)) {
-        case 'photo':
-          logger.log('GOTO TAKE PHOTO');
-          takePhoto();
-          break;
-
-        case 'switchcamera':
-          handleSwitchCamera({}).finally(() => {
-            connector.sendMessage(peerId!, '#switchcamera');
-          });
-          break;
-
-        default:
-          break;
-      }
-    }
-  }, [connector, handleSwitchCamera, peerId, takePhoto]);
-
-  const onCall: CameraViewProps['onCall'] = () => true;
-
-  const onHangUp = useCallback<CameraViewProps['onHangUp']>(() => {
-    logger.log('Closed');
-  }, []);
-
-  const getStream = useCallback<Required<CameraViewProps>['mediaStreamGenerator']>(async () => (
-    startStream({
-      video: true,
-    })
-  ), []);
-
-  const convertStream = useCallback<Required<CameraViewProps>['mediaStreamConverter']>(({
-    local,
-    remote,
-  }) => {
-    setLocalStream(local);
-
-    return {
-      major: local,
-      minor: remote,
-    };
-  }, []);
+    await wait(3000);
+    setDisableShutter(undefined);
+  }, [localStream, disableSwitchCamera, disableShutter, notice]);
 
   const onSaveSelectedPhotos = useCallback<PhotoManagementProps['onSave']>((selectedPhotos) => {
     downloadFiles(selectedPhotos);
@@ -161,26 +89,203 @@ const Camera: FunctionComponent<CameraProps> = () => {
     }
   }, [notice]);
 
-  useEffect(() => {
+  const switchCamera = useCallback(async () => {
+    const nextCameraInfo = await getNextCamera(localStream);
 
-  });
+    if (!nextCameraInfo) {
+      return;
+    }
+
+    try {
+      const stream = await startStream({
+        video: {
+          deviceId: nextCameraInfo.deviceId,
+        },
+      });
+
+      setLocalStream(stream);
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [localStream, notice]);
+
+  const takePhotoWithMessage = useCallback(async () => {
+    sendMessage('#photo');
+    await takePhoto();
+    sendMessage('#photoed');
+  }, [takePhoto, sendMessage]);
+
+  const switchCameraWithMessage = useCallback(async () => {
+    sendMessage('#switchcamera');
+    await switchCamera();
+    sendMessage('#switchedcamera');
+  }, [switchCamera, sendMessage]);
+
+  const onMessage = useCallback<OnMessage>(async (message) => {
+    logger.log('message', message);
+
+    if (/^#/.test(message)) {
+      logger.log('MESSAGE', message.substring(1));
+      switch (message.substring(1)) {
+        case 'photo':
+          setShutterAnimationId(Date.now());
+          await takePhotoWithMessage();
+          break;
+
+        case 'switchcamera':
+          await switchCameraWithMessage();
+          break;
+
+        default:
+          break;
+      }
+    }
+  }, [switchCameraWithMessage, takePhotoWithMessage]);
+
+  const onCall = useCallback<OnCall>(async (sourceId, answer) => {
+    logger.log(`Get call from <${sourceId}>`);
+
+    const acceptCall = await askYesNo(`Accept call from <${sourceId}>?`);
+
+    try {
+      if (!acceptCall) {
+        logger.log(`Declined call from <${sourceId}>`);
+        answer(false);
+
+        throw Error('Declined call');
+      }
+
+      if (!localMinStream) {
+        throw ReferenceError('Media stream not ready');
+      }
+
+      const stream = await answer(true, localMinStream);
+
+      if (!stream) {
+        throw ReferenceError('Not receive remote stream');
+      }
+
+      logger.log(`Receive remote stream <${sourceId}>`);
+      setRemoteStream(stream);
+    } catch (error) {
+      const errorMessage = `${error}`;
+
+      logger.warn(errorMessage);
+      notice(errorMessage);
+    }
+  }, [askYesNo, localMinStream, notice]);
+
+  const onHangUp: OnHangUp = () => {
+    setLocalStream(undefined);
+    setLocalMinStream(undefined);
+    setRemoteStream(undefined);
+  };
+
+  useEffect(() => {
+    getCameras()
+      .then((cameras) => {
+        const camera = cameras.find((info) => /\bmicrosoft\b/i.test(info.label));
+
+        return startStream({
+          video: {
+            deviceId: camera?.deviceId,
+          },
+        });
+      })
+      .then((stream) => {
+        setLocalStream(stream);
+        setDisableShutter(undefined);
+        setDisableSwitchCamera(undefined);
+      })
+      .catch((error) => {
+        notice(`Failed to init stream: ${error}`);
+      });
+  }, [notice]);
+
+  useEffect(() => {
+    if (localStream) {
+      setLocalMinStream(minifyCameraStream(localStream));
+    } else {
+      setLocalMinStream(undefined);
+    }
+
+    return () => {
+      if (localStream) {
+        stopStream(localStream);
+      }
+    };
+  }, [localStream]);
+
+  useEffect(() => () => {
+    if (localMinStream) {
+      stopStream(localMinStream);
+    }
+  }, [localMinStream]);
+
+  useEffect(() => {
+    if (localMinStream && peerId) {
+      call(peerId, localMinStream);
+    }
+  }, [call, localMinStream, peerId]);
+
+  useEffect(() => {
+    if (isDataConnected) {
+      setOnMessage(onMessage);
+    }
+
+    return () => {
+      setOnMessage();
+    };
+  }, [isDataConnected, onMessage, setOnMessage]);
+
+  useEffect(() => {
+    if (isDataConnected) {
+      setOnCall(onCall);
+    }
+
+    return () => {
+      setOnCall();
+    };
+  }, [isDataConnected, onCall, setOnCall]);
+
+  useEffect(() => {
+    if (isMediaConnected) {
+      setOnHangUp(onHangUp);
+    }
+
+    return () => {
+      setOnHangUp();
+    };
+  }, [isMediaConnected, setOnHangUp]);
+
+  useEffect(() => () => {
+    if (isOnline) {
+      onHangUp();
+    }
+  }, [isOnline]);
+
+  useEffect(() => {
+    setDisableShutter(true);
+    setDisableSwitchCamera(true);
+
+    return () => {
+      onHangUp();
+    };
+  }, []);
 
   return (
     <CameraView
       className={styles.camera}
-      targetId={targetId}
-      mediaStreamGenerator={getStream}
-      mediaStreamConverter={convertStream}
-      onShot={onPhoto}
-      onCall={onCall}
-      onData={onData}
-      onHangUp={onHangUp}
-      onSwitchCamera={handleSwitchCamera}
-      disabledSwitchCamera={disabledSwitchCamera}
-      showTakePhotoAnimation={takingPhoto}
+      disableShutter={disableShutter}
+      disableSwitchCamera={disableSwitchCamera}
+      shutterAnimationId={shutterAnimationId}
+      onShutter={takePhotoWithMessage}
+      onSwitchCamera={switchCameraWithMessage}
+      majorStream={localStream}
+      minorStream={remoteStream}
     >
       <div className={styles.title}>
-        <Tag>Camera #{connectorId}</Tag>
+        <Tag>Camera #{connectionId}</Tag>
 
         <ShareCamera
           ask
