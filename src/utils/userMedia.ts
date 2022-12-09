@@ -58,12 +58,12 @@ export const minifyCameraStream = (stream: MediaStream) => {
 
     track.applyConstraints({
       width: {
-        max: Math.round(Number(width?.max ?? 0) / 30),
+        max: Math.round(Number(width?.max ?? 0) / 3),
       },
       height: {
-        max: Math.round(Number(height?.max ?? 0) / 30),
+        max: Math.round(Number(height?.max ?? 0) / 3),
       },
-      frameRate: 5,
+      frameRate: 15,
     });
   });
 
