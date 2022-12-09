@@ -86,12 +86,18 @@
     height: $size;
     box-sizing: border-box;
     border-radius: 50%;
-    border: 0.2em solid $color;
-    background-color: $color;
+    border: 0.2em solid currentcolor;
+    background-color: currentcolor;
     background-clip: content-box;
+    color: $color;
     grid-area: shutter;
     justify-self: center;
-    cursor: pointer;
+
+    &:global(.disabled) {
+      $color: var(--font-disabled-color, #ccc);
+
+      color: $color;
+    }
   }
 
   .photo-list {
