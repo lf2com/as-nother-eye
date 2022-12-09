@@ -21,9 +21,18 @@ export const getSpeakers = async () => (await getDevices())
 
 export const startStream = async (
   constraints: MediaStreamConstraints = defaultStreamConstraints,
-) => navigator.mediaDevices.getUserMedia(
-  mergeObject(defaultStreamConstraints, constraints),
-);
+) => {
+  const cameras = await getCameras();
+  const realCameras = cameras.filter((info) => !/\bvirtual\b/i.test(info.label));
+  const realCamera = realCameras[0];
+  const realCameraConstraints = {
+    video: {
+      deviceId: realCamera?.deviceId,
+    },
+  };
+
+  return navigator.mediaDevices.getUserMedia(mergeObject(realCameraConstraints, constraints));
+};
 
 export const stopStream = (stream: MediaStream) => {
   stream.getTracks().forEach((track) => track.stop());

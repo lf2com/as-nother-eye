@@ -17,10 +17,8 @@ import { downloadFiles } from '../../utils/downloadFile';
 import Logger from '../../utils/logger';
 import shareData from '../../utils/shareData';
 import {
-  getCameras,
   getNextCamera, minifyCameraStream, startStream, stopStream,
 } from '../../utils/userMedia';
-import wait from '../../utils/wait';
 
 import styles from './styles.module.scss';
 
@@ -71,7 +69,6 @@ const Camera: FunctionComponent = () => {
       notice(`${error}`);
     }
 
-    await wait(3000);
     setDisableShutter(undefined);
   }, [localStream, disableSwitchCamera, disableShutter, notice]);
 
@@ -182,16 +179,7 @@ const Camera: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    getCameras()
-      .then((cameras) => {
-        const camera = cameras.find((info) => /\bmicrosoft\b/i.test(info.label));
-
-        return startStream({
-          video: {
-            deviceId: camera?.deviceId,
-          },
-        });
-      })
+    startStream()
       .then((stream) => {
         setLocalStream(stream);
         setDisableShutter(undefined);
