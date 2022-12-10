@@ -78,34 +78,3 @@ export const minifyCameraStream = (stream: MediaStream) => {
 
   return minStream;
 };
-
-export const switchCamera = async (stream: MediaStream) => {
-  const nextCamera = await getNextCamera(stream);
-
-  if (!nextCamera) {
-    return stream;
-  }
-
-  if (stream) {
-    stream.getTracks().forEach((track) => {
-      stream.removeTrack(track);
-      track.stop();
-    });
-  }
-
-  const nextStream = await startStream({
-    video: {
-      deviceId: nextCamera.deviceId,
-    },
-  });
-
-  if (!stream) {
-    return nextStream;
-  }
-
-  nextStream.getTracks().forEach((track) => {
-    stream.addTrack(track);
-  });
-
-  return stream;
-};
