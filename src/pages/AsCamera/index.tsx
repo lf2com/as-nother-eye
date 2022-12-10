@@ -94,6 +94,13 @@ const Camera: FunctionComponent = () => {
     }
 
     try {
+      if (localMinStream) {
+        stopStream(localMinStream);
+      }
+      if (localStream) {
+        stopStream(localStream);
+      }
+
       const stream = await startStream({
         video: {
           deviceId: nextCameraInfo.deviceId,
@@ -104,7 +111,7 @@ const Camera: FunctionComponent = () => {
     } catch (error) {
       notice(`${error}`);
     }
-  }, [localStream, notice]);
+  }, [localStream, localMinStream, notice]);
 
   const takePhotoWithMessage = useCallback(async () => {
     sendMessage('#photo');
@@ -196,19 +203,7 @@ const Camera: FunctionComponent = () => {
     } else {
       setLocalMinStream(undefined);
     }
-
-    return () => {
-      if (localStream) {
-        stopStream(localStream);
-      }
-    };
   }, [localStream]);
-
-  useEffect(() => () => {
-    if (localMinStream) {
-      stopStream(localMinStream);
-    }
-  }, [localMinStream]);
 
   useEffect(() => {
     if (localMinStream && peerId) {
