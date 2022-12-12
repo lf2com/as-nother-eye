@@ -1,9 +1,8 @@
 import { DataConnection, MediaConnection } from 'peerjs';
 import React, {
-  createContext, useCallback, useContext, useEffect, useMemo, useState,
+  createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 
-import Logger from '../../utils/logger';
 import RemoteConnection from '../../utils/RemoteConnection';
 import EventHandler from '../../utils/RemoteConnection/event/handler';
 
@@ -14,6 +13,12 @@ export type OnMessage = (message: string) => void;
 export type OnCall = EventHandler['call'];
 
 export type OnHangUp = (metadata?: unknown) => void;
+
+interface ConnectionListeners {
+  onMessage?: OnMessage;
+  onCall?: OnCall;
+  onHangUp?: OnHangUp;
+}
 
 interface ConnectionContextProps {
   id: string;
@@ -48,15 +53,12 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
 }) => {
   const searchParams = useMemo(() => new URLSearchParams(globalThis.location.search), []);
   const id = useMemo(() => searchParams.get('id') ?? undefined, [searchParams]);
-  const logger = useMemo(() => new Logger({ tag: `[${id}]` }), [id]);
   const connector = useMemo(() => new RemoteConnection(id), [id]);
   const [isOnline, setIsOnline] = useState(false);
   const [peerId, setPeerId] = useState<string>();
   const [dataConnection, setDataConnection] = useState<DataConnection>();
   const [mediaConnection, setMediaConnection] = useState<MediaConnection>();
-  const [onMessage, setOnMessage] = useState<OnMessage>();
-  const [onCall, setOnCall] = useState<OnCall>();
-  const [onHangUp, setOnHangUp] = useState<OnHangUp>();
+  const listeners = useRef<ConnectionListeners>({});
 
   const call = useCallback<ConnectionContextProps['call']>(async (targetId, stream) => (
     connector.call(targetId, stream)
@@ -98,28 +100,29 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
 
     switch (typeof data) {
       case 'string':
-        onMessage?.(data);
+        listeners.current.onMessage?.(data);
         break;
 
       default:
         break;
     }
-  }, [onMessage, peerId]);
+  }, [peerId]);
 
-  const handleCall = useCallback<EventHandler['call']>(async (sourceId, answer, metadata) => {
-    logger.log('oncall', sourceId, answer);
+  const handleCall: EventHandler['call'] = async (sourceId, answer, metadata) => {
+    const { onCall } = listeners.current;
+
     if (onCall) {
       await onCall(sourceId, answer, metadata);
     }
-  }, [logger, onCall]);
+  };
 
   const handleHangUp = useCallback<EventHandler['hangup']>(async (sourceId, metadata) => {
     if (sourceId !== peerId) {
       return;
     }
 
-    onHangUp?.(metadata);
-  }, [onHangUp, peerId]);
+    listeners.current.onHangUp?.(metadata);
+  }, [peerId]);
 
   const contextValue = useMemo<ConnectionContextProps>(() => ({
     id: connector.id,
@@ -130,9 +133,15 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
     call,
     changeStream,
     sendMessage,
-    setOnMessage: (caller) => setOnMessage(() => caller),
-    setOnCall: (caller) => setOnCall(() => caller),
-    setOnHangUp: (caller) => setOnHangUp(() => caller),
+    setOnMessage: (caller) => {
+      listeners.current.onMessage = caller;
+    },
+    setOnCall: (caller) => {
+      listeners.current.onCall = caller;
+    },
+    setOnHangUp: (caller) => {
+      listeners.current.onHangUp = caller;
+    },
   }), [
     call, changeStream, connector.id, dataConnection, isOnline,
     mediaConnection, peerId, sendMessage,
@@ -144,8 +153,6 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
     connector.addEventListener('connecteddata', onConnectedData);
     connector.addEventListener('connectedmedia', onConnectedMedia);
     connector.addEventListener('call', handleCall);
-    connector.addEventListener('data', handleData);
-    connector.addEventListener('hangup', handleHangUp);
 
     return () => {
       connector.removeEventListener('online', onOnline);
@@ -153,16 +160,28 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
       connector.removeEventListener('connecteddata', onConnectedData);
       connector.removeEventListener('connectedmedia', onConnectedMedia);
       connector.removeEventListener('call', handleCall);
-      connector.removeEventListener('data', handleData);
-      connector.removeEventListener('hangup', handleHangUp);
     };
-  }, [connector, handleCall, handleData, handleHangUp]);
+  }, [connector]);
+
+  useEffect(() => {
+    connector.addEventListener('data', handleData);
+
+    return () => connector.removeEventListener('data', handleData);
+  }, [connector, handleData]);
+
+  useEffect(() => {
+    connector.addEventListener('hangup', handleHangUp);
+
+    return () => connector.removeEventListener('hangup', handleHangUp);
+  }, [connector, handleHangUp]);
 
   useEffect(() => {
     connector.connect();
 
     return () => {
-      connector.disconnect();
+      if (connector.isOnline) {
+        connector.disconnect();
+      }
     };
   }, [connector]);
 

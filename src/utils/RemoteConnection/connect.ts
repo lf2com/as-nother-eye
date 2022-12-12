@@ -133,6 +133,7 @@ RemoteConnection.prototype.connect = function f(
 ) {
   return new Promise((resolve, reject) => {
     if (this.peer && this.isOnline) {
+      this.logger.log('Peer already connected');
       resolve(undefined);
       return;
     }
@@ -148,6 +149,7 @@ RemoteConnection.prototype.connect = function f(
       this.selfId = currentId;
       this.selfIsOnline = true;
       this.dispatchEvent('online');
+      this.logger.log('Peer connected');
       resolve(undefined);
     });
 
@@ -214,21 +216,25 @@ RemoteConnection.prototype.connect = function f(
       }
 
       const peer = this.selfPeer!;
+      const dataConnection = peer.connect(targetId);
 
+      this.logger.log(`Connecting to ${targetId}`);
       peer.off('error');
       peer.on('error', (error) => {
         this.logger.warn('Peer error', error);
+        this.disconnect(targetId);
         reject(error);
       });
 
-      const dataConnection = peer.connect(targetId);
-
       resolve(createDataConnection.call(this, dataConnection));
     }))
-    .then(() => console.log(100))
-    .catch((e) => {
-      console.warn(110, e);
-      throw e;
+    .then(() => {
+      this.logger.log(`Connected to ${targetId}`);
+    })
+    .catch((error) => {
+      this.logger.log(`Failed to connect to ${targetId}: ${error}`);
+
+      throw error;
     });
 };
 

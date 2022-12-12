@@ -7,6 +7,7 @@ import { OnHangUp, OnMessage, useConnectionContext } from '../../contexts/Connec
 import { useModalContext } from '../../contexts/ModalContext';
 
 import CameraView, { CameraViewProps } from '../../components/CameraView';
+import Loading from '../../components/Loading';
 import { AskInputModalProps } from '../../components/Modal/AskInputModal';
 import Tag from '../../components/Tag';
 import ConnectCamera from './components/ConnectCamera';
@@ -31,6 +32,7 @@ const Photoer: FunctionComponent = () => {
     setOnHangUp,
   } = useConnectionContext();
   const { notice } = useModalContext();
+  const [loadingMessage, setLoadingMessage] = useState<string>();
   const [disableShutter, setDisableShutter] = useState<boolean>();
   const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
   const [localStream, setLocalStream] = useState<MediaStream>();
@@ -122,12 +124,19 @@ const Photoer: FunctionComponent = () => {
 
   useEffect(() => {
     if (localMinStream && targetId) {
+      setLoadingMessage(`Connecting to <${targetId}>`);
       call(targetId, localMinStream)
         .then((stream) => {
           setRemoteStream(stream ?? undefined);
+        })
+        .catch((error) => {
+          notice(`${error}`);
+        })
+        .finally(() => {
+          setLoadingMessage(undefined);
         });
     }
-  }, [call, localMinStream, targetId]);
+  }, [call, localMinStream, notice, targetId]);
 
   useEffect(() => {
     if (isDataConnected) {
@@ -186,6 +195,11 @@ const Photoer: FunctionComponent = () => {
           onConnectCamera={onConnectCamera}
         />
       </div>
+
+      <Loading
+      >
+        {loadingMessage}
+      </Loading>
     </CameraView>
   );
 };
