@@ -32,6 +32,7 @@ const AskInputModal: FunctionComponentWithChildren<AskInputModalProps> = ({
   children,
 }) => {
   const [inputValue, setInputValue] = useState('');
+  const [isConfirmed, setIsConfirmed] = useState<boolean>();
   const refInput = useRef<HTMLInputElement>(null);
 
   const onOk = useCallback(() => {
@@ -62,13 +63,17 @@ const AskInputModal: FunctionComponentWithChildren<AskInputModalProps> = ({
       });
     }
     if (key === 'Enter') {
+      setIsConfirmed(true);
       onOk();
     }
   }, [onKeyDown, onOk]);
 
   useEffect(() => {
     if (show) {
-      refInput.current?.focus();
+      setIsConfirmed(false);
+      setTimeout(() => {
+        refInput.current?.select();
+      });
     }
   }, [show]);
 
@@ -78,12 +83,14 @@ const AskInputModal: FunctionComponentWithChildren<AskInputModalProps> = ({
       onOk={onOk}
       onCancel={onCancel}
       onClickOutside={onClickOutside}
+      disabled={isConfirmed}
     >
       <p>
         {children}
       </p>
       <input
         ref={refInput}
+        disabled={isConfirmed}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />

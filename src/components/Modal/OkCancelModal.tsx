@@ -8,11 +8,17 @@ import Modal, { ModalBasicProps } from '.';
 interface OkCancelModalProps extends ModalBasicProps {
   onOk: () => void;
   onCancel: () => void;
+  disabled?: boolean;
+  disabledOk?: boolean;
+  disabledCancel?: boolean;
 }
 
 const OkCancelModal: FunctionComponentWithChildren<OkCancelModalProps> = ({
   onOk,
   onCancel,
+  disabled,
+  disabledOk,
+  disabledCancel,
   children,
   ...restProps
 }) => (
@@ -20,12 +26,21 @@ const OkCancelModal: FunctionComponentWithChildren<OkCancelModalProps> = ({
     {...restProps}
     buttons={[
       (
-        <ModalButton key='cancel' onClick={onCancel}>
+        <ModalButton
+          key='cancel'
+          disabled={disabled || disabledCancel}
+          onClick={onCancel}
+        >
           Cancel
         </ModalButton>
       ),
       (
-        <ModalButton key='ok' highlight onClick={onOk}>
+        <ModalButton
+          key='ok'
+          highlight
+          disabled={disabled || disabledOk}
+          onClick={onOk}
+        >
           OK
         </ModalButton>
       ),
