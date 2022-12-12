@@ -206,10 +206,10 @@ const Camera: FunctionComponent = () => {
   }, [localStream]);
 
   useEffect(() => {
-    if (localMinStream && peerId) {
+    if (localMinStream && peerId && isMediaConnected) {
       call(peerId, localMinStream);
     }
-  }, [call, localMinStream, peerId]);
+  }, [call, localMinStream, peerId, isMediaConnected]);
 
   useEffect(() => {
     if (isDataConnected) {
