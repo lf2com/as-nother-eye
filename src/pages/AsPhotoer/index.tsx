@@ -184,8 +184,8 @@ const Photoer: FunctionComponent = () => {
       disableSwitchCamera={disableSwitchCamera}
       onShutter={onShutter}
       onSwitchCamera={onSwitchCamera}
-      majorStream={remoteStream}
-      minorStream={localStream}
+      majorContent={remoteStream}
+      minorContent={localStream}
     >
       <div className={styles.title}>
         <Tag>Photoer #{connectionId}</Tag>

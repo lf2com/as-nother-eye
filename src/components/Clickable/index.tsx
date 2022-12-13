@@ -1,12 +1,13 @@
 import classnames from 'classnames';
-import React, { MouseEventHandler, useCallback, useMemo } from 'react';
+import React, {
+  AllHTMLAttributes, MouseEventHandler, useCallback, useMemo,
+} from 'react';
 
 import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
-interface ClickableProps {
+interface ClickableProps extends AllHTMLAttributes<HTMLSpanElement> {
   disabled?: boolean;
-  onClick?: MouseEventHandler;
   stopPropagation?: boolean;
 }
 
@@ -23,7 +24,7 @@ const Clickable: FunctionComponentWithClassNameAndChildren<ClickableProps> = ({
     className,
   ), [className, disabled]);
 
-  const handleClick = useCallback<MouseEventHandler>((event) => {
+  const handleClick = useCallback<MouseEventHandler<HTMLSpanElement>>((event) => {
     if (stopPropagation) {
       event.stopPropagation();
     }

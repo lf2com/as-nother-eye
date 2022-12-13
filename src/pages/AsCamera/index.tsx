@@ -264,8 +264,8 @@ const Camera: FunctionComponent = () => {
       shutterAnimationId={shutterAnimationId}
       onShutter={takePhotoWithMessage}
       onSwitchCamera={switchCameraWithMessage}
-      majorStream={localStream}
-      minorStream={remoteStream}
+      majorContent={localStream}
+      minorContent={remoteStream}
     >
       <div className={styles.title}>
         <Tag>Camera #{connectionId}</Tag>
