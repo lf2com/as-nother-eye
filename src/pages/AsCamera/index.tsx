@@ -10,7 +10,6 @@ import { useModalContext } from '../../contexts/ModalContext';
 import CameraView from '../../components/CameraView';
 import Tag from '../../components/Tag';
 import PhotoManagement, { PhotoManagementProps } from '../components/PhotoManagement';
-import ShareCamera from './components/ShareCamera';
 
 import createRoutePath from '../../utils/createRoutePath';
 import { downloadFiles } from '../../utils/downloadFile';
@@ -185,6 +184,16 @@ const Camera: FunctionComponent = () => {
     setRemoteStream(undefined);
   };
 
+  const shareCamera = useCallback(async () => {
+    const share = await askYesNo('Share camera link?');
+
+    if (share) {
+      shareData({
+        url: cameraUrl,
+      });
+    }
+  }, [askYesNo, cameraUrl]);
+
   useEffect(() => {
     startStream()
       .then((stream) => {
@@ -265,15 +274,11 @@ const Camera: FunctionComponent = () => {
       onShutter={takePhotoWithMessage}
       onSwitchCamera={switchCameraWithMessage}
       majorContent={localStream}
-      minorContent={remoteStream}
+      minorContent={remoteStream ?? 'Share Camera'}
+      onClickMinor={remoteStream ? undefined : shareCamera}
     >
       <div className={styles.title}>
         <Tag>Camera #{connectionId}</Tag>
-
-        <ShareCamera
-          ask
-          cameraUrl={cameraUrl}
-        />
       </div>
 
       <PhotoManagement
