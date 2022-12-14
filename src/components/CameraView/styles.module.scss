@@ -1,5 +1,6 @@
 .camera-view {
   $bg-color: var(--camera-bg-color);
+  $disabled-bg-color: var(--camera-disabled-bg-color);
   $grid-size: calc(100% / 3);
 
   position: relative;
@@ -13,7 +14,52 @@
 
   .major {
     position: relative;
+    width: 100%;
+    height: 100%;
     grid-area: major;
+    display: block;
+    
+    &:not(:has(video)) {
+      background-color: $disabled-bg-color;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    &:has(video) {
+      &::before,
+      &::after {
+        $grid-color: var(--bg-color, #fff);
+  
+        content: '';
+        position: absolute;
+        box-sizing: border-box;
+        border: 0 solid $grid-color;
+        pointer-events: none;
+        z-index: 1;
+      }
+  
+      &::before {
+        transform: translateY(-50%);
+        top: 50%;
+        width: 100%;
+        height: $grid-size;
+        border-width: 1px 0;
+      }
+  
+      &::after {
+        transform: translateX(-50%);
+        left: 50%;
+        width: $grid-size;
+        height: 100%;
+        border-width: 0 1px;
+      }
+    }
+
+    &:global(.disabled) {
+      cursor: default;
+    }
     
     &.taking-photo {
       animation: anim-shot 0.25s linear forwards;
@@ -29,33 +75,6 @@
       }
     }
 
-    &::before,
-    &::after {
-      $grid-color: var(--bg-color, #fff);
-
-      content: '';
-      position: absolute;
-      box-sizing: border-box;
-      border: 0 solid $grid-color;
-      z-index: 1;
-    }
-
-    &::before {
-      transform: translateY(-50%);
-      top: 50%;
-      width: 100%;
-      height: $grid-size;
-      border-width: 1px 0;
-    }
-
-    &::after {
-      transform: translateX(-50%);
-      left: 50%;
-      width: $grid-size;
-      height: 100%;
-      border-width: 0 1px;
-    }
-
     .video {
       position: absolute;
     }
@@ -68,11 +87,27 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    margin: 0.5em;
+    margin: 0.5rem;
     max-width: 30%;
     max-height: 30%;
+    width: 100%;
+    height: 100%;
     border: 1px solid $border-color;
     outline: 1px solid $shadow-color;
+    background-color: $bg-color;
+    display: block;
+
+    &:not(:has(video)) {
+      background-color: $disabled-bg-color;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    &:global(.disabled) {
+      cursor: default;
+    }
   }
 
   .shutter {

@@ -3,10 +3,10 @@ import React from 'react';
 import { FunctionComponentWithChildren } from '../../types/ComponentProps';
 import styles from './styles.module.scss';
 
-const ShadowWrapper: FunctionComponentWithChildren = ({ children }) => (
-  <span className={styles['shadow-wrapper']}>
+const WithTextShadow: FunctionComponentWithChildren = ({ children }) => (
+  <span className={styles.shadow}>
     {children}
   </span>
 );
 
-export default ShadowWrapper;
+export default WithTextShadow;

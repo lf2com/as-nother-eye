@@ -2,7 +2,7 @@ import { faCameraRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classnames from 'classnames';
 import React, {
-  useCallback, useEffect, useRef, useState,
+  ReactNode, useCallback, useEffect, useRef, useState,
 } from 'react';
 
 import Clickable from '../Clickable';
@@ -13,24 +13,28 @@ import { FunctionComponentWithClassNameAndChildren } from '../../types/Component
 import styles from './styles.module.scss';
 
 export interface CameraViewProps {
-  majorStream?: MediaStream;
-  minorStream?: MediaStream;
+  majorContent?: MediaStream | ReactNode;
+  minorContent?: MediaStream | ReactNode;
   disableShutter?: boolean;
   shutterAnimationId?: number;
-  onShutter: () => void | Promise<void>;
   disableSwitchCamera?: boolean;
+  onShutter: () => void | Promise<void>;
   onSwitchCamera: () => void | Promise<void>;
+  onClickMajor?: () => void | Promise<void>;
+  onClickMinor?: () => void | Promise<void>;
 }
 
 const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = ({
   className,
-  majorStream,
-  minorStream,
+  majorContent = null,
+  minorContent = null,
   disableShutter: refDisableShutter,
   disableSwitchCamera: refDisableSwitchCamera,
   shutterAnimationId: refShutterAnimationId,
   onShutter,
   onSwitchCamera,
+  onClickMajor,
+  onClickMinor,
   children,
 }) => {
   const [shutterAnimationId, setShutterAnimationId] = useState<number>();
@@ -83,22 +87,36 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
 
   return (
     <Frame className={classnames(styles['camera-view'], className)}>
-      <Frame
+      <Clickable
         className={classnames(styles.major, {
           [styles['taking-photo']]: !!shutterAnimationId,
         })}
         onAnimationEnd={onShutterAnimationEnd}
+        disabled={!onClickMajor}
+        onClick={onClickMajor}
       >
-        <Video
-          ref={refMajorVideo}
-          className={styles.video}
-          srcObject={majorStream}
-        />
-      </Frame>
-      <Video
+        {(majorContent instanceof MediaStream
+          ? (
+            <Video
+              ref={refMajorVideo}
+              className={styles.video}
+              srcObject={majorContent}
+            />
+          )
+          : majorContent
+        )}
+      </Clickable>
+
+      <Clickable
         className={styles.minor}
-        srcObject={minorStream}
-      />
+        disabled={!onClickMinor}
+        onClick={onClickMinor}
+      >
+        {(minorContent instanceof MediaStream
+          ? <Video srcObject={minorContent} />
+          : minorContent
+        )}
+      </Clickable>
 
       <Clickable
         disabled={disableShutter}

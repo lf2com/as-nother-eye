@@ -8,9 +8,8 @@ import { useModalContext } from '../../contexts/ModalContext';
 
 import CameraView, { CameraViewProps } from '../../components/CameraView';
 import Loading from '../../components/Loading';
-import { AskInputModalProps } from '../../components/Modal/AskInputModal';
+import AskInputModal, { AskInputModalProps } from '../../components/Modal/AskInputModal';
 import Tag from '../../components/Tag';
-import ConnectCamera from './components/ConnectCamera';
 
 import Logger from '../../utils/logger';
 import { minifyCameraStream, startStream, stopStream } from '../../utils/userMedia';
@@ -39,6 +38,11 @@ const Photoer: FunctionComponent = () => {
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [targetId, setTargetId] = useState(params.targetId);
+  const [showConnectCameraModal, setShowConnectCameraModal] = useState(!targetId);
+
+  const hideConnectCameraModal = () => {
+    setShowConnectCameraModal(false);
+  };
 
   const onShutter = useCallback<CameraViewProps['onShutter']>(() => {
     setDisableShutter(true);
@@ -96,6 +100,11 @@ const Photoer: FunctionComponent = () => {
       notice(`${error}`);
     }
   }, [notice]);
+
+  const onClickMajor = (remoteStream
+    ? undefined
+    : () => setShowConnectCameraModal(true)
+  );
 
   useEffect(() => {
     startStream()
@@ -169,6 +178,12 @@ const Photoer: FunctionComponent = () => {
   }, [isOnline]);
 
   useEffect(() => {
+    if (isMediaConnected && showConnectCameraModal) {
+      hideConnectCameraModal();
+    }
+  }, [isMediaConnected, showConnectCameraModal]);
+
+  useEffect(() => {
     setDisableShutter(true);
     setDisableSwitchCamera(true);
 
@@ -184,17 +199,22 @@ const Photoer: FunctionComponent = () => {
       disableSwitchCamera={disableSwitchCamera}
       onShutter={onShutter}
       onSwitchCamera={onSwitchCamera}
-      majorStream={remoteStream}
-      minorStream={localStream}
+      majorContent={remoteStream ?? 'Connect to Camera'}
+      minorContent={localStream}
+      onClickMajor={onClickMajor}
     >
       <div className={styles.title}>
         <Tag>Photoer #{connectionId}</Tag>
-
-        <ConnectCamera
-          ask={!isMediaConnected}
-          onConnectCamera={onConnectCamera}
-        />
       </div>
+
+      <AskInputModal
+        show={showConnectCameraModal}
+        onCancel={hideConnectCameraModal}
+        onConfirm={onConnectCamera}
+        onClickOutside={hideConnectCameraModal}
+      >
+        Connect to camera
+      </AskInputModal>
 
       <Loading
       >
