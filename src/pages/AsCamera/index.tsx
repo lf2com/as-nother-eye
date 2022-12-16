@@ -113,16 +113,24 @@ const Camera: FunctionComponent = () => {
   }, [localStream, localMinStream, notice]);
 
   const takePhotoWithMessage = useCallback(async () => {
-    sendMessage('#photo');
-    await takePhoto();
-    sendMessage('#photoed');
-  }, [takePhoto, sendMessage]);
+    try {
+      await sendMessage('#photo', true);
+      await takePhoto();
+      await sendMessage('#photoed', true);
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [sendMessage, takePhoto, notice]);
 
   const switchCameraWithMessage = useCallback(async () => {
-    sendMessage('#switchcamera');
-    await switchCamera();
-    sendMessage('#switchedcamera');
-  }, [switchCamera, sendMessage]);
+    try {
+      await sendMessage('#switchcamera', true);
+      await switchCamera();
+      await sendMessage('#switchedcamera', true);
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [sendMessage, switchCamera, notice]);
 
   const onMessage = useCallback<OnMessage>(async (message) => {
     logger.log('message', message);

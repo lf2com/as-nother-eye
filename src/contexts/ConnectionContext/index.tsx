@@ -28,7 +28,7 @@ interface ConnectionContextProps {
   peerId: string | null;
   call: (id: string, stream: MediaStream) => Promise<MediaStream | null>;
   changeStream: (stream: MediaStream) => Promise<void>;
-  sendMessage: (message: string) => Promise<void>;
+  sendMessage: (message: string, ignorePeer?: boolean) => Promise<void>;
   setOnMessage: (caller?: OnMessage) => void;
   setOnCall: (caller?: OnCall) => void;
   setOnHangUp: (caller?: OnHangUp) => void;
@@ -72,12 +72,16 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
     await call(peerId, stream);
   }, [call, peerId]);
 
-  const sendMessage = useCallback<ConnectionContextProps['sendMessage']>(async (message) => {
-    if (!peerId) {
+  const sendMessage = useCallback<ConnectionContextProps['sendMessage']>(async (
+    message,
+    ignorePeer = false,
+  ) => {
+    if (!ignorePeer && !peerId) {
       throw ReferenceError('Not connect to peer yet');
     }
-
-    await connector.sendMessage(peerId, message);
+    if (peerId) {
+      await connector.sendMessage(peerId, message);
+    }
   }, [connector, peerId]);
 
   const onOnline: EventHandler['online'] = () => setIsOnline(true);
