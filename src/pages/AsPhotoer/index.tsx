@@ -106,6 +106,7 @@ const Photoer: FunctionComponent = () => {
       }
 
       setTargetId(id);
+      hideConnectCameraModal();
     } catch (error) {
       notice(`${error}`);
     }
