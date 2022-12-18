@@ -8,8 +8,8 @@ import {
 import { useModalContext } from '../../contexts/ModalContext';
 
 import CameraView from '../../components/CameraView';
+import PhotoManagement, { PhotoManagementProps } from '../../components/PhotoManagement';
 import Tag from '../../components/Tag';
-import PhotoManagement, { PhotoManagementProps } from '../components/PhotoManagement';
 
 import createRoutePath from '../../utils/createRoutePath';
 import { downloadFiles } from '../../utils/downloadFile';
