@@ -44,15 +44,25 @@ const Photoer: FunctionComponent = () => {
     setShowConnectCameraModal(false);
   };
 
-  const onShutter = useCallback<CameraViewProps['onShutter']>(() => {
+  const onShutter = useCallback<CameraViewProps['onShutter']>(async () => {
     setDisableShutter(true);
-    sendMessage('#photo');
-  }, [sendMessage]);
+
+    try {
+      await sendMessage('#photo');
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [notice, sendMessage]);
 
   const onSwitchCamera = useCallback<CameraViewProps['onSwitchCamera']>(async () => {
     setDisableSwitchCamera(true);
-    sendMessage('#switchcamera');
-  }, [sendMessage]);
+
+    try {
+      await sendMessage('#switchcamera');
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [notice, sendMessage]);
 
   const onMessage: OnMessage = (message) => {
     logger.log('message', message);
@@ -96,6 +106,7 @@ const Photoer: FunctionComponent = () => {
       }
 
       setTargetId(id);
+      hideConnectCameraModal();
     } catch (error) {
       notice(`${error}`);
     }

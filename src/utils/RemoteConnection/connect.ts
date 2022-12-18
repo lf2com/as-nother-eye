@@ -226,7 +226,9 @@ RemoteConnection.prototype.connect = function f(
         reject(error);
       });
 
-      resolve(createDataConnection.call(this, dataConnection));
+      createDataConnection.call(this, dataConnection)
+        .then(resolve)
+        .catch(reject);
     }))
     .then(() => {
       this.logger.log(`Connected to ${targetId}`);
