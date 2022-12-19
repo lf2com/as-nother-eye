@@ -121,4 +121,6 @@ const Modal: FunctionComponentWithClassNameAndChildren<ModalProps> = ({
   );
 };
 
+export { ModalButton };
+
 export default Modal;

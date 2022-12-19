@@ -1,9 +1,7 @@
 import React from 'react';
 
-import ModalButton from './components/Button';
-
 import { FunctionComponentWithChildren } from '../../types/ComponentProps';
-import Modal, { ModalBasicProps } from '.';
+import Modal, { ModalBasicProps, ModalButton } from '.';
 
 interface YesNoModalProps extends ModalBasicProps {
   onYes: () => void;

@@ -3,13 +3,12 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import ModalButton from '../Modal/components/Button';
 import Photo from './components/Photo';
 
 import dateToStr from '../../utils/dateToStr';
 
 import Clickable from '../Clickable';
-import Modal from '../Modal';
+import Modal, { ModalButton } from '../Modal';
 import PhotoList from '../PhotoList';
 
 import { FunctionComponentWithClassName } from '../../types/ComponentProps';
