@@ -1,4 +1,4 @@
-import wait from './wait';
+import wait from '@/utils/wait';
 
 const delayAwaitResult = async <P>(
   promise: P,

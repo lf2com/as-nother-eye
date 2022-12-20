@@ -37,11 +37,8 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: '.',
+        project: '**/*/tsconfig.json',
       },
-      // node: {
-      //   extensions: ['.js', '.ts', '.tsx'],
-      // },
     },
   },
   rules: {
@@ -60,6 +57,7 @@ module.exports = {
     // enable console
     // 'no-console': 'off',
 
+    'import/no-unresolved': 'error',
     'import/extensions': ['error', 'never'],
 
     // method overload
@@ -72,17 +70,18 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
 
+    'import/order': 'off',
     'simple-import-sort/imports': [
       'warn',
       {
         groups: [
-          // packages
           ['^@?\\w'],
           ['/contexts/?'],
           ['/components/?'],
           ['/hooks/?'],
           ['/utils/?'],
-          ['\\./\\w+$'],
+          ['/types/?'],
+          ['/pages/?'],
           ['/\\w+.scss$'],
         ],
       },

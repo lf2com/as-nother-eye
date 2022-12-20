@@ -2,7 +2,6 @@ import Peer, { DataConnection, MediaConnection } from 'peerjs';
 
 import './event';
 import { RemoteConnection } from './base';
-
 import EventHandler from './event/handler';
 
 const MESSAGE_DECLINE_CALL = '#decline-call';

@@ -3,16 +3,16 @@ import React, {
 } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { OnHangUp, OnMessage, useConnectionContext } from '../../contexts/ConnectionContext';
-import { useModalContext } from '../../contexts/ModalContext';
+import { OnHangUp, OnMessage, useConnectionContext } from '@/contexts/ConnectionContext';
+import { useModalContext } from '@/contexts/ModalContext';
 
-import CameraView, { CameraViewProps } from '../../components/CameraView';
-import Loading from '../../components/Loading';
-import AskInputModal, { AskInputModalProps } from '../../components/Modal/AskInputModal';
-import Tag from '../../components/Tag';
+import CameraView, { CameraViewProps } from '@/components/CameraView';
+import Loading from '@/components/Loading';
+import AskInputModal, { AskInputModalProps } from '@/components/Modal/AskInputModal';
+import Tag from '@/components/Tag';
 
-import Logger from '../../utils/logger';
-import { minifyCameraStream, startStream, stopStream } from '../../utils/userMedia';
+import Logger from '@/utils/logger';
+import { minifyCameraStream, startStream, stopStream } from '@/utils/userMedia';
 
 import styles from './styles.module.scss';
 

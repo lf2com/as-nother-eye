@@ -1,9 +1,10 @@
 import classnames from 'classnames';
 import React, { useMemo } from 'react';
 
-import { LogType } from '../../../../utils/logger';
+import { LogType } from '@/utils/logger';
 
-import { FunctionComponentWithChildren } from '../../../../types/ComponentProps';
+import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 export interface LogMessageProps {

@@ -2,14 +2,15 @@ import React, { FunctionComponent } from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 
-import ConnectionContextProvider from './contexts/ConnectionContext';
-import LoggerContextProvider from './contexts/LoggerContext';
-import ModalContextProvider from './contexts/ModalContext';
+import ConnectionContextProvider from '@/contexts/ConnectionContext';
+import LoggerContextProvider from '@/contexts/LoggerContext';
+import ModalContextProvider from '@/contexts/ModalContext';
 
-import Camera from './pages/AsCamera';
-import Photoer from './pages/AsPhotoer';
-import Test from './pages/Test';
-import Welcome from './pages/Welcome';
+import Camera from '@/pages/AsCamera';
+import Photoer from '@/pages/AsPhotoer';
+import Test from '@/pages/Test';
+import Welcome from '@/pages/Welcome';
+
 import styles from './styles.module.scss';
 
 const App: FunctionComponent = () => (

@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import React, { FunctionComponent } from 'react';
 
-import Clickable from '../Clickable';
+import Clickable from '@/components/Clickable';
 
 import styles from './styles.module.scss';
 

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { FunctionComponentWithChildren } from '../../types/ComponentProps';
+import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+
 import Modal, { ModalBasicProps, ModalButton } from '.';
 
 interface NotificationModalProps extends ModalBasicProps {

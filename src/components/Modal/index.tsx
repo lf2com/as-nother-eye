@@ -7,9 +7,10 @@ import ModalButtonContextProvider from './contexts/ModalButtonContext';
 
 import ModalButton from './components/Button';
 
-import wait from '../../utils/wait';
+import wait from '@/utils/wait';
 
-import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
+import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 export interface ModalBasicProps {
