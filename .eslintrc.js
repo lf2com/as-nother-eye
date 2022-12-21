@@ -57,7 +57,9 @@ module.exports = {
     // enable console
     // 'no-console': 'off',
 
-    'import/no-unresolved': 'error',
+    'import/no-unresolved': ['error', {
+      ignore: ['^@/'],
+    }],
     'import/extensions': ['error', 'never'],
 
     // method overload
