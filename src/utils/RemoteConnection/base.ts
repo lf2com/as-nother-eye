@@ -1,7 +1,7 @@
 import Peer from 'peerjs';
 
-import Logger from '../logger';
-import randomStr from '../random';
+import Logger from '@/utils/logger';
+import randomStr from '@/utils/random';
 
 export class RemoteConnection {
   protected selfId: string;

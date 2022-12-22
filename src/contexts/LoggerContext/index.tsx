@@ -5,9 +5,10 @@ import React, {
 
 import LogMessage, { LogMessageProps } from './components/LogMessage';
 
-import Logger from '../../utils/logger';
+import Logger from '@/utils/logger';
 
-import { FunctionComponentWithChildren } from '../../types/ComponentProps';
+import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 interface LoggerContextProps {

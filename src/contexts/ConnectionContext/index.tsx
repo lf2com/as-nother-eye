@@ -3,10 +3,10 @@ import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 
-import RemoteConnection from '../../utils/RemoteConnection';
-import EventHandler from '../../utils/RemoteConnection/event/handler';
+import RemoteConnection from '@/utils/RemoteConnection';
+import EventHandler from '@/utils/RemoteConnection/event/handler';
 
-import { FunctionComponentWithChildren } from '../../types/ComponentProps';
+import { FunctionComponentWithChildren } from '@/types/ComponentProps';
 
 export type OnMessage = (message: string) => void;
 

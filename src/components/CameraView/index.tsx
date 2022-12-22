@@ -5,11 +5,12 @@ import React, {
   ReactNode, useCallback, useEffect, useRef, useState,
 } from 'react';
 
-import Clickable from '../Clickable';
-import Frame from '../Frame';
-import Video from '../Video';
+import Clickable from '@/components/Clickable';
+import Frame from '@/components/Frame';
+import Video from '@/components/Video';
 
-import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
+import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 export interface CameraViewProps {

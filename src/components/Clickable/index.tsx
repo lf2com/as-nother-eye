@@ -3,7 +3,8 @@ import React, {
   AllHTMLAttributes, MouseEventHandler, useCallback, useMemo,
 } from 'react';
 
-import { FunctionComponentWithClassNameAndChildren } from '../../types/ComponentProps';
+import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 interface ClickableProps extends AllHTMLAttributes<HTMLSpanElement> {

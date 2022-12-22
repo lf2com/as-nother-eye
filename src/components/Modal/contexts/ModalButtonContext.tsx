@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo } from 'react';
 
-import { FunctionComponentWithChildren } from '../../../types/ComponentProps';
+import { FunctionComponentWithChildren } from '@/types/ComponentProps';
 
 interface ModalButtonContextProps {
   disabledAll: boolean;

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
     "outDir": "./dist",
     "target": "esnext",
     "lib": [
@@ -16,5 +17,10 @@
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
+    "paths": {
+      "@/*": ["*"],
+      // "@contexts/*": ["contexts/*"],
+      // "@pages/*": ["pages/*"],
+    },
   },
 }

@@ -3,15 +3,15 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
-import Clickable from '../../../components/Clickable';
-import Modal from '../../../components/Modal';
-import ModalButton from '../../../components/Modal/components/Button';
-import PhotoList from '../../../components/PhotoList';
 import Photo from './components/Photo';
+import Clickable from '@/components/Clickable';
+import Modal, { ModalButton } from '@/components/Modal';
+import PhotoList from '@/components/PhotoList';
 
-import dateToStr from '../../../utils/dateToStr';
+import dateToStr from '@/utils/dateToStr';
 
-import { FunctionComponentWithClassName } from '../../../types/ComponentProps';
+import { FunctionComponentWithClassName } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 export interface PhotoManagementProps {

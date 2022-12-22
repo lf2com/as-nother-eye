@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Button from '../../components/Button';
-import Frame from '../../components/Frame';
+import Button from '@/components/Button';
+import Frame from '@/components/Frame';
 
 import styles from './styles.module.scss';
 

@@ -1,4 +1,4 @@
-import mergeObject from './mergeObject';
+import mergeObject from '@/utils/mergeObject';
 
 type MediaStreamConstraints = Parameters<MediaDevices['getUserMedia']>[0];
 

@@ -5,7 +5,8 @@ import React, {
 
 import Photo from './components/Photo';
 
-import { FunctionComponentWithClassName } from '../../types/ComponentProps';
+import { FunctionComponentWithClassName } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 interface PhotoListProps {

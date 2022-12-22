@@ -2,10 +2,10 @@ import React, {
   ChangeEventHandler, KeyboardEventHandler, useCallback, useEffect, useRef, useState,
 } from 'react';
 
-import OkCancelModal from './OkCancelModal';
+import { FunctionComponentWithChildren } from '@/types/ComponentProps';
 
-import { FunctionComponentWithChildren } from '../../types/ComponentProps';
 import { ModalBasicProps } from '.';
+import OkCancelModal from './OkCancelModal';
 
 export interface AskInputModalProps {
   show: boolean;

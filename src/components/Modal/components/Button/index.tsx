@@ -3,9 +3,10 @@ import React, { useMemo } from 'react';
 
 import { useModalButtonContext } from '../../contexts/ModalButtonContext';
 
-import Clickable from '../../../Clickable';
+import Clickable from '@/components/Clickable';
 
-import { FunctionComponentWithChildren } from '../../../../types/ComponentProps';
+import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+
 import styles from './styles.module.scss';
 
 export interface ModalButtonProps {

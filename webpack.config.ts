@@ -62,6 +62,9 @@ export default (env: any, options: any): WebpackConfig & WebpackDevServerConfig 
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      },
     },
     plugins: [
       new HtmlWebpackPlugin({

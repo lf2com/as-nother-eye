@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 
-import Logger from '../../utils/logger';
-import randomStr from '../../utils/random';
+import Logger from '@/utils/logger';
+import randomStr from '@/utils/random';
 
 import styles from './styles.module.scss';
 

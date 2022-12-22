@@ -4,20 +4,20 @@ import React, {
 
 import {
   OnCall, OnHangUp, OnMessage, useConnectionContext,
-} from '../../contexts/ConnectionContext';
-import { useModalContext } from '../../contexts/ModalContext';
+} from '@/contexts/ConnectionContext';
+import { useModalContext } from '@/contexts/ModalContext';
 
-import CameraView from '../../components/CameraView';
-import Tag from '../../components/Tag';
-import PhotoManagement, { PhotoManagementProps } from '../components/PhotoManagement';
+import CameraView from '@/components/CameraView';
+import PhotoManagement, { PhotoManagementProps } from '@/components/PhotoManagement';
+import Tag from '@/components/Tag';
 
-import createRoutePath from '../../utils/createRoutePath';
-import { downloadFiles } from '../../utils/downloadFile';
-import Logger from '../../utils/logger';
-import shareData from '../../utils/shareData';
+import createRoutePath from '@/utils/createRoutePath';
+import { downloadFiles } from '@/utils/downloadFile';
+import Logger from '@/utils/logger';
+import shareData from '@/utils/shareData';
 import {
   getNextCamera, minifyCameraStream, startStream, stopStream,
-} from '../../utils/userMedia';
+} from '@/utils/userMedia';
 
 import styles from './styles.module.scss';
 
