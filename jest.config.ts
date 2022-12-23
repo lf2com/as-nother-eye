@@ -26,4 +26,7 @@ export default {
   ],
   watchPathIgnorePatterns: [],
   watchman: true,
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
 };
