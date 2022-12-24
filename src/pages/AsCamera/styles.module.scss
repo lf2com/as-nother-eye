@@ -1,4 +1,8 @@
 .camera {
+  .mirror {
+    transform: scaleX(-1);
+  }
+
   .title {
     position: absolute;
     top: 0;
@@ -8,22 +12,6 @@
     flex-direction: row;
     align-items: center;
     z-index: 1;
-  }
-  
-  .major {
-    &.taking-photo {
-      animation: anim-shot 0.25s linear forwards;
-  
-      @keyframes anim-shot {
-        0% {
-          filter: contrast(0);
-        }
-
-        100% {
-          filter: contrast(1);
-        }
-      }
-    }
   }
   
   .photo-list {

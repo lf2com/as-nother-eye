@@ -1,3 +1,6 @@
+import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import classnames from 'classnames';
 import React, {
   FunctionComponent, useCallback, useEffect, useState,
 } from 'react';
@@ -7,6 +10,7 @@ import { OnHangUp, OnMessage, useConnectionContext } from '@/contexts/Connection
 import { useModalContext } from '@/contexts/ModalContext';
 
 import CameraView, { CameraViewProps } from '@/components/CameraView';
+import Clickable from '@/components/Clickable';
 import Loading from '@/components/Loading';
 import AskInputModal, { AskInputModalProps } from '@/components/Modal/AskInputModal';
 import Tag from '@/components/Tag';
@@ -37,8 +41,13 @@ const Photoer: FunctionComponent = () => {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
+  const [mirrorCamera, setMirrorCamera] = useState(false);
   const [targetId, setTargetId] = useState(params.targetId);
   const [showConnectCameraModal, setShowConnectCameraModal] = useState(!targetId);
+
+  const toggleMirroCamera = () => {
+    setMirrorCamera((prevMirror) => !prevMirror);
+  };
 
   const hideConnectCameraModal = () => {
     setShowConnectCameraModal(false);
@@ -206,6 +215,9 @@ const Photoer: FunctionComponent = () => {
   return (
     <CameraView
       className={styles.photoer}
+      majorClassName={classnames({
+        [styles.mirror]: mirrorCamera,
+      })}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
       onShutter={onShutter}
@@ -217,6 +229,13 @@ const Photoer: FunctionComponent = () => {
       <div className={styles.title}>
         <Tag>Photoer #{connectionId}</Tag>
       </div>
+
+      <Clickable
+        className={styles['mirror-button']}
+        onClick={toggleMirroCamera}
+      >
+        <FontAwesomeIcon icon={faArrowsLeftRight} />
+      </Clickable>
 
       <AskInputModal
         show={showConnectCameraModal}

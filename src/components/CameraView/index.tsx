@@ -14,6 +14,7 @@ import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProp
 import styles from './styles.module.scss';
 
 export interface CameraViewProps {
+  majorClassName?: string;
   majorContent?: MediaStream | ReactNode;
   minorContent?: MediaStream | ReactNode;
   disableShutter?: boolean;
@@ -27,6 +28,7 @@ export interface CameraViewProps {
 
 const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = ({
   className,
+  majorClassName,
   majorContent = null,
   minorContent = null,
   disableShutter: refDisableShutter,
@@ -91,7 +93,7 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
       <Clickable
         className={classnames(styles.major, {
           [styles['taking-photo']]: !!shutterAnimationId,
-        })}
+        }, majorClassName)}
         onAnimationEnd={onShutterAnimationEnd}
         disabled={!onClickMajor}
         onClick={onClickMajor}

@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import React, {
   FunctionComponent, useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -43,6 +44,7 @@ const Camera: FunctionComponent = () => {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
+  const [mirrorCamera, setMirrorCamera] = useState(false);
   const [photos, setPhotos] = useState<Blob[]>([]);
   const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectionId}`), [connectionId]);
 
@@ -61,15 +63,65 @@ const Camera: FunctionComponent = () => {
         redEyeReduction: true,
       });
 
-      if (photoBlob) {
-        setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
+      if (!photoBlob) {
+        throw ReferenceError('No photo blob');
+      }
+
+      const url = URL.createObjectURL(photoBlob);
+
+      try {
+        const finalPhotoBlob = await new Promise<Blob>((resolve, reject) => {
+          if (!mirrorCamera) {
+            resolve(photoBlob);
+
+            return;
+          }
+
+          const img = new Image();
+
+          img.addEventListener('error', reject);
+
+          img.addEventListener('load', () => {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            if (!context) {
+              reject(Error('Failed to get context 2D'));
+
+              return;
+            }
+
+            const {
+              naturalWidth: width,
+              naturalHeight: height,
+            } = img;
+
+            canvas.width = width;
+            canvas.height = height;
+            context.setTransform(-1, 0, 0, 1, width, 0);
+            context.drawImage(img, 0, 0);
+            canvas.toBlob((blob) => {
+              if (blob) {
+                resolve(blob);
+              } else {
+                reject(Error('Failed to convert canvas'));
+              }
+            });
+          });
+
+          img.src = url;
+        });
+
+        setPhotos((prevPhotos) => prevPhotos.concat(finalPhotoBlob));
+      } finally {
+        URL.revokeObjectURL(url);
       }
     } catch (error) {
       notice(`${error}`);
     }
 
     setDisableShutter(undefined);
-  }, [localStream, disableSwitchCamera, disableShutter, notice]);
+  }, [localStream, disableSwitchCamera, disableShutter, mirrorCamera, notice]);
 
   const onSaveSelectedPhotos = useCallback<PhotoManagementProps['onSave']>((selectedPhotos) => {
     downloadFiles(selectedPhotos);
@@ -216,6 +268,13 @@ const Camera: FunctionComponent = () => {
 
   useEffect(() => {
     if (localStream) {
+      const shouldMirror = localStream.getVideoTracks().some((track) => {
+        const facingModes = track.getCapabilities().facingMode;
+
+        return !!facingModes?.includes('user');
+      });
+
+      setMirrorCamera(shouldMirror);
       setLocalMinStream(minifyCameraStream(localStream));
     } else {
       setLocalMinStream(undefined);
@@ -276,6 +335,9 @@ const Camera: FunctionComponent = () => {
   return (
     <CameraView
       className={styles.camera}
+      majorClassName={classnames({
+        [styles.mirror]: mirrorCamera,
+      })}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
       shutterAnimationId={shutterAnimationId}
