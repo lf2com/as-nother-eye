@@ -46,10 +46,6 @@ const Photoer: FunctionComponent = () => {
   const [targetId, setTargetId] = useState(params.targetId);
   const [showConnectCameraModal, setShowConnectCameraModal] = useState(!targetId);
 
-  const toggleMirroCamera = () => {
-    setMirrorCamera((prevMirror) => !prevMirror);
-  };
-
   const hideConnectCameraModal = () => {
     setShowConnectCameraModal(false);
   };
@@ -74,16 +70,33 @@ const Photoer: FunctionComponent = () => {
     }
   }, [notice, sendCommand]);
 
-  const onCommand: OnCommand = (type, command) => {
-    logger.log('command', type, command);
+  const handleMirrorCamera = useCallback(async (mirror: boolean) => {
+    try {
+      await sendCommand(CommandType.flipCamera, 'horizontal');
+      setMirrorCamera(mirror);
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [notice, sendCommand]);
+
+  const toggleMirroCamera = useCallback(() => {
+    handleMirrorCamera(!mirrorCamera);
+  }, [handleMirrorCamera, mirrorCamera]);
+
+  const onCommand: OnCommand = (type, param) => {
+    logger.log('command', type, param);
 
     switch (type) {
       case CommandType.takingPhoto:
-        setDisableShutter(!!command);
+        setDisableShutter(!!param);
         break;
 
       case CommandType.switchingCamera:
-        setDisableSwitchCamera(!!command);
+        setDisableSwitchCamera(!!param);
+        break;
+
+      case CommandType.flippingCamera:
+        setMirrorCamera(!!param);
         break;
 
       default:

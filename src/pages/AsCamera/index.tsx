@@ -185,6 +185,16 @@ const Camera: FunctionComponent = () => {
     }
   }, [sendCommand, switchCamera, notice]);
 
+  const mirrorCameraWithMessage = useCallback(async (mirror: boolean) => {
+    try {
+      await sendCommand(CommandType.flippingCamera, true);
+      setMirrorCamera(mirror);
+      await sendCommand(CommandType.flippingCamera, false);
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [notice, sendCommand]);
+
   const onCommand = useCallback<OnCommand>(async (type, command) => {
     logger.log('command', type, command);
 
@@ -198,10 +208,14 @@ const Camera: FunctionComponent = () => {
         await switchCameraWithMessage();
         break;
 
+      case CommandType.flipCamera:
+        await mirrorCameraWithMessage(!mirrorCamera);
+        break;
+
       default:
         break;
     }
-  }, [switchCameraWithMessage, takePhotoWithMessage]);
+  }, [mirrorCameraWithMessage, switchCameraWithMessage, takePhotoWithMessage, mirrorCamera]);
 
   const onCall = useCallback<OnCall>(async (sourceId, answer) => {
     logger.log(`Get call from <${sourceId}>`);
@@ -266,18 +280,18 @@ const Camera: FunctionComponent = () => {
 
   useEffect(() => {
     if (localStream) {
-      const shouldMirror = localStream.getVideoTracks().some((track) => {
+      const defultMirror = localStream.getVideoTracks().some((track) => {
         const facingModes = track.getCapabilities().facingMode;
 
         return !!facingModes?.includes('user');
       });
 
-      setMirrorCamera(shouldMirror);
+      mirrorCameraWithMessage(defultMirror);
       setLocalMinStream(minifyCameraStream(localStream));
     } else {
       setLocalMinStream(undefined);
     }
-  }, [localStream]);
+  }, [localStream, mirrorCameraWithMessage]);
 
   useEffect(() => {
     if (localMinStream && peerId && isMediaConnected) {
