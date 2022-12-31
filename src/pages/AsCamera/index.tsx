@@ -3,8 +3,9 @@ import React, {
 } from 'react';
 
 import {
-  OnCall, OnHangUp, OnMessage, useConnectionContext,
+  OnCall, OnCommand, OnHangUp, useConnectionContext,
 } from '@/contexts/ConnectionContext';
+import { CommandType } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
 import CameraView from '@/components/CameraView';
@@ -31,8 +32,8 @@ const Camera: FunctionComponent = () => {
     isMediaConnected,
     peerId,
     call,
-    sendMessage,
-    setOnMessage,
+    sendCommand,
+    setOnCommand,
     setOnCall,
     setOnHangUp,
   } = useConnectionContext();
@@ -114,42 +115,39 @@ const Camera: FunctionComponent = () => {
 
   const takePhotoWithMessage = useCallback(async () => {
     try {
-      await sendMessage('#photo', true);
+      await sendCommand(CommandType.takingPhoto, true);
       await takePhoto();
-      await sendMessage('#photoed', true);
+      await sendCommand(CommandType.takingPhoto, false);
     } catch (error) {
       notice(`${error}`);
     }
-  }, [sendMessage, takePhoto, notice]);
+  }, [sendCommand, takePhoto, notice]);
 
   const switchCameraWithMessage = useCallback(async () => {
     try {
-      await sendMessage('#switchcamera', true);
+      await sendCommand(CommandType.switchingCamera, true);
       await switchCamera();
-      await sendMessage('#switchedcamera', true);
+      await sendCommand(CommandType.switchingCamera, false);
     } catch (error) {
       notice(`${error}`);
     }
-  }, [sendMessage, switchCamera, notice]);
+  }, [sendCommand, switchCamera, notice]);
 
-  const onMessage = useCallback<OnMessage>(async (message) => {
-    logger.log('message', message);
+  const onCommand = useCallback<OnCommand>(async (type, command) => {
+    logger.log('command', type, command);
 
-    if (/^#/.test(message)) {
-      logger.log('MESSAGE', message.substring(1));
-      switch (message.substring(1)) {
-        case 'photo':
-          setShutterAnimationId(Date.now());
-          await takePhotoWithMessage();
-          break;
+    switch (type) {
+      case CommandType.takePhoto:
+        setShutterAnimationId(Date.now());
+        await takePhotoWithMessage();
+        break;
 
-        case 'switchcamera':
-          await switchCameraWithMessage();
-          break;
+      case CommandType.switchCamera:
+        await switchCameraWithMessage();
+        break;
 
-        default:
-          break;
-      }
+      default:
+        break;
     }
   }, [switchCameraWithMessage, takePhotoWithMessage]);
 
@@ -230,13 +228,13 @@ const Camera: FunctionComponent = () => {
 
   useEffect(() => {
     if (isDataConnected) {
-      setOnMessage(onMessage);
+      setOnCommand(onCommand);
     }
 
     return () => {
-      setOnMessage();
+      setOnCommand();
     };
-  }, [isDataConnected, onMessage, setOnMessage]);
+  }, [isDataConnected, onCommand, setOnCommand]);
 
   useEffect(() => {
     if (isDataConnected) {

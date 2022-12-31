@@ -8,6 +8,10 @@ import EventHandler from '@/utils/RemoteConnection/event/handler';
 
 import { FunctionComponentWithChildren } from '@/types/ComponentProps';
 
+import { Command, CommandListener, CommandType } from './Command';
+
+export type OnCommand = CommandListener<CommandType>;
+
 export type OnMessage = (message: string) => void;
 
 export type OnCall = EventHandler['call'];
@@ -15,6 +19,7 @@ export type OnCall = EventHandler['call'];
 export type OnHangUp = (metadata?: unknown) => void;
 
 interface ConnectionListeners {
+  onCommand?: CommandListener<CommandType>;
   onMessage?: OnMessage;
   onCall?: OnCall;
   onHangUp?: OnHangUp;
@@ -28,7 +33,13 @@ interface ConnectionContextProps {
   peerId: string | null;
   call: (id: string, stream: MediaStream) => Promise<MediaStream | null>;
   changeStream: (stream: MediaStream) => Promise<void>;
+  sendCommand: <T extends CommandType>(
+    type: T,
+    param: Command<T>['param'],
+    ignorePeer?: boolean
+  ) => Promise<void>;
   sendMessage: (message: string, ignorePeer?: boolean) => Promise<void>;
+  setOnCommand: (caller?: OnCommand) => void;
   setOnMessage: (caller?: OnMessage) => void;
   setOnCall: (caller?: OnCall) => void;
   setOnHangUp: (caller?: OnHangUp) => void;
@@ -42,7 +53,9 @@ const ConnectionContext = createContext<ConnectionContextProps>({
   peerId: null,
   call: async () => null,
   changeStream: async () => {},
+  sendCommand: async () => {},
   sendMessage: async () => {},
+  setOnCommand: () => {},
   setOnMessage: () => {},
   setOnCall: () => {},
   setOnHangUp: () => {},
@@ -71,6 +84,21 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
 
     await call(peerId, stream);
   }, [call, peerId]);
+
+  const sendCommand = useCallback<ConnectionContextProps['sendCommand']>(async (
+    type: CommandType,
+    param: Command<CommandType>['param'],
+    ignorePeer = false,
+  ) => {
+    if (!ignorePeer && !peerId) {
+      throw ReferenceError('Not connect to peer yet');
+    }
+    if (peerId) {
+      const message = `#${type}:${param}`;
+
+      await connector.sendMessage(peerId, message);
+    }
+  }, [connector, peerId]);
 
   const sendMessage = useCallback<ConnectionContextProps['sendMessage']>(async (
     message,
@@ -103,9 +131,29 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
     }
 
     switch (typeof data) {
-      case 'string':
-        listeners.current.onMessage?.(data);
+      case 'string': {
+        const matchs = data.match(/^#(.+?)(?::(.+))$/);
+
+        if (matchs) {
+          const [, type, rawParam] = matchs;
+
+          let param = rawParam;
+
+          try {
+            param = JSON.parse(rawParam);
+          } catch (e) {
+            // do nothing
+          }
+
+          listeners.current.onCommand?.(
+            type as CommandType,
+            param as Command<CommandType>['param'],
+          );
+        } else {
+          listeners.current.onMessage?.(data);
+        }
         break;
+      }
 
       default:
         break;
@@ -136,7 +184,11 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
     peerId: peerId ?? null,
     call,
     changeStream,
+    sendCommand,
     sendMessage,
+    setOnCommand: (caller) => {
+      listeners.current.onCommand = caller;
+    },
     setOnMessage: (caller) => {
       listeners.current.onMessage = caller;
     },
@@ -148,7 +200,7 @@ const ConnectionContextProvider: FunctionComponentWithChildren = ({
     },
   }), [
     call, changeStream, connector.id, dataConnection, isOnline,
-    mediaConnection, peerId, sendMessage,
+    mediaConnection, peerId, sendMessage, sendCommand,
   ]);
 
   useEffect(() => {
