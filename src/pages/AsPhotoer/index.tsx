@@ -6,7 +6,8 @@ import React, {
 } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { OnHangUp, OnMessage, useConnectionContext } from '@/contexts/ConnectionContext';
+import { OnCommand, OnHangUp, useConnectionContext } from '@/contexts/ConnectionContext';
+import { CommandType } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
 import CameraView, { CameraViewProps } from '@/components/CameraView';
@@ -30,8 +31,8 @@ const Photoer: FunctionComponent = () => {
     isDataConnected,
     isMediaConnected,
     call,
-    sendMessage,
-    setOnMessage,
+    sendCommand,
+    setOnCommand,
     setOnHangUp,
   } = useConnectionContext();
   const { notice } = useModalContext();
@@ -57,46 +58,36 @@ const Photoer: FunctionComponent = () => {
     setDisableShutter(true);
 
     try {
-      await sendMessage('#photo');
+      await sendCommand(CommandType.takePhoto, 0);
     } catch (error) {
       notice(`${error}`);
     }
-  }, [notice, sendMessage]);
+  }, [notice, sendCommand]);
 
   const onSwitchCamera = useCallback<CameraViewProps['onSwitchCamera']>(async () => {
     setDisableSwitchCamera(true);
 
     try {
-      await sendMessage('#switchcamera');
+      await sendCommand(CommandType.switchCamera, 'next');
     } catch (error) {
       notice(`${error}`);
     }
-  }, [notice, sendMessage]);
+  }, [notice, sendCommand]);
 
-  const onMessage: OnMessage = (message) => {
-    logger.log('message', message);
+  const onCommand: OnCommand = (type, command) => {
+    logger.log('command', type, command);
 
-    if (/^#/.test(message)) {
-      switch (message.substring(1)) {
-        case 'photo':
-          setDisableShutter(true);
-          break;
+    switch (type) {
+      case CommandType.takingPhoto:
+        setDisableShutter(!!command);
+        break;
 
-        case 'photoed':
-          setDisableShutter(false);
-          break;
+      case CommandType.switchingCamera:
+        setDisableSwitchCamera(!!command);
+        break;
 
-        case 'switchcamera':
-          setDisableSwitchCamera(true);
-          break;
-
-        case 'switchedcamera':
-          setDisableSwitchCamera(false);
-          break;
-
-        default:
-          break;
-      }
+      default:
+        break;
     }
 
     // const blob = new Blob([data as ArrayBuffer]);
@@ -169,13 +160,13 @@ const Photoer: FunctionComponent = () => {
 
   useEffect(() => {
     if (isDataConnected) {
-      setOnMessage(onMessage);
+      setOnCommand(onCommand);
     }
 
     return () => {
-      setOnMessage();
+      setOnCommand();
     };
-  }, [isDataConnected, setOnMessage]);
+  }, [isDataConnected, setOnCommand]);
 
   useEffect(() => {
     if (isMediaConnected) {
