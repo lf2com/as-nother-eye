@@ -2,7 +2,7 @@ export enum CommandType {
   switchCamera = 'switchCamera',
   switchingCamera = 'switchingCamera',
   flipCamera = 'flipCamera',
-  flippingCamera = 'flipingCamera',
+  flippingCamera = 'flippingCamera',
   takePhoto = 'takePhoto',
   takingPhoto = 'takingPhoto',
 }

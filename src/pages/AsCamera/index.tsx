@@ -1,3 +1,5 @@
+import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classnames from 'classnames';
 import React, {
   FunctionComponent, useCallback, useEffect, useMemo, useState,
@@ -10,6 +12,7 @@ import { CommandType } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
 import CameraView from '@/components/CameraView';
+import Clickable from '@/components/Clickable';
 import PhotoManagement, { PhotoManagementProps } from '@/components/PhotoManagement';
 import Tag from '@/components/Tag';
 
@@ -195,6 +198,10 @@ const Camera: FunctionComponent = () => {
     }
   }, [notice, sendCommand]);
 
+  const toggleMirroCamera = useCallback(() => {
+    mirrorCameraWithMessage(!mirrorCamera);
+  }, [mirrorCamera, mirrorCameraWithMessage]);
+
   const onCommand = useCallback<OnCommand>(async (type, command) => {
     logger.log('command', type, command);
 
@@ -215,7 +222,7 @@ const Camera: FunctionComponent = () => {
       default:
         break;
     }
-  }, [mirrorCameraWithMessage, switchCameraWithMessage, takePhotoWithMessage, mirrorCamera]);
+  }, [mirrorCamera, mirrorCameraWithMessage, switchCameraWithMessage, takePhotoWithMessage]);
 
   const onCall = useCallback<OnCall>(async (sourceId, answer) => {
     logger.log(`Get call from <${sourceId}>`);
@@ -242,13 +249,14 @@ const Camera: FunctionComponent = () => {
 
       logger.log(`Receive remote stream <${sourceId}>`);
       setRemoteStream(stream);
+      mirrorCameraWithMessage(mirrorCamera);
     } catch (error) {
       const errorMessage = `${error}`;
 
       logger.warn(errorMessage);
       notice(errorMessage);
     }
-  }, [askYesNo, localMinStream, notice]);
+  }, [askYesNo, localMinStream, mirrorCamera, mirrorCameraWithMessage, notice]);
 
   const onHangUp: OnHangUp = () => {
     setLocalStream(undefined);
@@ -362,6 +370,13 @@ const Camera: FunctionComponent = () => {
       <div className={styles.title}>
         <Tag>Camera #{connectionId}</Tag>
       </div>
+
+      <Clickable
+        className={styles['mirror-button']}
+        onClick={toggleMirroCamera}
+      >
+        <FontAwesomeIcon icon={faArrowsLeftRight} />
+      </Clickable>
 
       <PhotoManagement
         className={styles['photo-list']}
