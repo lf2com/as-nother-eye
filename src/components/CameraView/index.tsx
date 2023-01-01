@@ -28,7 +28,6 @@ export interface CameraViewProps {
 
 const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = ({
   className,
-  majorClassName,
   majorContent = null,
   minorContent = null,
   disableShutter: refDisableShutter,
@@ -93,7 +92,7 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
       <Clickable
         className={classnames(styles.major, {
           [styles['taking-photo']]: !!shutterAnimationId,
-        }, majorClassName)}
+        })}
         onAnimationEnd={onShutterAnimationEnd}
         disabled={!onClickMajor}
         onClick={onClickMajor}
