@@ -1,4 +1,10 @@
 .camera {
+  .hidden {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .mirror {
     transform: scaleX(-1);
 
@@ -33,7 +39,7 @@
   
   .photo-list {
     position: absolute;
-    top: 0;
+    top: 7.5%;
     right: 0;
     margin: 0.5em;
     width: 30%;
