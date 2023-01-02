@@ -1,5 +1,3 @@
-import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, {
   FunctionComponent, useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
@@ -11,7 +9,6 @@ import { CommandType } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
 import CameraView from '@/components/CameraView';
-import Clickable from '@/components/Clickable';
 import PhotoManagement, { PhotoManagementProps } from '@/components/PhotoManagement';
 import Tag from '@/components/Tag';
 import Video from '@/components/Video';
@@ -44,6 +41,7 @@ const Camera: FunctionComponent = () => {
   const { notice, askYesNo } = useModalContext();
   const [disableShutter, setDisableShutter] = useState<boolean>();
   const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
+  const [disableFlipCamera, setDisableFlipCamera] = useState<boolean>();
   const [shutterAnimationId, setShutterAnimationId] = useState<number>();
   const [localRawStream, setLocalRawStream] = useState<MediaStream>();
   const [localStream, setLocalStream] = useState<MediaStream>();
@@ -51,7 +49,7 @@ const Camera: FunctionComponent = () => {
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [photos, setPhotos] = useState<Blob[]>([]);
   const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectionId}`), [connectionId]);
-  const mirrorCameraRef = useRef(false);
+  const flipCameraRef = useRef(false);
   const localRawVideoRef = useRef<HTMLVideoElement>(null);
   const localCanvasRef = useRef<HTMLCanvasElement>(null);
   const drawLocalCanvasAnimationId = useRef<number>();
@@ -151,19 +149,15 @@ const Camera: FunctionComponent = () => {
     }
   }, [sendCommand, switchCamera, notice]);
 
-  const mirrorCameraWithMessage = useCallback(async (mirror: boolean) => {
+  const flipCameraWithMessage = useCallback(async (flip = !flipCameraRef.current) => {
     try {
       await sendCommand(CommandType.flippingCamera, true, true);
-      mirrorCameraRef.current = mirror;
+      flipCameraRef.current = flip;
       await sendCommand(CommandType.flippingCamera, false, true);
     } catch (error) {
       notice(`${error}`);
     }
   }, [notice, sendCommand]);
-
-  const toggleMirrorCamera = useCallback(() => {
-    mirrorCameraWithMessage(!mirrorCameraRef.current);
-  }, [mirrorCameraWithMessage]);
 
   const onCommand = useCallback<OnCommand>(async (type, command) => {
     logger.log('command', type, command);
@@ -179,13 +173,13 @@ const Camera: FunctionComponent = () => {
         break;
 
       case CommandType.flipCamera:
-        await toggleMirrorCamera();
+        await flipCameraWithMessage();
         break;
 
       default:
         break;
     }
-  }, [switchCameraWithMessage, takePhotoWithMessage, toggleMirrorCamera]);
+  }, [switchCameraWithMessage, takePhotoWithMessage, flipCameraWithMessage]);
 
   const onCall = useCallback<OnCall>(async (sourceId, answer) => {
     logger.log(`Get call from <${sourceId}>`);
@@ -247,7 +241,7 @@ const Camera: FunctionComponent = () => {
       if (context) {
         context.save();
 
-        if (mirrorCameraRef.current) {
+        if (flipCameraRef.current) {
           context.setTransform(-1, 0, 0, 1, videoWidth, 0);
         }
 
@@ -277,6 +271,7 @@ const Camera: FunctionComponent = () => {
         setLocalRawStream(stream);
         setDisableShutter(undefined);
         setDisableSwitchCamera(undefined);
+        setDisableFlipCamera(undefined);
       })
       .catch((error) => {
         notice(`Failed to init stream: ${error}`);
@@ -285,15 +280,15 @@ const Camera: FunctionComponent = () => {
 
   useEffect(() => {
     if (localRawStream) {
-      const defultMirror = localRawStream.getVideoTracks().some((track) => {
+      const defultFlip = localRawStream.getVideoTracks().some((track) => {
         const facingModes = track.getCapabilities().facingMode;
 
         return !!facingModes?.includes('user');
       });
 
-      mirrorCameraWithMessage(defultMirror);
+      flipCameraWithMessage(defultFlip);
     }
-  }, [localRawStream, mirrorCameraWithMessage]);
+  }, [localRawStream, flipCameraWithMessage]);
 
   useEffect(() => {
     if (localStream) {
@@ -348,6 +343,7 @@ const Camera: FunctionComponent = () => {
   useEffect(() => {
     setDisableShutter(true);
     setDisableSwitchCamera(true);
+    setDisableFlipCamera(true);
 
     return () => {
       onHangUp();
@@ -359,9 +355,11 @@ const Camera: FunctionComponent = () => {
       className={styles.camera}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
+      disableFlipCamera={disableFlipCamera}
       shutterAnimationId={shutterAnimationId}
       onShutter={takePhotoWithMessage}
       onSwitchCamera={switchCameraWithMessage}
+      onFlipCamera={flipCameraWithMessage}
       majorContent={localStream}
       minorContent={remoteStream ?? 'Share Camera'}
       onClickMinor={remoteStream ? undefined : shareCamera}
@@ -382,13 +380,6 @@ const Camera: FunctionComponent = () => {
           height={localRawVideoRef.current?.height}
         />
       </div>
-
-      <Clickable
-        className={styles['mirror-button']}
-        onClick={toggleMirrorCamera}
-      >
-        <FontAwesomeIcon icon={faArrowsLeftRight} />
-      </Clickable>
 
       <PhotoManagement
         className={styles['photo-list']}

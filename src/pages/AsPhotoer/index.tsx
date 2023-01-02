@@ -1,6 +1,3 @@
-import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import classnames from 'classnames';
 import React, {
   FunctionComponent, useCallback, useEffect, useState,
 } from 'react';
@@ -11,7 +8,6 @@ import { CommandType } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
 import CameraView, { CameraViewProps } from '@/components/CameraView';
-import Clickable from '@/components/Clickable';
 import Loading from '@/components/Loading';
 import AskInputModal, { AskInputModalProps } from '@/components/Modal/AskInputModal';
 import Tag from '@/components/Tag';
@@ -39,10 +35,10 @@ const Photoer: FunctionComponent = () => {
   const [loadingMessage, setLoadingMessage] = useState<string>();
   const [disableShutter, setDisableShutter] = useState<boolean>();
   const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
+  const [disableFlipCamera, setDisableFlipCamera] = useState<boolean>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
-  const [mirrorCamera, setMirrorCamera] = useState(false);
   const [targetId, setTargetId] = useState(params.targetId);
   const [showConnectCameraModal, setShowConnectCameraModal] = useState(!targetId);
 
@@ -70,18 +66,15 @@ const Photoer: FunctionComponent = () => {
     }
   }, [notice, sendCommand]);
 
-  const handleMirrorCamera = useCallback(async (mirror: boolean) => {
+  const onFlipCamera = useCallback(async () => {
+    setDisableFlipCamera(true);
+
     try {
       await sendCommand(CommandType.flipCamera, 'horizontal');
-      setMirrorCamera(mirror);
     } catch (error) {
       notice(`${error}`);
     }
   }, [notice, sendCommand]);
-
-  const toggleMirroCamera = useCallback(() => {
-    handleMirrorCamera(!mirrorCamera);
-  }, [handleMirrorCamera, mirrorCamera]);
 
   const onCommand: OnCommand = (type, param) => {
     logger.log('command', type, param);
@@ -96,7 +89,7 @@ const Photoer: FunctionComponent = () => {
         break;
 
       case CommandType.flippingCamera:
-        setMirrorCamera(!!param);
+        setDisableFlipCamera(!!param);
         break;
 
       default:
@@ -186,12 +179,14 @@ const Photoer: FunctionComponent = () => {
       setOnHangUp(onHangUp);
       setDisableShutter(false);
       setDisableSwitchCamera(false);
+      setDisableFlipCamera(false);
     }
 
     return () => {
       setOnHangUp();
       setDisableShutter(true);
       setDisableSwitchCamera(true);
+      setDisableFlipCamera(true);
     };
   }, [isMediaConnected, setOnHangUp]);
 
@@ -210,6 +205,7 @@ const Photoer: FunctionComponent = () => {
   useEffect(() => {
     setDisableShutter(true);
     setDisableSwitchCamera(true);
+    setDisableFlipCamera(true);
 
     return () => {
       onHangUp();
@@ -219,13 +215,12 @@ const Photoer: FunctionComponent = () => {
   return (
     <CameraView
       className={styles.photoer}
-      majorClassName={classnames({
-        [styles.mirror]: mirrorCamera,
-      })}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
+      disableFlipCamera={disableFlipCamera}
       onShutter={onShutter}
       onSwitchCamera={onSwitchCamera}
+      onFlipCamera={onFlipCamera}
       majorContent={remoteStream ?? 'Connect to Camera'}
       minorContent={localStream}
       onClickMajor={onClickMajor}
@@ -233,13 +228,6 @@ const Photoer: FunctionComponent = () => {
       <div className={styles.title}>
         <Tag>Photoer #{connectionId}</Tag>
       </div>
-
-      <Clickable
-        className={styles['mirror-button']}
-        onClick={toggleMirroCamera}
-      >
-        <FontAwesomeIcon icon={faArrowsLeftRight} />
-      </Clickable>
 
       <AskInputModal
         show={showConnectCameraModal}
