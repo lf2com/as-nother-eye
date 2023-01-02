@@ -1,4 +1,4 @@
-import { faCameraRotate } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsLeftRight, faCameraRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classnames from 'classnames';
 import React, {
@@ -20,8 +20,10 @@ export interface CameraViewProps {
   disableShutter?: boolean;
   shutterAnimationId?: number;
   disableSwitchCamera?: boolean;
+  disableFlipCamera?: boolean;
   onShutter: () => void | Promise<void>;
   onSwitchCamera: () => void | Promise<void>;
+  onFlipCamera: () => void | Promise<void>;
   onClickMajor?: () => void | Promise<void>;
   onClickMinor?: () => void | Promise<void>;
 }
@@ -32,9 +34,11 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
   minorContent = null,
   disableShutter: refDisableShutter,
   disableSwitchCamera: refDisableSwitchCamera,
+  disableFlipCamera: refDisableFlipCamera,
   shutterAnimationId: refShutterAnimationId,
   onShutter,
   onSwitchCamera,
+  onFlipCamera,
   onClickMajor,
   onClickMinor,
   children,
@@ -42,6 +46,7 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
   const [shutterAnimationId, setShutterAnimationId] = useState<number>();
   const [disableShutter, setDisableShutter] = useState<boolean>();
   const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
+  const [disableFlipCamera, setDisableFlipCamera] = useState<boolean>();
   const refMajorVideo = useRef<HTMLVideoElement>(null);
 
   const handleShutter = useCallback(async () => {
@@ -60,6 +65,12 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
     await onSwitchCamera();
     setDisableSwitchCamera(refDisableSwitchCamera !== undefined);
   }, [onSwitchCamera, refDisableSwitchCamera]);
+
+  const handleFlipCamera = useCallback(async () => {
+    setDisableFlipCamera(refDisableFlipCamera ?? true);
+    await onFlipCamera();
+    setDisableFlipCamera(refDisableFlipCamera !== undefined);
+  }, [onFlipCamera, refDisableFlipCamera]);
 
   useEffect(() => {
     const video = refMajorVideo.current;
@@ -80,6 +91,10 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
   useEffect(() => {
     setDisableSwitchCamera(refDisableSwitchCamera ?? false);
   }, [refDisableSwitchCamera]);
+
+  useEffect(() => {
+    setDisableFlipCamera(refDisableFlipCamera ?? false);
+  }, [refDisableFlipCamera]);
 
   useEffect(() => {
     if (refShutterAnimationId) {
@@ -133,6 +148,14 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
         onClick={handleSwitchCamera}
       >
         <FontAwesomeIcon icon={faCameraRotate} />
+      </Clickable>
+
+      <Clickable
+        className={styles['flip-camera']}
+        disabled={disableFlipCamera}
+        onClick={handleFlipCamera}
+      >
+        <FontAwesomeIcon icon={faArrowsLeftRight} />
       </Clickable>
 
       {children}
