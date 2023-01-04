@@ -22,7 +22,7 @@ type SwitchingCameraCommand = CommmadParameters<
   boolean
 >;
 
-type FlipCameraCommand = CommmadParameters<
+export type FlipCameraCommand = CommmadParameters<
   CommandType.flipCamera,
   'horizontal' | 'vertical'
 >;

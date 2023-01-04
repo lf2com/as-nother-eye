@@ -1,9 +1,11 @@
-import { faArrowsLeftRight, faCameraRotate } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsLeftRight, faArrowsUpDown, faCameraRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classnames from 'classnames';
 import React, {
   ReactNode, useCallback, useEffect, useRef, useState,
 } from 'react';
+
+import { FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
 
 import Clickable from '@/components/Clickable';
 import Frame from '@/components/Frame';
@@ -23,7 +25,7 @@ export interface CameraViewProps {
   disableFlipCamera?: boolean;
   onShutter: () => void | Promise<void>;
   onSwitchCamera: () => void | Promise<void>;
-  onFlipCamera: () => void | Promise<void>;
+  onFlipCamera: (direction: FlipCameraCommand['param']) => void | Promise<void>;
   onClickMajor?: () => void | Promise<void>;
   onClickMinor?: () => void | Promise<void>;
 }
@@ -66,11 +68,14 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
     setDisableSwitchCamera(refDisableSwitchCamera !== undefined);
   }, [onSwitchCamera, refDisableSwitchCamera]);
 
-  const handleFlipCamera = useCallback(async () => {
+  const handleFlipCamera = useCallback(async (direction: FlipCameraCommand['param']) => {
     setDisableFlipCamera(refDisableFlipCamera ?? true);
-    await onFlipCamera();
+    await onFlipCamera(direction);
     setDisableFlipCamera(refDisableFlipCamera !== undefined);
   }, [onFlipCamera, refDisableFlipCamera]);
+
+  const flipCameraHorizontal = () => handleFlipCamera('horizontal');
+  const flipCameraVertical = () => handleFlipCamera('vertical');
 
   useEffect(() => {
     const video = refMajorVideo.current;
@@ -150,13 +155,21 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
         <FontAwesomeIcon icon={faCameraRotate} />
       </Clickable>
 
-      <Clickable
-        className={styles['flip-camera']}
-        disabled={disableFlipCamera}
-        onClick={handleFlipCamera}
-      >
-        <FontAwesomeIcon icon={faArrowsLeftRight} />
-      </Clickable>
+      <div className={styles['flip-camera-tool']}>
+        <Clickable
+          disabled={disableFlipCamera}
+          onClick={flipCameraVertical}
+        >
+          <FontAwesomeIcon icon={faArrowsUpDown} />
+        </Clickable>
+
+        <Clickable
+          disabled={disableFlipCamera}
+          onClick={flipCameraHorizontal}
+        >
+          <FontAwesomeIcon icon={faArrowsLeftRight} />
+        </Clickable>
+      </div>
 
       {children}
     </Frame>
