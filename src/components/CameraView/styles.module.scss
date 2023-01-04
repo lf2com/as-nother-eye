@@ -153,6 +153,7 @@
 
   .flip-camera {
     $color: var(--edge-color, #000);
+    $disabled-color: var(--font-disabled-hl-color, #999);
     $shadow-color: var(--bg-color, #fff);
 
     position: absolute;
@@ -162,9 +163,13 @@
     font-size: 1.5em;
     color: $color;
     filter:
-      drop-shadow(-1px -1px 0 $shadow-color)
-      drop-shadow(-1px 1px 0 $shadow-color)
-      drop-shadow(1px -1px 0 $shadow-color)
-      drop-shadow(1px 1px 0 $shadow-color);
+      drop-shadow(1px 0 0 $shadow-color)
+      drop-shadow(-1px 0 0 $shadow-color)
+      drop-shadow(0 -1px 0 $shadow-color)
+      drop-shadow(0 1px 0 $shadow-color);
+
+    &:global(.disabled) {
+      color: $disabled-color;
+    }
   }
 }
