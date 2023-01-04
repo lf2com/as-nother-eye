@@ -66,11 +66,11 @@ const Photoer: FunctionComponent = () => {
     }
   }, [notice, sendCommand]);
 
-  const onFlipCamera = useCallback(async () => {
+  const onFlipCamera = useCallback<CameraViewProps['onFlipCamera']>(async (direction) => {
     setDisableFlipCamera(true);
 
     try {
-      await sendCommand(CommandType.flipCamera, 'horizontal');
+      await sendCommand(CommandType.flipCamera, direction);
     } catch (error) {
       notice(`${error}`);
     }

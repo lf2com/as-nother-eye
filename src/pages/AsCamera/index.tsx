@@ -5,10 +5,10 @@ import React, {
 import {
   OnCall, OnCommand, OnHangUp, useConnectionContext,
 } from '@/contexts/ConnectionContext';
-import { CommandType } from '@/contexts/ConnectionContext/Command';
+import { CommandType, FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
-import CameraView from '@/components/CameraView';
+import CameraView, { CameraViewProps } from '@/components/CameraView';
 import PhotoManagement, { PhotoManagementProps } from '@/components/PhotoManagement';
 import Tag from '@/components/Tag';
 import Video from '@/components/Video';
@@ -49,7 +49,7 @@ const Camera: FunctionComponent = () => {
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [photos, setPhotos] = useState<Blob[]>([]);
   const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectionId}`), [connectionId]);
-  const flipCameraRef = useRef(false);
+  const flipCameraRef = useRef<FlipCameraCommand['param'][]>([]);
   const localRawVideoRef = useRef<HTMLVideoElement>(null);
   const localCanvasRef = useRef<HTMLCanvasElement>(null);
   const drawLocalCanvasAnimationId = useRef<number>();
@@ -149,10 +149,22 @@ const Camera: FunctionComponent = () => {
     }
   }, [sendCommand, switchCamera, notice]);
 
-  const flipCameraWithMessage = useCallback(async (flip = !flipCameraRef.current) => {
+  const flipCameraWithMessage = useCallback<CameraViewProps['onFlipCamera']>(async (direction) => {
     try {
+      const flipOptions = flipCameraRef.current;
+      const indexOfDirection = flipOptions.indexOf(direction);
+
       await sendCommand(CommandType.flippingCamera, true, true);
-      flipCameraRef.current = flip;
+
+      if (indexOfDirection === -1) {
+        flipCameraRef.current = [...flipOptions, direction];
+      } else {
+        flipCameraRef.current = [
+          ...flipOptions.slice(0, indexOfDirection),
+          ...flipOptions.slice(indexOfDirection + 1),
+        ];
+      }
+
       await sendCommand(CommandType.flippingCamera, false, true);
     } catch (error) {
       notice(`${error}`);
@@ -173,7 +185,7 @@ const Camera: FunctionComponent = () => {
         break;
 
       case CommandType.flipCamera:
-        await flipCameraWithMessage();
+        await flipCameraWithMessage(command as FlipCameraCommand['param']);
         break;
 
       default:
@@ -239,10 +251,15 @@ const Camera: FunctionComponent = () => {
     const canvasStream = canvas.captureStream();
     const drawNextFrame = () => {
       if (context) {
+        const flipOptions = flipCameraRef.current;
+
         context.save();
 
-        if (flipCameraRef.current) {
-          context.setTransform(-1, 0, 0, 1, videoWidth, 0);
+        if (flipOptions.includes('horizontal')) {
+          context.transform(-1, 0, 0, 1, videoWidth, 0);
+        }
+        if (flipOptions.includes('vertical')) {
+          context.transform(1, 0, 0, -1, 0, videoHeight);
         }
 
         context.drawImage(video, 0, 0, videoWidth, videoHeight);
@@ -280,13 +297,17 @@ const Camera: FunctionComponent = () => {
 
   useEffect(() => {
     if (localRawStream) {
-      const defultFlip = localRawStream.getVideoTracks().some((track) => {
+      const defaultFlip = localRawStream.getVideoTracks().some((track) => {
         const facingModes = track.getCapabilities().facingMode;
 
         return !!facingModes?.includes('user');
       });
 
-      flipCameraWithMessage(defultFlip);
+      flipCameraRef.current = [];
+
+      if (defaultFlip) {
+        flipCameraWithMessage('horizontal');
+      }
     }
   }, [localRawStream, flipCameraWithMessage]);
 
