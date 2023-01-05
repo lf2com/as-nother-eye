@@ -55,23 +55,67 @@ const Camera: FunctionComponent = () => {
   const drawLocalCanvasAnimationId = useRef<number>();
 
   const takePhoto = useCallback(async () => {
-    if (!localStream || disableSwitchCamera || disableShutter) {
+    if (!localRawStream || disableSwitchCamera || disableShutter) {
       return;
     }
 
     setDisableShutter(true);
 
     try {
-      const canvas = localCanvasRef.current;
+      const track = localRawStream.getTracks()[0];
 
-      if (!canvas) {
-        throw ReferenceError('No camera running');
+      if (!track) {
+        throw ReferenceError('No camera track');
       }
 
-      const blob = await new Promise((resolve) => {
-        canvas.toBlob(resolve);
+      const imageCapture = new ImageCapture(track);
+      const blob = await imageCapture.takePhoto({
+        redEyeReduction: true,
       });
-      const photoBlob = blob as Blob;
+      const photoBlob = await new Promise<Blob>((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+
+        img.addEventListener('load', () => {
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+
+          if (!context) {
+            throw Error('Failed to get canvas context');
+          }
+
+          const flipOptions = flipCameraRef.current;
+          const {
+            naturalWidth: width,
+            naturalHeight: height,
+          } = img;
+
+          canvas.width = width;
+          canvas.height = height;
+
+          if (flipOptions.includes('horizontal')) {
+            context.transform(-1, 0, 0, 1, width, 0);
+          }
+          if (flipOptions.includes('vertical')) {
+            context.transform(1, 0, 0, -1, 0, height);
+          }
+
+          context.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((bitmapBlob) => {
+            if (bitmapBlob) {
+              resolve(bitmapBlob);
+            } else {
+              reject(Error('Failed to convert camera frame'));
+            }
+          });
+        });
+
+        img.addEventListener('error', (error) => {
+          reject(error);
+        });
+
+        img.src = url;
+      });
 
       if (!photoBlob) {
         throw ReferenceError('No photo blob');
@@ -86,7 +130,7 @@ const Camera: FunctionComponent = () => {
     }
 
     setDisableShutter(undefined);
-  }, [localStream, disableSwitchCamera, disableShutter, notice]);
+  }, [localRawStream, disableSwitchCamera, disableShutter, notice]);
 
   const onSaveSelectedPhotos = useCallback<PhotoManagementProps['onSave']>((selectedPhotos) => {
     downloadFiles(selectedPhotos);
