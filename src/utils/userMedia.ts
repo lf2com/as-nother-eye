@@ -56,7 +56,7 @@ export const getNextCamera = async (prevStream?: MediaStream): Promise<MediaDevi
     return null;
   }
 
-  return cameras[nextCameraIndex];
+  return cameras[nextCameraIndex] ?? null;
 };
 
 export const minifyCameraStream = (stream: MediaStream) => {
