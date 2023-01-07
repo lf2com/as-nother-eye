@@ -26,7 +26,13 @@ afterEach(() => {
 
 describe('Device related', () => {
   describe('getDevices', () => {
-    it('should call navigator.mediaDevices.enumerateDevices', async () => {
+    it('should return array', () => {
+      mockEnumerateDevices([]);
+
+      expect(getDevices()).resolves.toBeInstanceOf(Array);
+    });
+
+    it('should call navigator.mediaDevices.enumerateDevices', () => {
       mockEnumerateDevices([
         {
           deviceId: 'fake-videoinput-device',
@@ -42,7 +48,7 @@ describe('Device related', () => {
         },
       ]);
 
-      expect(await getDevices()).toEqual([
+      expect(getDevices()).resolves.toEqual([
         {
           deviceId: 'fake-videoinput-device',
           kind: 'videoinput',
@@ -60,7 +66,13 @@ describe('Device related', () => {
   });
 
   describe('getCameras', () => {
-    it('should return devices with kind of videoinput', async () => {
+    it('should return array', () => {
+      mockEnumerateDevices([]);
+
+      expect(getCameras()).resolves.toBeInstanceOf(Array);
+    });
+
+    it('should return devices with kind of videoinput', () => {
       mockEnumerateDevices([
         {
           deviceId: 'fake-videoinput-device',
@@ -76,7 +88,7 @@ describe('Device related', () => {
         },
       ]);
 
-      expect(await getCameras()).toEqual([
+      expect(getCameras()).resolves.toEqual([
         {
           deviceId: 'fake-videoinput-device',
           kind: 'videoinput',
@@ -86,7 +98,13 @@ describe('Device related', () => {
   });
 
   describe('getMicrophones', () => {
-    it('should return devices with kind of audioinput', async () => {
+    it('should return array', () => {
+      mockEnumerateDevices([]);
+
+      expect(getMicrophones()).resolves.toBeInstanceOf(Array);
+    });
+
+    it('should return devices with kind of audioinput', () => {
       mockEnumerateDevices([
         {
           deviceId: 'fake-videoinput-device',
@@ -102,7 +120,7 @@ describe('Device related', () => {
         },
       ]);
 
-      expect(await getMicrophones()).toEqual([
+      expect(getMicrophones()).resolves.toEqual([
         {
           deviceId: 'fake-audioinput-device',
           kind: 'audioinput',
@@ -112,7 +130,13 @@ describe('Device related', () => {
   });
 
   describe('getSpeakers', () => {
-    it('should return devices with kind of audiooutput', async () => {
+    it('should return array', () => {
+      mockEnumerateDevices([]);
+
+      expect(getSpeakers()).resolves.toBeInstanceOf(Array);
+    });
+
+    it('should return devices with kind of audiooutput', () => {
       mockEnumerateDevices([
         {
           deviceId: 'fake-videoinput-device',
@@ -128,7 +152,7 @@ describe('Device related', () => {
         },
       ]);
 
-      expect(await getSpeakers()).toEqual([
+      expect(getSpeakers()).resolves.toEqual([
         {
           deviceId: 'fake-audiooutput-device',
           kind: 'audiooutput',
@@ -216,7 +240,7 @@ describe('Stream related', () => {
   });
 
   describe('getNextCamera', () => {
-    it('should return next camera if has other cameras', async () => {
+    it('should return next camera if has other cameras', () => {
       mockEnumerateDevices([
         {
           deviceId: 'fake-video-1',
@@ -250,13 +274,13 @@ describe('Stream related', () => {
       );
     });
 
-    it('should return null if no video track', async () => {
+    it('should return null if no video track', () => {
       const mockedStream = mockMediaStreamTracks([]);
 
       expect(getNextCamera(mockedStream)).resolves.toBe(null);
     });
 
-    it('should return null if only has the same camera', async () => {
+    it('should return null if only has the same camera', () => {
       mockEnumerateDevices([
         {
           deviceId: 'fake-video-1',
@@ -276,7 +300,7 @@ describe('Stream related', () => {
       expect(getNextCamera(mockedStream)).resolves.toBe(null);
     });
 
-    it('should return null if no camera', async () => {
+    it('should return null if no camera', () => {
       mockEnumerateDevices([]);
 
       const mockedStream = mockMediaStreamTracks([
