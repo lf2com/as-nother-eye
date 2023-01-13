@@ -6,7 +6,7 @@ import React, {
 import RemoteConnection from '@/utils/RemoteConnection';
 import EventHandler from '@/utils/RemoteConnection/event/handler';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import { Command, CommandListener, CommandType } from './Command';
 
@@ -61,7 +61,7 @@ const ConnectionContext = createContext<ConnectionContextProps>({
   setOnHangUp: () => {},
 });
 
-const ConnectionContextProvider: FunctionComponentWithChildren = ({
+const ConnectionContextProvider: FCWithChildren = ({
   children,
 }) => {
   const searchParams = useMemo(() => new URLSearchParams(globalThis.location.search), []);

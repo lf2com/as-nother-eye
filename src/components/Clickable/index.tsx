@@ -3,7 +3,7 @@ import React, {
   AllHTMLAttributes, MouseEventHandler, useCallback, useMemo,
 } from 'react';
 
-import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -12,7 +12,7 @@ interface ClickableProps extends AllHTMLAttributes<HTMLSpanElement> {
   stopPropagation?: boolean;
 }
 
-const Clickable: FunctionComponentWithClassNameAndChildren<ClickableProps> = ({
+const Clickable: FCWithClassNameAndChildren<ClickableProps> = ({
   disabled = false,
   className,
   onClick,

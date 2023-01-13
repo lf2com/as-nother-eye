@@ -7,7 +7,7 @@ import NotificationModal from '@/components/Modal/NotificationModal';
 import OkCancelModal from '@/components/Modal/OkCancelModal';
 import YesNoModal from '@/components/Modal/YesNoModal';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 type BaseModalFunc<T = void> = (
   message: ReactNode,
@@ -31,7 +31,7 @@ interface ModalItem {
   Modal: ReactElement,
 }
 
-const ModalContextProvider: FunctionComponentWithChildren = ({ children }) => {
+const ModalContextProvider: FCWithChildren = ({ children }) => {
   const [modals, setModals] = useState<ModalItem[]>([]);
 
   const removeModal = useCallback((id: ModalItem['id']) => {

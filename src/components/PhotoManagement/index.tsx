@@ -10,7 +10,7 @@ import PhotoList from '@/components/PhotoList';
 
 import dateToStr from '@/utils/dateToStr';
 
-import { FunctionComponentWithClassName } from '@/types/ComponentProps';
+import { FCWithClassName } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -21,7 +21,7 @@ export interface PhotoManagementProps {
   show?: boolean;
 }
 
-const PhotoManagement: FunctionComponentWithClassName<PhotoManagementProps> = ({
+const PhotoManagement: FCWithClassName<PhotoManagementProps> = ({
   show: defShowModal = false,
   className,
   photos,

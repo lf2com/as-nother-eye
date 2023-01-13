@@ -7,7 +7,7 @@ import LogMessage, { LogMessageProps } from './components/LogMessage';
 
 import Logger from '@/utils/logger';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -32,7 +32,7 @@ interface LoggerContextProviderProps {
   show?: boolean;
 }
 
-const LoggerContextProvider: FunctionComponentWithChildren<LoggerContextProviderProps> = ({
+const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
   tag,
   show: defaultShow = true,
   children,

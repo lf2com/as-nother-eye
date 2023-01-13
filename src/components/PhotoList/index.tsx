@@ -5,7 +5,7 @@ import React, {
 
 import Photo from './components/Photo';
 
-import { FunctionComponentWithClassName } from '@/types/ComponentProps';
+import { FCWithClassName } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -14,7 +14,7 @@ interface PhotoListProps {
   photos: (Blob | File)[];
 }
 
-const PhotoList: FunctionComponentWithClassName<PhotoListProps> = ({
+const PhotoList: FCWithClassName<PhotoListProps> = ({
   photos,
   className,
   aspectRatio = 1,

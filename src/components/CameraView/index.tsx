@@ -11,7 +11,7 @@ import Clickable from '@/components/Clickable';
 import Frame from '@/components/Frame';
 import Video from '@/components/Video';
 
-import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -30,7 +30,7 @@ export interface CameraViewProps {
   onClickMinor?: () => void | Promise<void>;
 }
 
-const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = ({
+const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
   className,
   majorContent = null,
   minorContent = null,

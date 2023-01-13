@@ -9,7 +9,7 @@ import ModalButton from './components/Button';
 
 import wait from '@/utils/wait';
 
-import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -29,7 +29,7 @@ export interface ModalProps extends ModalBasicProps {
   buttonOnlyOnce?: boolean;
 }
 
-const Modal: FunctionComponentWithClassNameAndChildren<ModalProps> = ({
+const Modal: FCWithClassNameAndChildren<ModalProps> = ({
   show: propShow,
   className,
   title,

@@ -5,7 +5,7 @@ import { useModalButtonContext } from '../../contexts/ModalButtonContext';
 
 import Clickable from '@/components/Clickable';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -15,7 +15,7 @@ export interface ModalButtonProps {
   onClick: () => void;
 }
 
-const ModalButton: FunctionComponentWithChildren<ModalButtonProps> = ({
+const ModalButton: FCWithChildren<ModalButtonProps> = ({
   disabled = false,
   highlight = false,
   onClick,

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import Modal, { ModalBasicProps, ModalButton } from '.';
 
@@ -9,7 +9,7 @@ interface YesNoModalProps extends ModalBasicProps {
   onNo: () => void;
 }
 
-const YesNoModal: FunctionComponentWithChildren<YesNoModalProps> = ({
+const YesNoModal: FCWithChildren<YesNoModalProps> = ({
   onYes,
   onNo,
   children,
