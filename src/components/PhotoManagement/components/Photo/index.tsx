@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, useEffect, useMemo } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -9,7 +9,7 @@ interface PhotoProps {
   onClick: () => void;
 }
 
-const Photo: FunctionComponent<PhotoProps> = ({
+const Photo: FC<PhotoProps> = ({
   photo,
   selected,
   onClick,

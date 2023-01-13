@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import React, { FunctionComponent, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -8,7 +8,7 @@ interface PhotoItemProps {
   onShown?: () => void;
 }
 
-const Photo: FunctionComponent<PhotoItemProps> = ({
+const Photo: FC<PhotoItemProps> = ({
   url,
   onShown,
 }) => {

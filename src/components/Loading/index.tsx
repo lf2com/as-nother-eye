@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React, {
-  FunctionComponent, ReactNode, useEffect, useMemo, useState,
+  FC, ReactNode, useEffect, useMemo, useState,
 } from 'react';
 
 import styles from './styles.module.scss';
@@ -12,7 +12,7 @@ interface LoadingProps {
   children?: ReactNode;
 }
 
-const Loading: FunctionComponent<LoadingProps> = ({
+const Loading: FC<LoadingProps> = ({
   children,
   show = !!children,
   fullscreen = false,

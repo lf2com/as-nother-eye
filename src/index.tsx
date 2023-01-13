@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FC } from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ import Welcome from '@/pages/Welcome';
 
 import styles from './styles.module.scss';
 
-const App: FunctionComponent = () => (
+const App: FC = () => (
   <div className={styles.app}>
     <LoggerContextProvider show={false}>
       <ModalContextProvider>

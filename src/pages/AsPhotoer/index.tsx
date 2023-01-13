@@ -1,5 +1,5 @@
 import React, {
-  FunctionComponent, useCallback, useEffect, useState,
+  FC, useCallback, useEffect, useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -19,7 +19,7 @@ import styles from './styles.module.scss';
 
 const logger = new Logger({ tag: '[Photoer]' });
 
-const Photoer: FunctionComponent = () => {
+const Photoer: FC = () => {
   const params = useParams();
   const {
     id: connectionId,
