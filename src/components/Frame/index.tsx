@@ -1,11 +1,11 @@
 import classnames from 'classnames';
-import React, { AllHTMLAttributes } from 'react';
+import React, { ComponentProps } from 'react';
 
 import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
-interface FrameProps extends AllHTMLAttributes<HTMLDivElement> {
+interface FrameProps extends ComponentProps<'div'> {
 }
 
 const Frame: FCWithClassNameAndChildren<FrameProps> = ({

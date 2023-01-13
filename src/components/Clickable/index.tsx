@@ -1,13 +1,13 @@
 import classnames from 'classnames';
 import React, {
-  AllHTMLAttributes, MouseEventHandler, useCallback, useMemo,
+  ComponentProps, MouseEventHandler, useCallback, useMemo,
 } from 'react';
 
 import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
-interface ClickableProps extends AllHTMLAttributes<HTMLSpanElement> {
+interface ClickableProps extends ComponentProps<'span'> {
   disabled?: boolean;
   stopPropagation?: boolean;
 }

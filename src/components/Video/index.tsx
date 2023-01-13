@@ -1,11 +1,11 @@
 import classnames from 'classnames';
 import React, {
-  forwardRef, HTMLAttributes, RefCallback, useCallback,
+  ComponentProps, forwardRef, RefCallback, useCallback,
 } from 'react';
 
 import styles from './styles.module.scss';
 
-interface VideoProps extends HTMLAttributes<HTMLVideoElement> {
+interface VideoProps extends ComponentProps<'video'> {
   srcObject?: MediaStream;
 }
 
