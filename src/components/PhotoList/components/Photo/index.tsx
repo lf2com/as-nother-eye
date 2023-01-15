@@ -1,5 +1,7 @@
 import classnames from 'classnames';
-import React, { FC, useCallback, useState } from 'react';
+import React, {
+  FC, ReactEventHandler, useCallback, useState,
+} from 'react';
 
 import styles from './styles.module.scss';
 
@@ -14,7 +16,7 @@ const Photo: FC<PhotoItemProps> = ({
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const onLoad = useCallback<React.ReactEventHandler<HTMLImageElement>>(() => {
+  const onLoad = useCallback<ReactEventHandler<HTMLImageElement>>(() => {
     setIsLoaded(true);
   }, []);
 

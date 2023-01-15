@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React, {
-  MouseEventHandler, TransitionEventHandler, useCallback, useEffect, useMemo, useState,
+  MouseEventHandler, ReactNode, TransitionEventHandler, useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 import ModalButtonContextProvider from './contexts/ModalButtonContext';
@@ -15,7 +15,7 @@ import styles from './styles.module.scss';
 
 export interface ModalBasicProps {
   show?: boolean;
-  title?: React.ReactNode;
+  title?: ReactNode;
   highlight?: boolean;
   onShown?: () => void;
   onHidden?: () => void;
