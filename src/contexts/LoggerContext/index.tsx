@@ -44,12 +44,6 @@ const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
     [],
   );
 
-  const className = useMemo(() => (
-    classNames(styles.logger, {
-      [styles.show]: show,
-    })
-  ), [show]);
-
   const logger = useMemo(() => new Logger({
     tag,
     onLog: (type, ...args) => {
@@ -70,7 +64,11 @@ const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
   return (
     <LoggerContext.Provider value={contextValue}>
       {children}
-      <div className={className}>
+      <div className={
+        classNames(styles.logger, {
+          [styles.show]: show,
+        })
+      }>
         {logs.map(({ type, timestamp, message }) => (
           <LogMessage
             key={`${type}-${message}-${timestamp}`}

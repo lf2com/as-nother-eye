@@ -1,7 +1,5 @@
 import classNames from 'classnames';
-import React, {
-  ComponentProps, MouseEventHandler, useCallback, useMemo,
-} from 'react';
+import React, { ComponentProps, MouseEventHandler, useCallback } from 'react';
 
 import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
@@ -19,12 +17,6 @@ const Clickable: FCWithClassNameAndChildren<ClickableProps> = ({
   stopPropagation,
   ...restProps
 }) => {
-  const finalClassName = useMemo(() => classNames(
-    styles.clickable,
-    { disabled },
-    className,
-  ), [className, disabled]);
-
   const handleClick = useCallback<MouseEventHandler<HTMLSpanElement>>((event) => {
     if (stopPropagation) {
       event.stopPropagation();
@@ -36,7 +28,11 @@ const Clickable: FCWithClassNameAndChildren<ClickableProps> = ({
 
   return (
     <span
-      className={finalClassName}
+      className={classNames(
+        styles.clickable,
+        { disabled },
+        className,
+      )}
       onClick={handleClick}
       {...restProps}
     />

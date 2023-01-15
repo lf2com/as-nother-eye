@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, {
-  MouseEventHandler, ReactNode, TransitionEventHandler, useCallback, useEffect, useMemo, useState,
+  MouseEventHandler, ReactNode, TransitionEventHandler, useCallback, useEffect, useState,
 } from 'react';
 
 import ModalButtonContextProvider from './contexts/ModalButtonContext';
@@ -46,13 +46,6 @@ const Modal: FCWithClassNameAndChildren<ModalProps> = ({
   const [show, setShow] = useState(false);
   const [disabledAll, setDisabledAll] = useState(false);
 
-  const modalClassName = useMemo(() => (
-    classNames(styles.modal, {
-      [styles.highlight]: highlight,
-      [styles.show]: show,
-    }, className)
-  ), [highlight, show, className]);
-
   const handleClickOutside = useCallback<MouseEventHandler>(() => {
     if (onClickOutside?.() !== false && hideOnClickOutside) {
       setShow(false);
@@ -96,7 +89,12 @@ const Modal: FCWithClassNameAndChildren<ModalProps> = ({
   return (
     <ModalButtonContextProvider disabledAll={disabledAll}>
       <div
-        className={modalClassName}
+        className={
+          classNames(styles.modal, {
+            [styles.highlight]: highlight,
+            [styles.show]: show,
+          }, className)
+        }
         onClick={handleClickOutside}
       >
         <div

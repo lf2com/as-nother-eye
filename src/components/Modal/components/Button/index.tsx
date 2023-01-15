@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { useModalButtonContext } from '../../contexts/ModalButtonContext';
 
@@ -22,14 +22,13 @@ const ModalButton: FCWithChildren<ModalButtonProps> = ({
   children,
 }) => {
   const { disabledAll } = useModalButtonContext();
-  const className = useMemo(() => classNames(styles.button, {
-    [styles.highlight]: highlight,
-  }), [highlight]);
 
   return (
     <Clickable
       disabled={disabledAll || disabled}
-      className={className}
+      className={classNames(styles.button, {
+        [styles.highlight]: highlight,
+      })}
       stopPropagation={disabled}
       onClick={onClick}
     >

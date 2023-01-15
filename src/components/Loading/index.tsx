@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, {
-  FC, ReactNode, useEffect, useMemo, useState,
+  FC, ReactNode, useEffect, useState,
 } from 'react';
 
 import styles from './styles.module.scss';
@@ -20,14 +20,6 @@ const Loading: FC<LoadingProps> = ({
 }) => {
   const [lastContent, setLastContent] = useState(children);
 
-  const className = useMemo(() => (
-    classNames(styles.loading, {
-      [styles.fullscreen]: fullscreen,
-      [styles.highlight]: highlight,
-      [styles.hide]: !show,
-    })
-  ), [fullscreen, highlight, show]);
-
   useEffect(() => {
     if (children !== undefined) {
       setLastContent(children);
@@ -35,7 +27,13 @@ const Loading: FC<LoadingProps> = ({
   }, [children]);
 
   return (
-    <div className={className}>
+    <div className={
+      classNames(styles.loading, {
+        [styles.fullscreen]: fullscreen,
+        [styles.highlight]: highlight,
+        [styles.hide]: !show,
+      })
+    }>
       <div className={styles.message}>
         {lastContent}
       </div>
