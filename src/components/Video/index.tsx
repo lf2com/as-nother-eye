@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   ComponentProps, forwardRef, RefCallback, useCallback,
 } from 'react';
@@ -32,7 +32,7 @@ const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   }, [ref, srcObject]);
 
   return (
-    <div className={classnames(styles.video, className, {
+    <div className={classNames(styles.video, className, {
       [styles.show]: hasContent,
     })}>
       <video

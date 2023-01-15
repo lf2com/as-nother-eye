@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -123,7 +123,7 @@ const PhotoManagement: FCWithClassName<PhotoManagementProps> = ({
   return (
     <>
       <Clickable
-        className={classnames(styles['photo-management-button'], className)}
+        className={classNames(styles['photo-management-button'], className)}
         onClick={showPhotoManagement}
       >
         <PhotoList

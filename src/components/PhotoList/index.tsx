@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   CSSProperties, useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -46,7 +46,7 @@ const PhotoList: FCWithClassName<PhotoListProps> = ({
 
   return (
     <div
-      className={classnames(styles['photo-list'], className)}
+      className={classNames(styles['photo-list'], className)}
       style={style}
     >
       {photoUrls.map((url, urlIndex) => (

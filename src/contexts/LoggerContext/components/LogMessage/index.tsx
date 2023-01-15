@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, { useMemo } from 'react';
 
 import { LogType } from '@/utils/logger';
@@ -17,7 +17,7 @@ const LogMessage: FCWithChildren<LogMessageProps> = ({
   // timestamp,
   children,
 }) => {
-  const className = useMemo(() => classnames(styles.message, styles[type]), [type]);
+  const className = useMemo(() => classNames(styles.message, styles[type]), [type]);
 
   return (
     <div className={className}>

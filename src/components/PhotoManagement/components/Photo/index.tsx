@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, { FC, useEffect, useMemo } from 'react';
 
 import styles from './styles.module.scss';
@@ -24,7 +24,7 @@ const Photo: FC<PhotoProps> = ({
 
   return (
     <img
-      className={classnames(styles.photo, {
+      className={classNames(styles.photo, {
         [styles.selected]: selected,
       })}
       src={photoUrl}

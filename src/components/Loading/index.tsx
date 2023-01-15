@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   FC, ReactNode, useEffect, useMemo, useState,
 } from 'react';
@@ -21,7 +21,7 @@ const Loading: FC<LoadingProps> = ({
   const [lastContent, setLastContent] = useState(children);
 
   const className = useMemo(() => (
-    classnames(styles.loading, {
+    classNames(styles.loading, {
       [styles.fullscreen]: fullscreen,
       [styles.highlight]: highlight,
       [styles.hide]: !show,

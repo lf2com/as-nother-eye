@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   createContext, Reducer, useContext, useMemo, useReducer, useState,
 } from 'react';
@@ -45,7 +45,7 @@ const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
   );
 
   const className = useMemo(() => (
-    classnames(styles.logger, {
+    classNames(styles.logger, {
       [styles.show]: show,
     })
   ), [show]);

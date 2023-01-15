@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   FC, ReactEventHandler, useCallback, useState,
 } from 'react';
@@ -26,7 +26,7 @@ const Photo: FC<PhotoItemProps> = ({
 
   return (
     <div
-      className={classnames(styles.photo, {
+      className={classNames(styles.photo, {
         [styles.loaded]: isLoaded,
       })}
       onAnimationEnd={handleShowAnimationEnd}

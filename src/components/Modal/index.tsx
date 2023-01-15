@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   MouseEventHandler, ReactNode, TransitionEventHandler, useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -47,7 +47,7 @@ const Modal: FCWithClassNameAndChildren<ModalProps> = ({
   const [disabledAll, setDisabledAll] = useState(false);
 
   const modalClassName = useMemo(() => (
-    classnames(styles.modal, {
+    classNames(styles.modal, {
       [styles.highlight]: highlight,
       [styles.show]: show,
     }, className)
@@ -100,18 +100,18 @@ const Modal: FCWithClassNameAndChildren<ModalProps> = ({
         onClick={handleClickOutside}
       >
         <div
-          className={classnames(styles.box, 'modal-box')}
+          className={classNames(styles.box, 'modal-box')}
           onClick={onClickContainer}
           onTransitionEnd={onTransitionEnd}
         >
-          <div className={classnames(styles.head, 'modal-head')}>
+          <div className={classNames(styles.head, 'modal-head')}>
             {title}
           </div>
-          <div className={classnames(styles.body, 'modal-body')}>
+          <div className={classNames(styles.body, 'modal-body')}>
             {children}
           </div>
           <div
-            className={classnames(styles.foot, 'modal-foot')}
+            className={classNames(styles.foot, 'modal-foot')}
             onClick={onClickButton}
           >
             {buttons}

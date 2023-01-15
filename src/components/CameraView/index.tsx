@@ -1,6 +1,6 @@
 import { faArrowsLeftRight, faArrowsUpDown, faCameraRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   ReactNode, useCallback, useEffect, useRef, useState,
 } from 'react';
@@ -108,9 +108,9 @@ const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
   }, [refShutterAnimationId]);
 
   return (
-    <Frame className={classnames(styles['camera-view'], className)}>
+    <Frame className={classNames(styles['camera-view'], className)}>
       <Clickable
-        className={classnames(styles.major, {
+        className={classNames(styles.major, {
           [styles['taking-photo']]: !!shutterAnimationId,
         })}
         onAnimationEnd={onShutterAnimationEnd}

@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, { ComponentProps } from 'react';
 
 import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
@@ -14,7 +14,7 @@ const Frame: FCWithClassNameAndChildren<FrameProps> = ({
   ...restProps
 }) => (
   <div
-    className={classnames(styles.frame, className)}
+    className={classNames(styles.frame, className)}
     {...restProps}
   >
     {children}

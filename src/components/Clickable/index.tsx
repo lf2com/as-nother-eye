@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   ComponentProps, MouseEventHandler, useCallback, useMemo,
 } from 'react';
@@ -19,7 +19,7 @@ const Clickable: FCWithClassNameAndChildren<ClickableProps> = ({
   stopPropagation,
   ...restProps
 }) => {
-  const finalClassName = useMemo(() => classnames(
+  const finalClassName = useMemo(() => classNames(
     styles.clickable,
     { disabled },
     className,
