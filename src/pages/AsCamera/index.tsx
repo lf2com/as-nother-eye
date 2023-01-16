@@ -1,15 +1,17 @@
 import React, {
-  FunctionComponent, useCallback, useEffect, useMemo, useState,
+  FC, useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 
 import {
-  OnCall, OnHangUp, OnMessage, useConnectionContext,
+  OnCall, OnCommand, OnHangUp, useConnectionContext,
 } from '@/contexts/ConnectionContext';
+import { CommandType, FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
-import CameraView from '@/components/CameraView';
+import CameraView, { CameraViewProps } from '@/components/CameraView';
 import PhotoManagement, { PhotoManagementProps } from '@/components/PhotoManagement';
 import Tag from '@/components/Tag';
+import Video from '@/components/Video';
 
 import createRoutePath from '@/utils/createRoutePath';
 import { downloadFiles } from '@/utils/downloadFile';
@@ -23,7 +25,7 @@ import styles from './styles.module.scss';
 
 const logger = new Logger({ tag: '[Camera]' });
 
-const Camera: FunctionComponent = () => {
+const Camera: FC = () => {
   const {
     id: connectionId,
     isOnline,
@@ -31,45 +33,104 @@ const Camera: FunctionComponent = () => {
     isMediaConnected,
     peerId,
     call,
-    sendMessage,
-    setOnMessage,
+    sendCommand,
+    setOnCommand,
     setOnCall,
     setOnHangUp,
   } = useConnectionContext();
   const { notice, askYesNo } = useModalContext();
   const [disableShutter, setDisableShutter] = useState<boolean>();
   const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
+  const [disableFlipCamera, setDisableFlipCamera] = useState<boolean>();
   const [shutterAnimationId, setShutterAnimationId] = useState<number>();
+  const [localRawStream, setLocalRawStream] = useState<MediaStream>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [photos, setPhotos] = useState<Blob[]>([]);
   const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectionId}`), [connectionId]);
+  const flipCameraRef = useRef<FlipCameraCommand['param'][]>([]);
+  const localRawVideoRef = useRef<HTMLVideoElement>(null);
+  const localCanvasRef = useRef<HTMLCanvasElement>(null);
+  const drawLocalCanvasAnimationId = useRef<number>();
 
   const takePhoto = useCallback(async () => {
-    if (!localStream || disableSwitchCamera || disableShutter) {
+    if (!localRawStream || disableSwitchCamera || disableShutter) {
       return;
     }
 
     setDisableShutter(true);
 
     try {
-      const track = localStream.getVideoTracks()[0];
+      const track = localRawStream.getTracks()[0];
+
+      if (!track) {
+        throw ReferenceError('No camera track');
+      }
+
       const imageCapture = new ImageCapture(track);
-      const photoBlob = await imageCapture.takePhoto({
-        fillLightMode: 'auto', // 'auto' | 'off' | 'flash'
+      const blob = await imageCapture.takePhoto({
         redEyeReduction: true,
       });
+      const photoBlob = await new Promise<Blob>((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
 
-      if (photoBlob) {
-        setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
+        img.addEventListener('load', () => {
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+
+          if (!context) {
+            throw Error('Failed to get canvas context');
+          }
+
+          const flipOptions = flipCameraRef.current;
+          const {
+            naturalWidth: width,
+            naturalHeight: height,
+          } = img;
+
+          canvas.width = width;
+          canvas.height = height;
+
+          if (flipOptions.includes('horizontal')) {
+            context.transform(-1, 0, 0, 1, width, 0);
+          }
+          if (flipOptions.includes('vertical')) {
+            context.transform(1, 0, 0, -1, 0, height);
+          }
+
+          context.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((bitmapBlob) => {
+            if (bitmapBlob) {
+              resolve(bitmapBlob);
+            } else {
+              reject(Error('Failed to convert camera frame'));
+            }
+          });
+        });
+
+        img.addEventListener('error', (error) => {
+          reject(error);
+        });
+
+        img.src = url;
+      });
+
+      if (!photoBlob) {
+        throw ReferenceError('No photo blob');
       }
+
+      const url = URL.createObjectURL(photoBlob);
+
+      setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
+      URL.revokeObjectURL(url);
     } catch (error) {
       notice(`${error}`);
     }
 
     setDisableShutter(undefined);
-  }, [localStream, disableSwitchCamera, disableShutter, notice]);
+  }, [localRawStream, disableSwitchCamera, disableShutter, notice]);
 
   const onSaveSelectedPhotos = useCallback<PhotoManagementProps['onSave']>((selectedPhotos) => {
     downloadFiles(selectedPhotos);
@@ -86,7 +147,7 @@ const Camera: FunctionComponent = () => {
   }, [notice]);
 
   const switchCamera = useCallback(async () => {
-    const nextCameraInfo = await getNextCamera(localStream);
+    const nextCameraInfo = await getNextCamera(localRawStream);
 
     if (!nextCameraInfo) {
       return;
@@ -96,8 +157,8 @@ const Camera: FunctionComponent = () => {
       if (localMinStream) {
         stopStream(localMinStream);
       }
-      if (localStream) {
-        stopStream(localStream);
+      if (localRawStream) {
+        stopStream(localRawStream);
       }
 
       const stream = await startStream({
@@ -106,52 +167,75 @@ const Camera: FunctionComponent = () => {
         },
       });
 
-      setLocalStream(stream);
+      setLocalRawStream(stream);
     } catch (error) {
       notice(`${error}`);
     }
-  }, [localStream, localMinStream, notice]);
+  }, [localRawStream, localMinStream, notice]);
 
   const takePhotoWithMessage = useCallback(async () => {
     try {
-      await sendMessage('#photo', true);
+      await sendCommand(CommandType.takingPhoto, true, true);
       await takePhoto();
-      await sendMessage('#photoed', true);
+      await sendCommand(CommandType.takingPhoto, false, true);
     } catch (error) {
       notice(`${error}`);
     }
-  }, [sendMessage, takePhoto, notice]);
+  }, [sendCommand, takePhoto, notice]);
 
   const switchCameraWithMessage = useCallback(async () => {
     try {
-      await sendMessage('#switchcamera', true);
+      await sendCommand(CommandType.switchingCamera, true, true);
       await switchCamera();
-      await sendMessage('#switchedcamera', true);
+      await sendCommand(CommandType.switchingCamera, false, true);
     } catch (error) {
       notice(`${error}`);
     }
-  }, [sendMessage, switchCamera, notice]);
+  }, [sendCommand, switchCamera, notice]);
 
-  const onMessage = useCallback<OnMessage>(async (message) => {
-    logger.log('message', message);
+  const flipCameraWithMessage = useCallback<CameraViewProps['onFlipCamera']>(async (direction) => {
+    try {
+      const flipOptions = flipCameraRef.current;
+      const indexOfDirection = flipOptions.indexOf(direction);
 
-    if (/^#/.test(message)) {
-      logger.log('MESSAGE', message.substring(1));
-      switch (message.substring(1)) {
-        case 'photo':
-          setShutterAnimationId(Date.now());
-          await takePhotoWithMessage();
-          break;
+      await sendCommand(CommandType.flippingCamera, true, true);
 
-        case 'switchcamera':
-          await switchCameraWithMessage();
-          break;
-
-        default:
-          break;
+      if (indexOfDirection === -1) {
+        flipCameraRef.current = [...flipOptions, direction];
+      } else {
+        flipCameraRef.current = [
+          ...flipOptions.slice(0, indexOfDirection),
+          ...flipOptions.slice(indexOfDirection + 1),
+        ];
       }
+
+      await sendCommand(CommandType.flippingCamera, false, true);
+    } catch (error) {
+      notice(`${error}`);
     }
-  }, [switchCameraWithMessage, takePhotoWithMessage]);
+  }, [notice, sendCommand]);
+
+  const onCommand = useCallback<OnCommand>(async (type, command) => {
+    logger.log('command', type, command);
+
+    switch (type) {
+      case CommandType.takePhoto:
+        setShutterAnimationId(Date.now());
+        await takePhotoWithMessage();
+        break;
+
+      case CommandType.switchCamera:
+        await switchCameraWithMessage();
+        break;
+
+      case CommandType.flipCamera:
+        await flipCameraWithMessage(command as FlipCameraCommand['param']);
+        break;
+
+      default:
+        break;
+    }
+  }, [switchCameraWithMessage, takePhotoWithMessage, flipCameraWithMessage]);
 
   const onCall = useCallback<OnCall>(async (sourceId, answer) => {
     logger.log(`Get call from <${sourceId}>`);
@@ -187,6 +271,7 @@ const Camera: FunctionComponent = () => {
   }, [askYesNo, localMinStream, notice]);
 
   const onHangUp: OnHangUp = () => {
+    setLocalRawStream(undefined);
     setLocalStream(undefined);
     setLocalMinStream(undefined);
     setRemoteStream(undefined);
@@ -202,12 +287,52 @@ const Camera: FunctionComponent = () => {
     }
   }, [askYesNo, cameraUrl]);
 
+  const onLoadedRawVideoData = () => {
+    const canvas = localCanvasRef.current!;
+    const video = localRawVideoRef.current!;
+    const context = canvas.getContext('2d');
+    const { videoWidth, videoHeight } = video;
+    const canvasStream = canvas.captureStream();
+    const drawNextFrame = () => {
+      if (context) {
+        const flipOptions = flipCameraRef.current;
+
+        context.save();
+
+        if (flipOptions.includes('horizontal')) {
+          context.transform(-1, 0, 0, 1, videoWidth, 0);
+        }
+        if (flipOptions.includes('vertical')) {
+          context.transform(1, 0, 0, -1, 0, videoHeight);
+        }
+
+        context.drawImage(video, 0, 0, videoWidth, videoHeight);
+        context.restore();
+      }
+
+      drawLocalCanvasAnimationId.current = requestAnimationFrame(drawNextFrame);
+    };
+
+    if (drawLocalCanvasAnimationId.current) {
+      cancelAnimationFrame(drawLocalCanvasAnimationId.current);
+    }
+
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
+    video.play();
+    drawNextFrame();
+    setLocalStream(
+      new MediaStream(canvasStream),
+    );
+  };
+
   useEffect(() => {
     startStream()
       .then((stream) => {
-        setLocalStream(stream);
+        setLocalRawStream(stream);
         setDisableShutter(undefined);
         setDisableSwitchCamera(undefined);
+        setDisableFlipCamera(undefined);
       })
       .catch((error) => {
         notice(`Failed to init stream: ${error}`);
@@ -215,11 +340,27 @@ const Camera: FunctionComponent = () => {
   }, [notice]);
 
   useEffect(() => {
+    if (localRawStream) {
+      const defaultFlip = localRawStream.getVideoTracks().some((track) => {
+        const facingModes = track.getCapabilities().facingMode;
+
+        return !!facingModes?.includes('user');
+      });
+
+      flipCameraRef.current = [];
+
+      if (defaultFlip) {
+        flipCameraWithMessage('horizontal');
+      }
+    }
+  }, [localRawStream, flipCameraWithMessage]);
+
+  useEffect(() => {
     if (localStream) {
       setLocalMinStream(minifyCameraStream(localStream));
-    } else {
-      setLocalMinStream(undefined);
     }
+
+    return () => setLocalMinStream(undefined);
   }, [localStream]);
 
   useEffect(() => {
@@ -230,13 +371,13 @@ const Camera: FunctionComponent = () => {
 
   useEffect(() => {
     if (isDataConnected) {
-      setOnMessage(onMessage);
+      setOnCommand(onCommand);
     }
 
     return () => {
-      setOnMessage();
+      setOnCommand();
     };
-  }, [isDataConnected, onMessage, setOnMessage]);
+  }, [isDataConnected, onCommand, setOnCommand]);
 
   useEffect(() => {
     if (isDataConnected) {
@@ -267,6 +408,7 @@ const Camera: FunctionComponent = () => {
   useEffect(() => {
     setDisableShutter(true);
     setDisableSwitchCamera(true);
+    setDisableFlipCamera(true);
 
     return () => {
       onHangUp();
@@ -278,15 +420,30 @@ const Camera: FunctionComponent = () => {
       className={styles.camera}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
+      disableFlipCamera={disableFlipCamera}
       shutterAnimationId={shutterAnimationId}
       onShutter={takePhotoWithMessage}
       onSwitchCamera={switchCameraWithMessage}
+      onFlipCamera={flipCameraWithMessage}
       majorContent={localStream}
       minorContent={remoteStream ?? 'Share Camera'}
       onClickMinor={remoteStream ? undefined : shareCamera}
     >
       <div className={styles.title}>
         <Tag>Camera #{connectionId}</Tag>
+      </div>
+
+      <div className={styles.hidden}>
+        <Video
+          ref={localRawVideoRef}
+          srcObject={localRawStream}
+          onLoadedData={onLoadedRawVideoData}
+        />
+        <canvas
+          ref={localCanvasRef}
+          width={localRawVideoRef.current?.width}
+          height={localRawVideoRef.current?.height}
+        />
       </div>
 
       <PhotoManagement

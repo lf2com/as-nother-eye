@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   createContext, Reducer, useContext, useMemo, useReducer, useState,
 } from 'react';
@@ -7,7 +7,7 @@ import LogMessage, { LogMessageProps } from './components/LogMessage';
 
 import Logger from '@/utils/logger';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -32,7 +32,7 @@ interface LoggerContextProviderProps {
   show?: boolean;
 }
 
-const LoggerContextProvider: FunctionComponentWithChildren<LoggerContextProviderProps> = ({
+const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
   tag,
   show: defaultShow = true,
   children,
@@ -43,12 +43,6 @@ const LoggerContextProvider: FunctionComponentWithChildren<LoggerContextProvider
     (prevLogs, log) => prevLogs.concat(log),
     [],
   );
-
-  const className = useMemo(() => (
-    classnames(styles.logger, {
-      [styles.show]: show,
-    })
-  ), [show]);
 
   const logger = useMemo(() => new Logger({
     tag,
@@ -70,7 +64,11 @@ const LoggerContextProvider: FunctionComponentWithChildren<LoggerContextProvider
   return (
     <LoggerContext.Provider value={contextValue}>
       {children}
-      <div className={className}>
+      <div className={
+        classNames(styles.logger, {
+          [styles.show]: show,
+        })
+      }>
         {logs.map(({ type, timestamp, message }) => (
           <LogMessage
             key={`${type}-${message}-${timestamp}`}

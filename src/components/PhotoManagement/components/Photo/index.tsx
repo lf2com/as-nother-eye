@@ -1,5 +1,5 @@
-import classnames from 'classnames';
-import React, { FunctionComponent, useEffect, useMemo } from 'react';
+import classNames from 'classnames';
+import React, { FC, useEffect, useMemo } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -9,7 +9,7 @@ interface PhotoProps {
   onClick: () => void;
 }
 
-const Photo: FunctionComponent<PhotoProps> = ({
+const Photo: FC<PhotoProps> = ({
   photo,
   selected,
   onClick,
@@ -24,7 +24,7 @@ const Photo: FunctionComponent<PhotoProps> = ({
 
   return (
     <img
-      className={classnames(styles.photo, {
+      className={classNames(styles.photo, {
         [styles.selected]: selected,
       })}
       src={photoUrl}

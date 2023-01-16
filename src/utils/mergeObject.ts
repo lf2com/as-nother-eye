@@ -1,4 +1,4 @@
-type IterableObject = Record<string, any>;
+type IterableObject = Record<string, unknown>;
 
 const mergeObject = <A extends IterableObject, B extends IterableObject>(
   a: A,
@@ -21,7 +21,7 @@ const mergeObject = <A extends IterableObject, B extends IterableObject>(
             valB as IterableObject,
           );
         } else {
-          result[key] = mergeObject(valB);
+          result[key] = mergeObject(valB as IterableObject);
         }
       } else if (Object.prototype.hasOwnProperty.call(b, key)) {
         result[key] = valB;

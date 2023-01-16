@@ -1,9 +1,10 @@
 import React, {
-  FunctionComponent, useCallback, useEffect, useState,
+  FC, useCallback, useEffect, useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { OnHangUp, OnMessage, useConnectionContext } from '@/contexts/ConnectionContext';
+import { OnCommand, OnHangUp, useConnectionContext } from '@/contexts/ConnectionContext';
+import { CommandType } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
 
 import CameraView, { CameraViewProps } from '@/components/CameraView';
@@ -18,7 +19,7 @@ import styles from './styles.module.scss';
 
 const logger = new Logger({ tag: '[Photoer]' });
 
-const Photoer: FunctionComponent = () => {
+const Photoer: FC = () => {
   const params = useParams();
   const {
     id: connectionId,
@@ -26,14 +27,15 @@ const Photoer: FunctionComponent = () => {
     isDataConnected,
     isMediaConnected,
     call,
-    sendMessage,
-    setOnMessage,
+    sendCommand,
+    setOnCommand,
     setOnHangUp,
   } = useConnectionContext();
   const { notice } = useModalContext();
   const [loadingMessage, setLoadingMessage] = useState<string>();
   const [disableShutter, setDisableShutter] = useState<boolean>();
   const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
+  const [disableFlipCamera, setDisableFlipCamera] = useState<boolean>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
@@ -48,46 +50,50 @@ const Photoer: FunctionComponent = () => {
     setDisableShutter(true);
 
     try {
-      await sendMessage('#photo');
+      await sendCommand(CommandType.takePhoto, 0);
     } catch (error) {
       notice(`${error}`);
     }
-  }, [notice, sendMessage]);
+  }, [notice, sendCommand]);
 
   const onSwitchCamera = useCallback<CameraViewProps['onSwitchCamera']>(async () => {
     setDisableSwitchCamera(true);
 
     try {
-      await sendMessage('#switchcamera');
+      await sendCommand(CommandType.switchCamera, 'next');
     } catch (error) {
       notice(`${error}`);
     }
-  }, [notice, sendMessage]);
+  }, [notice, sendCommand]);
 
-  const onMessage: OnMessage = (message) => {
-    logger.log('message', message);
+  const onFlipCamera = useCallback<CameraViewProps['onFlipCamera']>(async (direction) => {
+    setDisableFlipCamera(true);
 
-    if (/^#/.test(message)) {
-      switch (message.substring(1)) {
-        case 'photo':
-          setDisableShutter(true);
-          break;
+    try {
+      await sendCommand(CommandType.flipCamera, direction);
+    } catch (error) {
+      notice(`${error}`);
+    }
+  }, [notice, sendCommand]);
 
-        case 'photoed':
-          setDisableShutter(false);
-          break;
+  const onCommand: OnCommand = (type, param) => {
+    logger.log('command', type, param);
 
-        case 'switchcamera':
-          setDisableSwitchCamera(true);
-          break;
+    switch (type) {
+      case CommandType.takingPhoto:
+        setDisableShutter(!!param);
+        break;
 
-        case 'switchedcamera':
-          setDisableSwitchCamera(false);
-          break;
+      case CommandType.switchingCamera:
+        setDisableSwitchCamera(!!param);
+        break;
 
-        default:
-          break;
-      }
+      case CommandType.flippingCamera:
+        setDisableFlipCamera(!!param);
+        break;
+
+      default:
+        break;
     }
 
     // const blob = new Blob([data as ArrayBuffer]);
@@ -160,25 +166,27 @@ const Photoer: FunctionComponent = () => {
 
   useEffect(() => {
     if (isDataConnected) {
-      setOnMessage(onMessage);
+      setOnCommand(onCommand);
     }
 
     return () => {
-      setOnMessage();
+      setOnCommand();
     };
-  }, [isDataConnected, setOnMessage]);
+  }, [isDataConnected, setOnCommand]);
 
   useEffect(() => {
     if (isMediaConnected) {
       setOnHangUp(onHangUp);
       setDisableShutter(false);
       setDisableSwitchCamera(false);
+      setDisableFlipCamera(false);
     }
 
     return () => {
       setOnHangUp();
       setDisableShutter(true);
       setDisableSwitchCamera(true);
+      setDisableFlipCamera(true);
     };
   }, [isMediaConnected, setOnHangUp]);
 
@@ -197,6 +205,7 @@ const Photoer: FunctionComponent = () => {
   useEffect(() => {
     setDisableShutter(true);
     setDisableSwitchCamera(true);
+    setDisableFlipCamera(true);
 
     return () => {
       onHangUp();
@@ -208,8 +217,10 @@ const Photoer: FunctionComponent = () => {
       className={styles.photoer}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
+      disableFlipCamera={disableFlipCamera}
       onShutter={onShutter}
       onSwitchCamera={onSwitchCamera}
+      onFlipCamera={onFlipCamera}
       majorContent={remoteStream ?? 'Connect to Camera'}
       minorContent={localStream}
       onClickMajor={onClickMajor}

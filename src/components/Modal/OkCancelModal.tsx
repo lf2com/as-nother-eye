@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import Modal, { ModalBasicProps, ModalButton } from '.';
 
@@ -12,7 +12,7 @@ interface OkCancelModalProps extends ModalBasicProps {
   disabledCancel?: boolean;
 }
 
-const OkCancelModal: FunctionComponentWithChildren<OkCancelModalProps> = ({
+const OkCancelModal: FCWithChildren<OkCancelModalProps> = ({
   onOk,
   onCancel,
   disabled,

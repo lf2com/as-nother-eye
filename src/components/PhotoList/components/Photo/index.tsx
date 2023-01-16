@@ -1,5 +1,7 @@
-import classnames from 'classnames';
-import React, { FunctionComponent, useCallback, useState } from 'react';
+import classNames from 'classnames';
+import React, {
+  FC, ReactEventHandler, useCallback, useState,
+} from 'react';
 
 import styles from './styles.module.scss';
 
@@ -8,13 +10,13 @@ interface PhotoItemProps {
   onShown?: () => void;
 }
 
-const Photo: FunctionComponent<PhotoItemProps> = ({
+const Photo: FC<PhotoItemProps> = ({
   url,
   onShown,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const onLoad = useCallback<React.ReactEventHandler<HTMLImageElement>>(() => {
+  const onLoad = useCallback<ReactEventHandler<HTMLImageElement>>(() => {
     setIsLoaded(true);
   }, []);
 
@@ -24,7 +26,7 @@ const Photo: FunctionComponent<PhotoItemProps> = ({
 
   return (
     <div
-      className={classnames(styles.photo, {
+      className={classNames(styles.photo, {
         [styles.loaded]: isLoaded,
       })}
       onAnimationEnd={handleShowAnimationEnd}

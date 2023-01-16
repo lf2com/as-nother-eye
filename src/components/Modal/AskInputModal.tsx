@@ -2,7 +2,7 @@ import React, {
   ChangeEventHandler, KeyboardEventHandler, useCallback, useEffect, useRef, useState,
 } from 'react';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import { ModalBasicProps } from '.';
 import OkCancelModal from './OkCancelModal';
@@ -22,7 +22,7 @@ export interface AskInputModalProps {
   onClickOutside?: ModalBasicProps['onClickOutside'];
 }
 
-const AskInputModal: FunctionComponentWithChildren<AskInputModalProps> = ({
+const AskInputModal: FCWithChildren<AskInputModalProps> = ({
   show,
   onConfirm,
   onCancel,

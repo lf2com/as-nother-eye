@@ -1,14 +1,14 @@
-import classnames from 'classnames';
-import React, { FunctionComponent } from 'react';
+import classNames from 'classnames';
+import React, { ComponentProps, FC } from 'react';
 
 import Clickable from '@/components/Clickable';
 
 import styles from './styles.module.scss';
 
-type ButtonProps = Parameters<typeof Clickable>[0];
+type ButtonProps = ComponentProps<typeof Clickable>;
 
-const Button: FunctionComponent<ButtonProps> = ({ className, ...props }) => (
-  <Clickable className={classnames(styles.button, className)} {...props} />
+const Button: FC<ButtonProps> = ({ className, ...props }) => (
+  <Clickable className={classNames(styles.button, className)} {...props} />
 );
 
 export default Button;

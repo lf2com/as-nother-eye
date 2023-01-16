@@ -2,11 +2,11 @@ import React from 'react';
 
 import WithTextShadow from '@/components/WithTextShadow';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
-const Tag: FunctionComponentWithChildren = ({ children }) => (
+const Tag: FCWithChildren = ({ children }) => (
   <div className={styles.tag}>
     <WithTextShadow>
       {children}

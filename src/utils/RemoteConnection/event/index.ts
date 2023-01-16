@@ -8,7 +8,7 @@ interface EventItem {
 
 type EventList = Partial<Record<keyof EventHandler, EventItem[]>>;
 
-type EventHandlerRegister = <E extends EventName>(
+type RemoteConnectionEventHandler = <E extends EventName>(
   eventName: E,
   handler: EventHandler[E],
   options?: {
@@ -20,8 +20,8 @@ declare module '../base' {
   interface RemoteConnection {
     eventHandlerList: EventList;
 
-    addEventListener: EventHandlerRegister;
-    removeEventListener: EventHandlerRegister;
+    addEventListener: RemoteConnectionEventHandler;
+    removeEventListener: RemoteConnectionEventHandler;
     dispatchEvent<E extends EventName>(eventName: E, ...args: Parameters<EventHandler[E]>): void;
   }
 }

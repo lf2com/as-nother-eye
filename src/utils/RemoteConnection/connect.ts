@@ -9,6 +9,7 @@ const MESSAGE_DECLINE_CALL = '#decline-call';
 interface ConnectionItem {
   dataConnection: DataConnection;
   mediaConnection?: MediaConnection;
+  accepted?: boolean;
 }
 
 declare module './base' {
@@ -52,7 +53,16 @@ function createDataConnection(
 
     dataConnection.off('data');
     dataConnection.on('data', (data) => {
+      const { accepted } = this.connectionList[targetId];
+
       this.logger.log('Data connection data', data);
+
+      if (accepted === false) {
+        this.logger.warn('Not accepted peer');
+
+        return;
+      }
+
       this.dispatchEvent('data', targetId, data);
     });
 
@@ -79,6 +89,7 @@ function createMediaConnection(
       const response = data as string;
 
       if (response === MESSAGE_DECLINE_CALL) {
+        this.connectionList[targetId].accepted = false;
         this.removeEventListener('data', handleDeclineResponse);
         reject(Error('Declined'));
       }
@@ -193,6 +204,7 @@ RemoteConnection.prototype.connect = function f(
         sourceId,
         async (accept, stream) => {
           if (!accept) {
+            this.connectionList[sourceId].accepted = false;
             await this.sendMessage(sourceId, MESSAGE_DECLINE_CALL);
             // mediaConnection.answer();
             // mediaConnection.close();
@@ -200,6 +212,7 @@ RemoteConnection.prototype.connect = function f(
             return undefined;
           }
 
+          this.connectionList[sourceId].accepted = true;
           answer.call(mediaConnection, stream);
 
           return createMediaConnection.call(this, mediaConnection);

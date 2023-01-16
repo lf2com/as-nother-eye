@@ -25,7 +25,7 @@ export const startStream = async (
   const cameras = await getCameras();
   const realCameras = cameras.filter((info) => !/\bvirtual\b/i.test(info.label));
   const realCamera = realCameras[0];
-  const realCameraConstraints = {
+  const realCameraConstraints: MediaStreamConstraints = {
     video: {
       deviceId: realCamera?.deviceId,
     },

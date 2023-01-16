@@ -1,14 +1,11 @@
-import { FunctionComponent, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren } from 'react';
 
 export type PropsWithClassName<P = unknown> = P & { className?: string };
 
-export type FunctionComponentWithChildren<P = {}> = FunctionComponent<PropsWithChildren<P>>;
-export type FCWithChildren<P = {}> = FunctionComponentWithChildren<P>;
+export type FCWithChildren<P = unknown> = FC<PropsWithChildren<P>>;
 
-export type FunctionComponentWithClassName<P = {}> = FunctionComponent<PropsWithClassName<P>>;
-export type FCWithClassName<P = {}> = FunctionComponentWithClassName<P>;
+export type FCWithClassName<P = unknown> = FC<PropsWithClassName<P>>;
 
-export type FunctionComponentWithClassNameAndChildren<P = {}> = (
-  FunctionComponent<PropsWithChildren<PropsWithClassName<P>>>
+export type FCWithClassNameAndChildren<P = unknown> = (
+  FCWithChildren<PropsWithClassName<P>>
 );
-export type FCWithClassNameAndChildren<P = {}> = FunctionComponentWithClassNameAndChildren<P>;

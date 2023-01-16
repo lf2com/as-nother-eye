@@ -1,39 +1,46 @@
-import { faCameraRotate } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsLeftRight, faArrowsUpDown, faCameraRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   ReactNode, useCallback, useEffect, useRef, useState,
 } from 'react';
+
+import { FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
 
 import Clickable from '@/components/Clickable';
 import Frame from '@/components/Frame';
 import Video from '@/components/Video';
 
-import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
 export interface CameraViewProps {
+  majorClassName?: string;
   majorContent?: MediaStream | ReactNode;
   minorContent?: MediaStream | ReactNode;
   disableShutter?: boolean;
   shutterAnimationId?: number;
   disableSwitchCamera?: boolean;
+  disableFlipCamera?: boolean;
   onShutter: () => void | Promise<void>;
   onSwitchCamera: () => void | Promise<void>;
+  onFlipCamera: (direction: FlipCameraCommand['param']) => void | Promise<void>;
   onClickMajor?: () => void | Promise<void>;
   onClickMinor?: () => void | Promise<void>;
 }
 
-const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = ({
+const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
   className,
   majorContent = null,
   minorContent = null,
   disableShutter: refDisableShutter,
   disableSwitchCamera: refDisableSwitchCamera,
+  disableFlipCamera: refDisableFlipCamera,
   shutterAnimationId: refShutterAnimationId,
   onShutter,
   onSwitchCamera,
+  onFlipCamera,
   onClickMajor,
   onClickMinor,
   children,
@@ -41,6 +48,7 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
   const [shutterAnimationId, setShutterAnimationId] = useState<number>();
   const [disableShutter, setDisableShutter] = useState<boolean>();
   const [disableSwitchCamera, setDisableSwitchCamera] = useState<boolean>();
+  const [disableFlipCamera, setDisableFlipCamera] = useState<boolean>();
   const refMajorVideo = useRef<HTMLVideoElement>(null);
 
   const handleShutter = useCallback(async () => {
@@ -59,6 +67,15 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
     await onSwitchCamera();
     setDisableSwitchCamera(refDisableSwitchCamera !== undefined);
   }, [onSwitchCamera, refDisableSwitchCamera]);
+
+  const handleFlipCamera = useCallback(async (direction: FlipCameraCommand['param']) => {
+    setDisableFlipCamera(refDisableFlipCamera ?? true);
+    await onFlipCamera(direction);
+    setDisableFlipCamera(refDisableFlipCamera !== undefined);
+  }, [onFlipCamera, refDisableFlipCamera]);
+
+  const flipCameraHorizontal = () => handleFlipCamera('horizontal');
+  const flipCameraVertical = () => handleFlipCamera('vertical');
 
   useEffect(() => {
     const video = refMajorVideo.current;
@@ -81,15 +98,19 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
   }, [refDisableSwitchCamera]);
 
   useEffect(() => {
+    setDisableFlipCamera(refDisableFlipCamera ?? false);
+  }, [refDisableFlipCamera]);
+
+  useEffect(() => {
     if (refShutterAnimationId) {
       setShutterAnimationId(refShutterAnimationId);
     }
   }, [refShutterAnimationId]);
 
   return (
-    <Frame className={classnames(styles['camera-view'], className)}>
+    <Frame className={classNames(styles['camera-view'], className)}>
       <Clickable
-        className={classnames(styles.major, {
+        className={classNames(styles.major, {
           [styles['taking-photo']]: !!shutterAnimationId,
         })}
         onAnimationEnd={onShutterAnimationEnd}
@@ -133,6 +154,22 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
       >
         <FontAwesomeIcon icon={faCameraRotate} />
       </Clickable>
+
+      <div className={styles['flip-camera-tool']}>
+        <Clickable
+          disabled={disableFlipCamera}
+          onClick={flipCameraVertical}
+        >
+          <FontAwesomeIcon icon={faArrowsUpDown} />
+        </Clickable>
+
+        <Clickable
+          disabled={disableFlipCamera}
+          onClick={flipCameraHorizontal}
+        >
+          <FontAwesomeIcon icon={faArrowsLeftRight} />
+        </Clickable>
+      </div>
 
       {children}
     </Frame>

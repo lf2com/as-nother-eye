@@ -1,9 +1,9 @@
-import classnames from 'classnames';
-import React, { useMemo } from 'react';
+import classNames from 'classnames';
+import React from 'react';
 
 import { LogType } from '@/utils/logger';
 
-import { FunctionComponentWithChildren } from '@/types/ComponentProps';
+import { FCWithChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -12,18 +12,14 @@ export interface LogMessageProps {
   timestamp: number;
 }
 
-const LogMessage: FunctionComponentWithChildren<LogMessageProps> = ({
+const LogMessage: FCWithChildren<LogMessageProps> = ({
   type = 'log',
   // timestamp,
   children,
-}) => {
-  const className = useMemo(() => classnames(styles.message, styles[type]), [type]);
-
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  );
-};
+}) => (
+  <div className={classNames(styles.message, styles[type])}>
+    {children}
+  </div>
+);
 
 export default React.memo(LogMessage);

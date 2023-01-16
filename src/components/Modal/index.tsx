@@ -1,6 +1,6 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
-  MouseEventHandler, TransitionEventHandler, useCallback, useEffect, useMemo, useState,
+  MouseEventHandler, ReactNode, TransitionEventHandler, useCallback, useEffect, useState,
 } from 'react';
 
 import ModalButtonContextProvider from './contexts/ModalButtonContext';
@@ -9,13 +9,13 @@ import ModalButton from './components/Button';
 
 import wait from '@/utils/wait';
 
-import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
 export interface ModalBasicProps {
   show?: boolean;
-  title?: React.ReactNode;
+  title?: ReactNode;
   highlight?: boolean;
   onShown?: () => void;
   onHidden?: () => void;
@@ -29,7 +29,7 @@ export interface ModalProps extends ModalBasicProps {
   buttonOnlyOnce?: boolean;
 }
 
-const Modal: FunctionComponentWithClassNameAndChildren<ModalProps> = ({
+const Modal: FCWithClassNameAndChildren<ModalProps> = ({
   show: propShow,
   className,
   title,
@@ -45,13 +45,6 @@ const Modal: FunctionComponentWithClassNameAndChildren<ModalProps> = ({
 }) => {
   const [show, setShow] = useState(false);
   const [disabledAll, setDisabledAll] = useState(false);
-
-  const modalClassName = useMemo(() => (
-    classnames(styles.modal, {
-      [styles.highlight]: highlight,
-      [styles.show]: show,
-    }, className)
-  ), [highlight, show, className]);
 
   const handleClickOutside = useCallback<MouseEventHandler>(() => {
     if (onClickOutside?.() !== false && hideOnClickOutside) {
@@ -96,22 +89,27 @@ const Modal: FunctionComponentWithClassNameAndChildren<ModalProps> = ({
   return (
     <ModalButtonContextProvider disabledAll={disabledAll}>
       <div
-        className={modalClassName}
+        className={
+          classNames(styles.modal, {
+            [styles.highlight]: highlight,
+            [styles.show]: show,
+          }, className)
+        }
         onClick={handleClickOutside}
       >
         <div
-          className={classnames(styles.box, 'modal-box')}
+          className={classNames(styles.box, 'modal-box')}
           onClick={onClickContainer}
           onTransitionEnd={onTransitionEnd}
         >
-          <div className={classnames(styles.head, 'modal-head')}>
+          <div className={classNames(styles.head, 'modal-head')}>
             {title}
           </div>
-          <div className={classnames(styles.body, 'modal-body')}>
+          <div className={classNames(styles.body, 'modal-body')}>
             {children}
           </div>
           <div
-            className={classnames(styles.foot, 'modal-foot')}
+            className={classNames(styles.foot, 'modal-foot')}
             onClick={onClickButton}
           >
             {buttons}
