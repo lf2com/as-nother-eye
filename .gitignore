@@ -1,5 +1,0 @@
-node_modules/
-*.scss.d.ts
-.env
-bin
-coverage
