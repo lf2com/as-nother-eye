@@ -1,6 +1,6 @@
 import { faArrowsLeftRight, faArrowsUpDown, faCameraRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
   ReactNode, useCallback, useEffect, useRef, useState,
 } from 'react';
@@ -11,7 +11,7 @@ import Clickable from '@/components/Clickable';
 import Frame from '@/components/Frame';
 import Video from '@/components/Video';
 
-import { FunctionComponentWithClassNameAndChildren } from '@/types/ComponentProps';
+import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
@@ -30,7 +30,7 @@ export interface CameraViewProps {
   onClickMinor?: () => void | Promise<void>;
 }
 
-const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = ({
+const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
   className,
   majorContent = null,
   minorContent = null,
@@ -108,9 +108,9 @@ const CameraView: FunctionComponentWithClassNameAndChildren<CameraViewProps> = (
   }, [refShutterAnimationId]);
 
   return (
-    <Frame className={classnames(styles['camera-view'], className)}>
+    <Frame className={classNames(styles['camera-view'], className)}>
       <Clickable
-        className={classnames(styles.major, {
+        className={classNames(styles.major, {
           [styles['taking-photo']]: !!shutterAnimationId,
         })}
         onAnimationEnd={onShutterAnimationEnd}

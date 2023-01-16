@@ -7,10 +7,10 @@ export enum CommandType {
   takingPhoto = 'takingPhoto',
 }
 
-type CommmadParameters<T extends CommandType, P> = {
-  type: T,
-  param: P,
-};
+interface CommmadParameters<T extends CommandType, P> {
+  type: T;
+  param: P;
+}
 
 type SwitchCameraCommand = CommmadParameters<
   CommandType.switchCamera,

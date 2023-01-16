@@ -1,6 +1,6 @@
 const randomPool: string[] = [];
 
-const genCandidatesFromRange = (st: string | number, ed: string | number): string[] => {
+const createStringList = (st: string | number, ed: string | number): string[] => {
   const strSt = `${st}`;
   const strEd = `${ed}`;
   const codeSt = strSt.charCodeAt(0);
@@ -25,9 +25,9 @@ const randomStr = (options: RandomOptions = {}): string => {
   const {
     prefix = '',
     length = 6,
-    candidates = genCandidatesFromRange('a', 'z')
-      .concat(genCandidatesFromRange('A', 'Z'))
-      .concat(genCandidatesFromRange(0, 9)),
+    candidates = createStringList('a', 'z')
+      .concat(createStringList('A', 'Z'))
+      .concat(createStringList(0, 9)),
     candidateStr = candidates.join(''),
   } = options;
   const str: string = Array.from({ length })

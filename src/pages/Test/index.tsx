@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FC } from 'react';
 
 import Logger from '@/utils/logger';
 import randomStr from '@/utils/random';
@@ -12,7 +12,7 @@ const logger = new Logger({
 const photoerId = randomStr();
 const cameraId = randomStr();
 
-const Test: FunctionComponent = () => {
+const Test: FC = () => {
   const leftUrl = `/photoer/${cameraId}?id=${photoerId}`;
   const rightUrl = `/camera?id=${cameraId}`;
 

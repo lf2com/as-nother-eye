@@ -1,5 +1,5 @@
 import React, {
-  FunctionComponent, useCallback, useEffect, useMemo, useRef, useState,
+  FC, useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 
 import {
@@ -25,7 +25,7 @@ import styles from './styles.module.scss';
 
 const logger = new Logger({ tag: '[Camera]' });
 
-const Camera: FunctionComponent = () => {
+const Camera: FC = () => {
   const {
     id: connectionId,
     isOnline,

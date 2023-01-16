@@ -1,11 +1,11 @@
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React, {
-  forwardRef, HTMLAttributes, RefCallback, useCallback,
+  ComponentProps, forwardRef, RefCallback, useCallback,
 } from 'react';
 
 import styles from './styles.module.scss';
 
-interface VideoProps extends HTMLAttributes<HTMLVideoElement> {
+interface VideoProps extends ComponentProps<'video'> {
   srcObject?: MediaStream;
 }
 
@@ -32,7 +32,7 @@ const Video = forwardRef<HTMLVideoElement, VideoProps>(({
   }, [ref, srcObject]);
 
   return (
-    <div className={classnames(styles.video, className, {
+    <div className={classNames(styles.video, className, {
       [styles.show]: hasContent,
     })}>
       <video
