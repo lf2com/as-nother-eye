@@ -1,26 +1,31 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
+    "allowJs": false,
+    "baseUrl": "./",
     "outDir": "./dist",
     "target": "esnext",
-    "lib": [
-      "dom",
-      "esnext",
-    ],
-    "jsx": "react",
-    "module": "commonjs",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "preserve",
+    "module": "esnext",
     "strict": true,
     "esModuleInterop": true,
+    "noEmit": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "isolatedModules": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "paths": {
-      "@/*": ["*"],
-      // "@contexts/*": ["contexts/*"],
-      // "@pages/*": ["pages/*"],
+      "@/*": ["./src/*"]
     },
+    "typeRoots": ["node_modules/@types"]
   },
+  "exclude": ["node_modules"],
+  "include": ["**/*.ts", "**/*.tsx"]
 }
