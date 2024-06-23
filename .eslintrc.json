@@ -1,0 +1,113 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "node": true,
+    "jest/globals": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "project": ["./tsconfig.json"]
+  },
+  "plugins": [
+    "prefer-arrow",
+    "react",
+    "react-hooks",
+    "@typescript-eslint",
+    "jest"
+  ],
+  "ignorePatterns": ["node_modules/", "dist/"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "default-case": "error",
+    "default-case-last": "error",
+    "no-console": "warn",
+    "no-fallthrough": "error",
+    "no-nested-ternary": "error",
+    "no-unused-vars": "off",
+    "object-property-newline": "error",
+    "prefer-arrow/prefer-arrow-functions": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.tsx"],
+      "rules": {
+        "react/forbid-foreign-prop-types": [
+          "error",
+          { "allowInPropTypes": true }
+        ],
+        "react/jsx-no-comment-textnodes": "error",
+        "react/jsx-no-duplicate-props": "error",
+        "react/jsx-no-target-blank": "error",
+        "react/jsx-no-undef": "error",
+        "react/jsx-pascal-case": [
+          "error",
+          {
+            "allowAllCaps": true,
+            "ignore": []
+          }
+        ],
+        "react/jsx-uses-react": "error",
+        "react/jsx-uses-vars": "error",
+        "react/no-danger-with-children": "error",
+        "react/no-deprecated": "error",
+        "react/no-direct-mutation-state": "error",
+        "react/no-is-mounted": "error",
+        "react/no-typos": "error",
+        "react/react-in-jsx-scope": "off",
+        "react/require-render-return": "error",
+        "react/style-prop-object": "error",
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/ban-types": [
+          "error",
+          {
+            "extendDefaults": true,
+            "types": {
+              "{}": false
+            }
+          }
+        ],
+        "@typescript-eslint/consistent-type-imports": [
+          "warn",
+          {
+            "disallowTypeAnnotations": true,
+            "fixStyle": "separate-type-imports",
+            "prefer": "type-imports"
+          }
+        ],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_",
+            "ignoreRestSiblings": true,
+            "varsIgnorePattern": "^_"
+          }
+        ]
+      }
+    }
+  ]
+}
