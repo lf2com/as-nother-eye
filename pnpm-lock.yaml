@@ -24,6 +24,7 @@ specifiers:
   parcel: ^2.12.0
   peerjs: ^1.4.7
   prettier: ^3.3.2
+  prettier-plugin-sort-json: ^4.0.0
   process: ^0.11.10
   react: ^18.3.1
   react-dom: ^18.3.1
@@ -65,6 +66,7 @@ devDependencies:
   jest-environment-jsdom: 29.7.0
   parcel: 2.12.0_typescript@5.5.2
   prettier: 3.3.2
+  prettier-plugin-sort-json: 4.0.0_prettier@3.3.2
   process: 0.11.10
   ts-jest: 29.1.1_4z2vb54p2eulbg7sqp36g2ifii
   ts-node: 10.9.2_typescript@5.5.2
@@ -5811,6 +5813,15 @@ packages:
   /prelude-ls/1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+    dev: true
+
+  /prettier-plugin-sort-json/4.0.0_prettier@3.3.2:
+    resolution: {integrity: sha512-zV5g+bWFD2zAqyQ8gCkwUTC49o9FxslaUdirwivt5GZHcf57hCocavykuyYqbExoEsuBOg8IU36OY7zmVEMOWA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      prettier: ^3.0.0
+    dependencies:
+      prettier: 3.3.2
     dev: true
 
   /prettier/3.3.2:
