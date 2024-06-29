@@ -8,23 +8,19 @@
   },
   "extends": [
     "eslint:recommended",
-    "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
   "ignorePatterns": ["node_modules/", "dist/"],
   "overrides": [
     {
+      "extends": ["plugin:react-hooks/recommended"],
       "files": ["*.tsx"],
       "rules": {
         "react-hooks/exhaustive-deps": "warn",
         "react-hooks/rules-of-hooks": "error",
-        "react/jsx-no-leaked-render": [
-          "error",
-          {
-            "validStrategies": ["coerce"]
-          }
-        ],
+        "react/jsx-boolean-value": "error",
+        "react/jsx-curly-brace-presence": "error",
         "react/jsx-no-script-url": "error",
         "react/jsx-no-useless-fragment": "error",
         "react/jsx-pascal-case": "error",
@@ -62,6 +58,16 @@
             "varsIgnorePattern": "^_"
           }
         ]
+      }
+    },
+    {
+      "files": ["*.test.ts", "*.test.tsx"],
+      "rules": {
+        "jest/no-disabled-tests": "warn",
+        "jest/no-focused-tests": "error",
+        "jest/no-identical-title": "error",
+        "jest/prefer-to-have-length": "warn",
+        "jest/valid-expect": "error"
       }
     }
   ],
