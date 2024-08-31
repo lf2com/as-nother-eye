@@ -1,20 +1,18 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 
 import ConnectionContextProvider from '@/contexts/ConnectionContext';
 import LoggerContextProvider from '@/contexts/LoggerContext';
 import ModalContextProvider from '@/contexts/ModalContext';
-
 import Camera from '@/pages/AsCamera';
 import Photoer from '@/pages/AsPhotoer';
 import Test from '@/pages/Test';
 import Welcome from '@/pages/Welcome';
 
-import styles from './styles.module.scss';
-
 const App: FC = () => (
-  <div className={styles.app}>
+  <div className="m-0 w-screen h-screen">
     <LoggerContextProvider show={false}>
       <ModalContextProvider>
         <ConnectionContextProvider>
@@ -34,6 +32,8 @@ const App: FC = () => (
   </div>
 );
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
 
 root.render(<App />);
