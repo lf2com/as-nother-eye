@@ -1,17 +1,17 @@
-import React, {
-  FC, useCallback, useEffect, useState,
-} from 'react';
+import type { FC } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { OnCommand, OnHangUp, useConnectionContext } from '@/contexts/ConnectionContext';
+import type { CameraViewProps } from '@/components/CameraView';
+import CameraView from '@/components/CameraView';
+import Loading from '@/components/Loading';
+import type { AskInputModalProps } from '@/components/Modal/AskInputModal';
+import AskInputModal from '@/components/Modal/AskInputModal';
+import Tag from '@/components/Tag';
+import type { OnCommand, OnHangUp } from '@/contexts/ConnectionContext';
+import { useConnectionContext } from '@/contexts/ConnectionContext';
 import { CommandType } from '@/contexts/ConnectionContext/Command';
 import { useModalContext } from '@/contexts/ModalContext';
-
-import CameraView, { CameraViewProps } from '@/components/CameraView';
-import Loading from '@/components/Loading';
-import AskInputModal, { AskInputModalProps } from '@/components/Modal/AskInputModal';
-import Tag from '@/components/Tag';
-
 import Logger from '@/utils/logger';
 import { minifyCameraStream, startStream, stopStream } from '@/utils/userMedia';
 
@@ -40,7 +40,8 @@ const Photoer: FC = () => {
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [targetId, setTargetId] = useState(params.targetId);
-  const [showConnectCameraModal, setShowConnectCameraModal] = useState(!targetId);
+  const [showConnectCameraModal, setShowConnectCameraModal] =
+    useState(!targetId);
 
   const hideConnectCameraModal = () => {
     setShowConnectCameraModal(false);
@@ -56,7 +57,9 @@ const Photoer: FC = () => {
     }
   }, [notice, sendCommand]);
 
-  const onSwitchCamera = useCallback<CameraViewProps['onSwitchCamera']>(async () => {
+  const onSwitchCamera = useCallback<
+    CameraViewProps['onSwitchCamera']
+  >(async () => {
     setDisableSwitchCamera(true);
 
     try {
@@ -66,15 +69,18 @@ const Photoer: FC = () => {
     }
   }, [notice, sendCommand]);
 
-  const onFlipCamera = useCallback<CameraViewProps['onFlipCamera']>(async (direction) => {
-    setDisableFlipCamera(true);
+  const onFlipCamera = useCallback<CameraViewProps['onFlipCamera']>(
+    async direction => {
+      setDisableFlipCamera(true);
 
-    try {
-      await sendCommand(CommandType.flipCamera, direction);
-    } catch (error) {
-      notice(`${error}`);
-    }
-  }, [notice, sendCommand]);
+      try {
+        await sendCommand(CommandType.flipCamera, direction);
+      } catch (error) {
+        notice(`${error}`);
+      }
+    },
+    [notice, sendCommand]
+  );
 
   const onCommand: OnCommand = (type, param) => {
     logger.log('command', type, param);
@@ -105,31 +111,33 @@ const Photoer: FC = () => {
     setRemoteStream(undefined);
   };
 
-  const onConnectCamera = useCallback<AskInputModalProps['onConfirm']>((id) => {
-    try {
-      if (id.length === 0) {
-        throw ReferenceError('No Camera ID');
+  const onConnectCamera = useCallback<AskInputModalProps['onConfirm']>(
+    id => {
+      try {
+        if (id.length === 0) {
+          throw ReferenceError('No Camera ID');
+        }
+
+        setTargetId(id);
+        hideConnectCameraModal();
+      } catch (error) {
+        notice(`${error}`);
       }
-
-      setTargetId(id);
-      hideConnectCameraModal();
-    } catch (error) {
-      notice(`${error}`);
-    }
-  }, [notice]);
-
-  const onClickMajor = (remoteStream
-    ? undefined
-    : () => setShowConnectCameraModal(true)
+    },
+    [notice]
   );
+
+  const onClickMajor = remoteStream
+    ? undefined
+    : () => setShowConnectCameraModal(true);
 
   useEffect(() => {
     startStream()
-      .then((stream) => {
+      .then(stream => {
         setLocalStream(stream);
         setLocalMinStream(minifyCameraStream(stream));
       })
-      .catch((error) => {
+      .catch(error => {
         notice(`Failed to init stream: ${error}`);
       });
   }, [notice]);
@@ -152,10 +160,10 @@ const Photoer: FC = () => {
     if (localMinStream && targetId) {
       setLoadingMessage(`Connecting to <${targetId}>`);
       call(targetId, localMinStream)
-        .then((stream) => {
+        .then(stream => {
           setRemoteStream(stream ?? undefined);
         })
-        .catch((error) => {
+        .catch(error => {
           notice(`${error}`);
         })
         .finally(() => {
@@ -190,11 +198,14 @@ const Photoer: FC = () => {
     };
   }, [isMediaConnected, setOnHangUp]);
 
-  useEffect(() => () => {
-    if (isOnline) {
-      onHangUp();
-    }
-  }, [isOnline]);
+  useEffect(
+    () => () => {
+      if (isOnline) {
+        onHangUp();
+      }
+    },
+    [isOnline]
+  );
 
   useEffect(() => {
     if (isMediaConnected && showConnectCameraModal) {
@@ -238,10 +249,7 @@ const Photoer: FC = () => {
         Connect to camera
       </AskInputModal>
 
-      <Loading
-      >
-        {loadingMessage}
-      </Loading>
+      <Loading>{loadingMessage}</Loading>
     </CameraView>
   );
 };

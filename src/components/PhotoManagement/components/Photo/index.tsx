@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import React, { FC, useEffect, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -9,18 +10,15 @@ interface PhotoProps {
   onClick: () => void;
 }
 
-const Photo: FC<PhotoProps> = ({
-  photo,
-  selected,
-  onClick,
-}) => {
+const Photo: FC<PhotoProps> = ({ photo, selected, onClick }) => {
   const photoUrl = useMemo(() => URL.createObjectURL(photo), [photo]);
 
-  useEffect(() => (
-    () => {
+  useEffect(
+    () => () => {
       URL.revokeObjectURL(photoUrl);
-    }
-  ), [photoUrl]);
+    },
+    [photoUrl]
+  );
 
   return (
     <img

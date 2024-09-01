@@ -1,7 +1,6 @@
 import classNames from 'classnames';
-import React, {
-  FC, ReactNode, useEffect, useState,
-} from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -27,16 +26,14 @@ const Loading: FC<LoadingProps> = ({
   }, [children]);
 
   return (
-    <div className={
-      classNames(styles.loading, {
+    <div
+      className={classNames(styles.loading, {
         [styles.fullscreen]: fullscreen,
         [styles.highlight]: highlight,
         [styles.hide]: !show,
-      })
-    }>
-      <div className={styles.message}>
-        {lastContent}
-      </div>
+      })}
+    >
+      <div className={styles.message}>{lastContent}</div>
     </div>
   );
 };

@@ -1,22 +1,19 @@
 import classNames from 'classnames';
-import React, { ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
+import React from 'react';
 
-import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
+import type { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 
 import styles from './styles.module.scss';
 
-interface FrameProps extends ComponentProps<'div'> {
-}
+interface FrameProps extends ComponentProps<'div'> {}
 
 const Frame: FCWithClassNameAndChildren<FrameProps> = ({
   className,
   children,
   ...restProps
 }) => (
-  <div
-    className={classNames(styles.frame, className)}
-    {...restProps}
-  >
+  <div className={classNames(styles.frame, className)} {...restProps}>
     {children}
   </div>
 );

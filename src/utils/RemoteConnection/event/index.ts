@@ -1,5 +1,6 @@
 import { RemoteConnection } from '../base';
-import EventHandler, { EventName } from './handler';
+import type { EventName } from './handler';
+import type EventHandler from './handler';
 
 interface EventItem {
   handler: EventHandler[keyof EventHandler];
@@ -13,7 +14,7 @@ type RemoteConnectionEventHandler = <E extends EventName>(
   handler: EventHandler[E],
   options?: {
     once?: boolean;
-  },
+  }
 ) => void;
 
 declare module '../base' {
@@ -22,7 +23,10 @@ declare module '../base' {
 
     addEventListener: RemoteConnectionEventHandler;
     removeEventListener: RemoteConnectionEventHandler;
-    dispatchEvent<E extends EventName>(eventName: E, ...args: Parameters<EventHandler[E]>): void;
+    dispatchEvent<E extends EventName>(
+      eventName: E,
+      ...args: Parameters<EventHandler[E]>
+    ): void;
   }
 }
 
@@ -34,16 +38,21 @@ RemoteConnection.prototype.eventHandlerList = {};
 RemoteConnection.prototype.addEventListener = function f(
   eventName,
   handler,
-  options = {},
+  options = {}
 ) {
   const handlers = this.eventHandlerList[eventName] ?? [];
   const { once = false } = options;
-  const notExists = handlers.every((item) => item.handler !== handler || item.once !== once);
+  const notExists = handlers.every(
+    item => item.handler !== handler || item.once !== once
+  );
 
   if (notExists) {
     this.eventHandlerList[eventName] = [
       ...handlers,
-      { handler, once },
+      {
+        handler,
+        once,
+      },
     ];
   }
 };
@@ -54,11 +63,13 @@ RemoteConnection.prototype.addEventListener = function f(
 RemoteConnection.prototype.removeEventListener = function f(
   eventName,
   handler,
-  options = {},
+  options = {}
 ) {
   const listeners = this.eventHandlerList[eventName] ?? [];
   const { once = false } = options;
-  const index = listeners.findIndex((item) => item.handler === handler && item.once === once);
+  const index = listeners.findIndex(
+    item => item.handler === handler && item.once === once
+  );
 
   if (index !== -1) {
     this.eventHandlerList[eventName] = listeners
@@ -78,6 +89,7 @@ RemoteConnection.prototype.dispatchEvent = function f(
   const handlers = this.eventHandlerList[eventName] ?? [];
 
   this.eventHandlerList[eventName] = handlers.filter(({ handler, once }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (handler as any).apply(this, args);
 
     return !once;

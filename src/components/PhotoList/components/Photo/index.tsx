@@ -1,7 +1,6 @@
 import classNames from 'classnames';
-import React, {
-  FC, ReactEventHandler, useCallback, useState,
-} from 'react';
+import type { FC, ReactEventHandler } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import styles from './styles.module.scss';
 
@@ -10,10 +9,7 @@ interface PhotoItemProps {
   onShown?: () => void;
 }
 
-const Photo: FC<PhotoItemProps> = ({
-  url,
-  onShown,
-}) => {
+const Photo: FC<PhotoItemProps> = ({ url, onShown }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const onLoad = useCallback<ReactEventHandler<HTMLImageElement>>(() => {
@@ -31,10 +27,7 @@ const Photo: FC<PhotoItemProps> = ({
       })}
       onAnimationEnd={handleShowAnimationEnd}
     >
-      <img
-        src={url}
-        onLoad={onLoad}
-      />
+      <img src={url} onLoad={onLoad} />
     </div>
   );
 };

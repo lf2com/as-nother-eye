@@ -1,17 +1,18 @@
-import { faArrowsLeftRight, faArrowsUpDown, faCameraRotate } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import React, {
-  ReactNode, useCallback, useEffect, useRef, useState,
-} from 'react';
-
-import { FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
+import type { ReactNode } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Clickable from '@/components/Clickable';
 import Frame from '@/components/Frame';
 import Video from '@/components/Video';
-
-import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
+import type { FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
+import type { FCWithClassNameAndChildren } from '@/types/ComponentProps';
+import {
+  faArrowsLeftRight,
+  faArrowsUpDown,
+  faCameraRotate,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import styles from './styles.module.scss';
 
@@ -68,11 +69,14 @@ const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
     setDisableSwitchCamera(refDisableSwitchCamera !== undefined);
   }, [onSwitchCamera, refDisableSwitchCamera]);
 
-  const handleFlipCamera = useCallback(async (direction: FlipCameraCommand['param']) => {
-    setDisableFlipCamera(refDisableFlipCamera ?? true);
-    await onFlipCamera(direction);
-    setDisableFlipCamera(refDisableFlipCamera !== undefined);
-  }, [onFlipCamera, refDisableFlipCamera]);
+  const handleFlipCamera = useCallback(
+    async (direction: FlipCameraCommand['param']) => {
+      setDisableFlipCamera(refDisableFlipCamera ?? true);
+      await onFlipCamera(direction);
+      setDisableFlipCamera(refDisableFlipCamera !== undefined);
+    },
+    [onFlipCamera, refDisableFlipCamera]
+  );
 
   const flipCameraHorizontal = () => handleFlipCamera('horizontal');
   const flipCameraVertical = () => handleFlipCamera('vertical');
@@ -117,15 +121,12 @@ const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
         disabled={!onClickMajor}
         onClick={onClickMajor}
       >
-        {(majorContent instanceof MediaStream
-          ? (
-            <Video
-              ref={refMajorVideo}
-              className={styles.video}
-              srcObject={majorContent}
-            />
-          )
-          : majorContent
+        {majorContent instanceof MediaStream && (
+          <Video
+            ref={refMajorVideo}
+            className={styles.video}
+            srcObject={majorContent}
+          />
         )}
       </Clickable>
 
@@ -134,9 +135,8 @@ const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
         disabled={!onClickMinor}
         onClick={onClickMinor}
       >
-        {(minorContent instanceof MediaStream
-          ? <Video srcObject={minorContent} />
-          : minorContent
+        {minorContent instanceof MediaStream && (
+          <Video srcObject={minorContent} />
         )}
       </Clickable>
 
@@ -156,17 +156,11 @@ const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
       </Clickable>
 
       <div className={styles['flip-camera-tool']}>
-        <Clickable
-          disabled={disableFlipCamera}
-          onClick={flipCameraVertical}
-        >
+        <Clickable disabled={disableFlipCamera} onClick={flipCameraVertical}>
           <FontAwesomeIcon icon={faArrowsUpDown} />
         </Clickable>
 
-        <Clickable
-          disabled={disableFlipCamera}
-          onClick={flipCameraHorizontal}
-        >
+        <Clickable disabled={disableFlipCamera} onClick={flipCameraHorizontal}>
           <FontAwesomeIcon icon={faArrowsLeftRight} />
         </Clickable>
       </div>

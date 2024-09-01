@@ -1,14 +1,19 @@
-import { DataConnection, MediaConnection } from 'peerjs';
+import type { DataConnection, MediaConnection } from 'peerjs';
 import React, {
-  createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 
+import type { FCWithChildren } from '@/types/ComponentProps';
 import RemoteConnection from '@/utils/RemoteConnection';
-import EventHandler from '@/utils/RemoteConnection/event/handler';
+import type EventHandler from '@/utils/RemoteConnection/event/handler';
 
-import { FCWithChildren } from '@/types/ComponentProps';
-
-import { Command, CommandListener, CommandType } from './Command';
+import type { Command, CommandListener, CommandType } from './Command';
 
 export type OnCommand = CommandListener<CommandType>;
 
@@ -61,10 +66,11 @@ const ConnectionContext = createContext<ConnectionContextProps>({
   setOnHangUp: () => {},
 });
 
-const ConnectionContextProvider: FCWithChildren = ({
-  children,
-}) => {
-  const searchParams = useMemo(() => new URLSearchParams(globalThis.location.search), []);
+const ConnectionContextProvider: FCWithChildren = ({ children }) => {
+  const searchParams = useMemo(
+    () => new URLSearchParams(globalThis.location.search),
+    []
+  );
   const id = useMemo(() => searchParams.get('id') ?? undefined, [searchParams]);
   const connector = useMemo(() => new RemoteConnection(id), [id]);
   const [isOnline, setIsOnline] = useState(false);
@@ -73,50 +79,60 @@ const ConnectionContextProvider: FCWithChildren = ({
   const [mediaConnection, setMediaConnection] = useState<MediaConnection>();
   const listeners = useRef<ConnectionListeners>({});
 
-  const call = useCallback<ConnectionContextProps['call']>(async (targetId, stream) => (
-    connector.call(targetId, stream)
-  ), [connector]);
+  const call = useCallback<ConnectionContextProps['call']>(
+    async (targetId, stream) => connector.call(targetId, stream),
+    [connector]
+  );
 
-  const changeStream = useCallback<ConnectionContextProps['changeStream']>(async (stream) => {
-    if (!peerId) {
-      throw ReferenceError('Not connect to peer yet');
-    }
+  const changeStream = useCallback<ConnectionContextProps['changeStream']>(
+    async stream => {
+      if (!peerId) {
+        throw ReferenceError('Not connect to peer yet');
+      }
 
-    await call(peerId, stream);
-  }, [call, peerId]);
+      await call(peerId, stream);
+    },
+    [call, peerId]
+  );
 
-  const sendCommand = useCallback<ConnectionContextProps['sendCommand']>(async (
-    type: CommandType,
-    param: Command<CommandType>['param'],
-    ignorePeer = false,
-  ) => {
-    if (!ignorePeer && !peerId) {
-      throw ReferenceError('Not connect to peer yet');
-    }
-    if (peerId) {
-      const message = `#${type}:${param}`;
+  const sendCommand = useCallback<ConnectionContextProps['sendCommand']>(
+    async (
+      type: CommandType,
+      param: Command<CommandType>['param'],
+      ignorePeer = false
+    ) => {
+      if (!ignorePeer && !peerId) {
+        throw ReferenceError('Not connect to peer yet');
+      }
+      if (peerId) {
+        const message = `#${type}:${param}`;
 
-      await connector.sendMessage(peerId, message);
-    }
-  }, [connector, peerId]);
+        await connector.sendMessage(peerId, message);
+      }
+    },
+    [connector, peerId]
+  );
 
-  const sendMessage = useCallback<ConnectionContextProps['sendMessage']>(async (
-    message,
-    ignorePeer = false,
-  ) => {
-    if (!ignorePeer && !peerId) {
-      throw ReferenceError('Not connect to peer yet');
-    }
-    if (peerId) {
-      await connector.sendMessage(peerId, message);
-    }
-  }, [connector, peerId]);
+  const sendMessage = useCallback<ConnectionContextProps['sendMessage']>(
+    async (message, ignorePeer = false) => {
+      if (!ignorePeer && !peerId) {
+        throw ReferenceError('Not connect to peer yet');
+      }
+      if (peerId) {
+        await connector.sendMessage(peerId, message);
+      }
+    },
+    [connector, peerId]
+  );
 
   const onOnline: EventHandler['online'] = () => setIsOnline(true);
 
   const onOffline: EventHandler['offline'] = () => setIsOnline(false);
 
-  const onConnectedData: EventHandler['connecteddata'] = (sourceId, connection) => {
+  const onConnectedData: EventHandler['connecteddata'] = (
+    sourceId,
+    connection
+  ) => {
     setPeerId(sourceId);
     setDataConnection(connection);
   };
@@ -125,42 +141,49 @@ const ConnectionContextProvider: FCWithChildren = ({
     setMediaConnection(connection);
   };
 
-  const handleData = useCallback<EventHandler['data']>((sourceId, data) => {
-    if (sourceId !== peerId) {
-      return;
-    }
-
-    switch (typeof data) {
-      case 'string': {
-        const matchs = data.match(/^#(.+?)(?::(.+))$/);
-
-        if (matchs) {
-          const [, type, rawParam] = matchs;
-
-          let param = rawParam;
-
-          try {
-            param = JSON.parse(rawParam);
-          } catch (e) {
-            // do nothing
-          }
-
-          listeners.current.onCommand?.(
-            type as CommandType,
-            param as Command<CommandType>['param'],
-          );
-        } else {
-          listeners.current.onMessage?.(data);
-        }
-        break;
+  const handleData = useCallback<EventHandler['data']>(
+    (sourceId, data) => {
+      if (sourceId !== peerId) {
+        return;
       }
 
-      default:
-        break;
-    }
-  }, [peerId]);
+      switch (typeof data) {
+        case 'string': {
+          const matchs = data.match(/^#(.+?)(?::(.+))$/);
 
-  const handleCall: EventHandler['call'] = async (sourceId, answer, metadata) => {
+          if (matchs) {
+            const [, type, rawParam] = matchs;
+
+            let param = rawParam;
+
+            try {
+              param = JSON.parse(rawParam);
+            } catch (e) {
+              // do nothing
+            }
+
+            listeners.current.onCommand?.(
+              type as CommandType,
+              param as Command<CommandType>['param']
+            );
+          } else {
+            listeners.current.onMessage?.(data);
+          }
+          break;
+        }
+
+        default:
+          break;
+      }
+    },
+    [peerId]
+  );
+
+  const handleCall: EventHandler['call'] = async (
+    sourceId,
+    answer,
+    metadata
+  ) => {
     const { onCall } = listeners.current;
 
     if (onCall) {
@@ -168,40 +191,53 @@ const ConnectionContextProvider: FCWithChildren = ({
     }
   };
 
-  const handleHangUp = useCallback<EventHandler['hangup']>(async (sourceId, metadata) => {
-    if (sourceId !== peerId) {
-      return;
-    }
+  const handleHangUp = useCallback<EventHandler['hangup']>(
+    async (sourceId, metadata) => {
+      if (sourceId !== peerId) {
+        return;
+      }
 
-    listeners.current.onHangUp?.(metadata);
-  }, [peerId]);
+      listeners.current.onHangUp?.(metadata);
+    },
+    [peerId]
+  );
 
-  const contextValue = useMemo<ConnectionContextProps>(() => ({
-    id: connector.id,
-    isOnline,
-    isDataConnected: !!dataConnection,
-    isMediaConnected: !!mediaConnection,
-    peerId: peerId ?? null,
-    call,
-    changeStream,
-    sendCommand,
-    sendMessage,
-    setOnCommand: (caller) => {
-      listeners.current.onCommand = caller;
-    },
-    setOnMessage: (caller) => {
-      listeners.current.onMessage = caller;
-    },
-    setOnCall: (caller) => {
-      listeners.current.onCall = caller;
-    },
-    setOnHangUp: (caller) => {
-      listeners.current.onHangUp = caller;
-    },
-  }), [
-    call, changeStream, connector.id, dataConnection, isOnline,
-    mediaConnection, peerId, sendMessage, sendCommand,
-  ]);
+  const contextValue = useMemo<ConnectionContextProps>(
+    () => ({
+      id: connector.id,
+      isOnline,
+      isDataConnected: !!dataConnection,
+      isMediaConnected: !!mediaConnection,
+      peerId: peerId ?? null,
+      call,
+      changeStream,
+      sendCommand,
+      sendMessage,
+      setOnCommand: caller => {
+        listeners.current.onCommand = caller;
+      },
+      setOnMessage: caller => {
+        listeners.current.onMessage = caller;
+      },
+      setOnCall: caller => {
+        listeners.current.onCall = caller;
+      },
+      setOnHangUp: caller => {
+        listeners.current.onHangUp = caller;
+      },
+    }),
+    [
+      call,
+      changeStream,
+      connector.id,
+      dataConnection,
+      isOnline,
+      mediaConnection,
+      peerId,
+      sendMessage,
+      sendCommand,
+    ]
+  );
 
   useEffect(() => {
     connector.addEventListener('online', onOnline);

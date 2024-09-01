@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { FCWithChildren } from '@/types/ComponentProps';
+import type { FCWithChildren } from '@/types/ComponentProps';
 
-import Modal, { ModalBasicProps, ModalButton } from '.';
+import type { ModalBasicProps } from '.';
+import Modal, { ModalButton } from '.';
 
 interface NotificationModalProps extends ModalBasicProps {
   onOk: () => void;
@@ -15,11 +16,11 @@ const NotificationModal: FCWithChildren<NotificationModalProps> = ({
 }) => (
   <Modal
     {...restProps}
-    button={(
-      <ModalButton key='ok' highlight onClick={onOk}>
+    button={
+      <ModalButton key="ok" highlight onClick={onOk}>
         OK
       </ModalButton>
-    )}
+    }
   >
     {children}
   </Modal>

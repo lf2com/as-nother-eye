@@ -1,9 +1,8 @@
 import classNames from 'classnames';
 import React from 'react';
 
-import { LogType } from '@/utils/logger';
-
-import { FCWithChildren } from '@/types/ComponentProps';
+import type { FCWithChildren } from '@/types/ComponentProps';
+import type { LogType } from '@/utils/logger';
 
 import styles from './styles.module.scss';
 
@@ -17,9 +16,7 @@ const LogMessage: FCWithChildren<LogMessageProps> = ({
   // timestamp,
   children,
 }) => (
-  <div className={classNames(styles.message, styles[type])}>
-    {children}
-  </div>
+  <div className={classNames(styles.message, styles[type])}>{children}</div>
 );
 
 export default React.memo(LogMessage);

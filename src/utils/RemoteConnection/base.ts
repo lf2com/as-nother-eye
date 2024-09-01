@@ -1,4 +1,4 @@
-import Peer from 'peerjs';
+import type Peer from 'peerjs';
 
 import Logger from '@/utils/logger';
 import randomStr from '@/utils/random';
@@ -19,11 +19,17 @@ export class RemoteConnection {
     });
   }
 
-  get peer() { return this.selfPeer; }
+  get peer() {
+    return this.selfPeer;
+  }
 
-  get id() { return this.selfId; }
+  get id() {
+    return this.selfId;
+  }
 
-  get isOnline() { return this.selfIsOnline; }
+  get isOnline() {
+    return this.selfIsOnline;
+  }
 }
 
 export default RemoteConnection;

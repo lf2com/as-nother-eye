@@ -10,20 +10,20 @@ const defaultStreamConstraints: MediaStreamConstraints = {
 
 export const getDevices = async () => navigator.mediaDevices.enumerateDevices();
 
-export const getCameras = async () => (await getDevices())
-  .filter(({ kind }) => kind === 'videoinput');
+export const getCameras = async () =>
+  (await getDevices()).filter(({ kind }) => kind === 'videoinput');
 
-export const getMicrophones = async () => (await getDevices())
-  .filter(({ kind }) => kind === 'audioinput');
+export const getMicrophones = async () =>
+  (await getDevices()).filter(({ kind }) => kind === 'audioinput');
 
-export const getSpeakers = async () => (await getDevices())
-  .filter(({ kind }) => kind === 'audiooutput');
+export const getSpeakers = async () =>
+  (await getDevices()).filter(({ kind }) => kind === 'audiooutput');
 
 export const startStream = async (
-  constraints: MediaStreamConstraints = defaultStreamConstraints,
+  constraints: MediaStreamConstraints = defaultStreamConstraints
 ) => {
   const cameras = await getCameras();
-  const realCameras = cameras.filter((info) => !/\bvirtual\b/i.test(info.label));
+  const realCameras = cameras.filter(info => !/\bvirtual\b/i.test(info.label));
   const realCamera = realCameras[0];
   const realCameraConstraints: MediaStreamConstraints = {
     video: {
@@ -31,14 +31,19 @@ export const startStream = async (
     },
   };
 
-  return navigator.mediaDevices.getUserMedia(mergeObject(realCameraConstraints, constraints));
+  return navigator.mediaDevices.getUserMedia(
+    // @ts-expect-error ignore type error
+    mergeObject(realCameraConstraints, constraints)
+  );
 };
 
 export const stopStream = (stream: MediaStream) => {
-  stream.getTracks().forEach((track) => track.stop());
+  stream.getTracks().forEach(track => track.stop());
 };
 
-export const getNextCamera = async (prevStream?: MediaStream): Promise<MediaDeviceInfo | null> => {
+export const getNextCamera = async (
+  prevStream?: MediaStream
+): Promise<MediaDeviceInfo | null> => {
   const constraints = prevStream?.getVideoTracks()[0]?.getConstraints();
 
   if (!constraints) {
@@ -46,10 +51,10 @@ export const getNextCamera = async (prevStream?: MediaStream): Promise<MediaDevi
   }
 
   const cameras = await getCameras();
-  const {
-    deviceId = cameras[0]?.deviceId,
-  } = constraints;
-  const currentCameraIndex = cameras.findIndex((camera) => deviceId === camera.deviceId);
+  const { deviceId = cameras[0]?.deviceId } = constraints;
+  const currentCameraIndex = cameras.findIndex(
+    camera => deviceId === camera.deviceId
+  );
   const nextCameraIndex = (currentCameraIndex + 1) % cameras.length;
 
   if (currentCameraIndex === nextCameraIndex) {
@@ -62,7 +67,7 @@ export const getNextCamera = async (prevStream?: MediaStream): Promise<MediaDevi
 export const minifyCameraStream = (stream: MediaStream) => {
   const minStream = stream.clone();
 
-  minStream.getTracks().forEach((track) => {
+  minStream.getTracks().forEach(track => {
     const { width, height } = track.getCapabilities();
 
     track.applyConstraints({

@@ -19,12 +19,7 @@
       "rules": {
         "react-hooks/exhaustive-deps": "warn",
         "react-hooks/rules-of-hooks": "error",
-        "react/jsx-no-leaked-render": [
-          "error",
-          {
-            "validStrategies": ["coerce"]
-          }
-        ],
+        "react/jsx-no-leaked-render": ["error"],
         "react/jsx-no-script-url": "error",
         "react/jsx-no-useless-fragment": "error",
         "react/jsx-pascal-case": "error",

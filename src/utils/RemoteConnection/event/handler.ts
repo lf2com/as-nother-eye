@@ -1,4 +1,4 @@
-import { DataConnection, MediaConnection } from 'peerjs';
+import type { DataConnection, MediaConnection } from 'peerjs';
 
 interface EventHandler {
   online: () => void;
@@ -11,8 +11,11 @@ interface EventHandler {
 
   call: (
     sourceId: string,
-    answer: (accept: boolean, stream?: MediaStream) => Promise<MediaStream | void>,
-    metadata?: unknown,
+    answer: (
+      accept: boolean,
+      stream?: MediaStream
+    ) => Promise<MediaStream | void>,
+    metadata?: unknown
   ) => void;
 
   hangup: (sourceId: string, metadata?: unknown) => void;

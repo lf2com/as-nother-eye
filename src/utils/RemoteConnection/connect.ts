@@ -1,8 +1,9 @@
-import Peer, { DataConnection, MediaConnection } from 'peerjs';
+import type { DataConnection, MediaConnection } from 'peerjs';
+import Peer from 'peerjs';
 
-import './event';
 import { RemoteConnection } from './base';
-import EventHandler from './event/handler';
+import './event';
+import type EventHandler from './event/handler';
 
 const MESSAGE_DECLINE_CALL = '#decline-call';
 
@@ -26,7 +27,7 @@ declare module './base' {
 
 function createDataConnection(
   this: RemoteConnection,
-  dataConnection: DataConnection,
+  dataConnection: DataConnection
 ): Promise<void> {
   const targetId = dataConnection.peer;
 
@@ -40,19 +41,19 @@ function createDataConnection(
     });
 
     dataConnection.off('iceStateChanged');
-    dataConnection.on('iceStateChanged', (state) => {
+    dataConnection.on('iceStateChanged', state => {
       this.logger.log('Data connection iceStateChanged', state);
     });
 
     dataConnection.off('error');
-    dataConnection.on('error', (error) => {
+    dataConnection.on('error', error => {
       this.logger.warn('Data connection error', error);
       delete this.connectionList[targetId];
       reject(error);
     });
 
     dataConnection.off('data');
-    dataConnection.on('data', (data) => {
+    dataConnection.on('data', data => {
       const { accepted } = this.connectionList[targetId];
 
       this.logger.log('Data connection data', data);
@@ -76,7 +77,7 @@ function createDataConnection(
 
 function createMediaConnection(
   this: RemoteConnection,
-  mediaConnection: MediaConnection,
+  mediaConnection: MediaConnection
 ): Promise<MediaStream> {
   const targetId = mediaConnection.peer;
 
@@ -96,7 +97,7 @@ function createMediaConnection(
     };
 
     mediaConnection.off('stream');
-    mediaConnection.on('stream', (remoteStream) => {
+    mediaConnection.on('stream', remoteStream => {
       this.logger.log('Peer call connection stream', remoteStream);
       this.connectionList[targetId].mediaConnection = mediaConnection;
       this.dispatchEvent('connectedmedia', targetId, mediaConnection);
@@ -105,12 +106,12 @@ function createMediaConnection(
     });
 
     mediaConnection.off('iceStateChanged');
-    mediaConnection.on('iceStateChanged', (state) => {
+    mediaConnection.on('iceStateChanged', state => {
       this.logger.log('Peer call connection iceStateChanged', state);
     });
 
     mediaConnection.off('error');
-    mediaConnection.on('error', (error) => {
+    mediaConnection.on('error', error => {
       this.logger.warn('Peer call connection error', error);
       this.removeEventListener('data', handleDeclineResponse);
       reject(error);
@@ -139,7 +140,7 @@ RemoteConnection.prototype.connectionList = {};
  */
 RemoteConnection.prototype.connect = function f(
   this: RemoteConnection,
-  targetId,
+  targetId
 ) {
   return new Promise((resolve, reject) => {
     if (this.peer && this.isOnline) {
@@ -154,7 +155,7 @@ RemoteConnection.prototype.connect = function f(
     this.logger.log('Peer connecting', this.id);
 
     peer.off('open');
-    peer.on('open', (currentId) => {
+    peer.on('open', currentId => {
       this.selfPeer = peer;
       this.selfId = currentId;
       this.selfIsOnline = true;
@@ -164,7 +165,7 @@ RemoteConnection.prototype.connect = function f(
     });
 
     peer.off('error');
-    peer.on('error', (error) => {
+    peer.on('error', error => {
       this.logger.warn('Peer error', error);
       reject(error);
     });
@@ -178,7 +179,7 @@ RemoteConnection.prototype.connect = function f(
     });
 
     peer.off('connection');
-    peer.on('connection', (dataConnection) => {
+    peer.on('connection', dataConnection => {
       this.logger.log('Peer connection', dataConnection);
       createDataConnection.call(this, dataConnection);
     });
@@ -191,12 +192,8 @@ RemoteConnection.prototype.connect = function f(
     });
 
     peer.off('call');
-    peer.on('call', (mediaConnection) => {
-      const {
-        peer: sourceId,
-        metadata,
-        answer,
-      } = mediaConnection;
+    peer.on('call', mediaConnection => {
+      const { peer: sourceId, metadata, answer } = mediaConnection;
 
       this.logger.log('Peer call', mediaConnection);
       this.dispatchEvent(
@@ -217,35 +214,39 @@ RemoteConnection.prototype.connect = function f(
 
           return createMediaConnection.call(this, mediaConnection);
         },
-        metadata,
+        metadata
       );
     });
   })
-    .then(() => new Promise((resolve, reject) => {
-      if (targetId === undefined || this.connectionList[targetId]) {
-        resolve(undefined);
-        return;
-      }
+    .then(
+      () =>
+        new Promise((resolve, reject) => {
+          if (targetId === undefined || this.connectionList[targetId]) {
+            resolve(undefined);
+            return;
+          }
 
-      const peer = this.selfPeer!;
-      const dataConnection = peer.connect(targetId);
+          const peer = this.selfPeer!;
+          const dataConnection = peer.connect(targetId);
 
-      this.logger.log(`Connecting to ${targetId}`);
-      peer.off('error');
-      peer.on('error', (error) => {
-        this.logger.warn('Peer error', error);
-        this.disconnect(targetId);
-        reject(error);
-      });
+          this.logger.log(`Connecting to ${targetId}`);
+          peer.off('error');
+          peer.on('error', error => {
+            this.logger.warn('Peer error', error);
+            this.disconnect(targetId);
+            reject(error);
+          });
 
-      createDataConnection.call(this, dataConnection)
-        .then(resolve)
-        .catch(reject);
-    }))
+          createDataConnection
+            .call(this, dataConnection)
+            .then(resolve)
+            .catch(reject);
+        })
+    )
     .then(() => {
       this.logger.log(`Connected to ${targetId}`);
     })
-    .catch((error) => {
+    .catch(error => {
       this.logger.log(`Failed to connect to ${targetId}: ${error}`);
 
       throw error;
@@ -257,7 +258,7 @@ RemoteConnection.prototype.connect = function f(
  */
 RemoteConnection.prototype.disconnect = function f(
   this: RemoteConnection,
-  targetId,
+  targetId
 ) {
   if (targetId) {
     const connection = this.connectionList[targetId];
@@ -273,7 +274,7 @@ RemoteConnection.prototype.disconnect = function f(
     return;
   }
 
-  Object.keys(this.connectionList).forEach((peerId) => {
+  Object.keys(this.connectionList).forEach(peerId => {
     this.disconnect(peerId);
   });
 
@@ -296,7 +297,7 @@ RemoteConnection.prototype.disconnect = function f(
 RemoteConnection.prototype.sendMessage = async function f(
   this: RemoteConnection,
   targetId,
-  message,
+  message
 ) {
   await this.connect(targetId);
   this.connectionList[targetId].dataConnection.send(message);
@@ -308,7 +309,7 @@ RemoteConnection.prototype.sendMessage = async function f(
 RemoteConnection.prototype.sendFile = async function f(
   this: RemoteConnection,
   targetId,
-  file,
+  file
 ) {
   await this.connect(targetId);
 
@@ -324,7 +325,7 @@ RemoteConnection.prototype.sendFile = async function f(
 RemoteConnection.prototype.call = async function f(
   this: RemoteConnection,
   targetId,
-  stream,
+  stream
 ) {
   await this.connect(targetId);
 
@@ -341,7 +342,7 @@ RemoteConnection.prototype.call = async function f(
   if (videoTrack) {
     const { peerConnection } = prevMediaConnection;
 
-    peerConnection.getSenders().forEach((sender) => {
+    peerConnection.getSenders().forEach(sender => {
       const { track } = sender;
 
       if (!track) {
