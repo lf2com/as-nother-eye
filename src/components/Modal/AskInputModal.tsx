@@ -1,7 +1,12 @@
-import type { ChangeEventHandler, KeyboardEventHandler } from 'react';
+import type {
+  ChangeEventHandler,
+  FC,
+  KeyboardEventHandler,
+  PropsWithChildren,
+} from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { FCWithChildren } from '@/types/ComponentProps';
+import twClassNames from '@/utils/twClassNames';
 
 import OkCancelModal from './OkCancelModal';
 
@@ -22,7 +27,7 @@ export interface AskInputModalProps {
   onClickOutside?: ModalBasicProps['onClickOutside'];
 }
 
-const AskInputModal: FCWithChildren<AskInputModalProps> = ({
+const AskInputModal: FC<PropsWithChildren<AskInputModalProps>> = ({
   show,
   onConfirm,
   onCancel,
@@ -94,6 +99,10 @@ const AskInputModal: FCWithChildren<AskInputModalProps> = ({
       <p>{children}</p>
       <input
         ref={refInput}
+        className={twClassNames(
+          'my-0 mx-[0.25em] py-[0.25em] px-[0.35em] outline-none rounded-[0.5em] border border-[#999] text-[#999] text-[1em] font-[monospace]',
+          'hover:border-[#333] focus:border-[#333] focus:text-[#333]'
+        )}
         disabled={isConfirmed}
         onChange={handleChange}
         onKeyDown={handleKeyDown}

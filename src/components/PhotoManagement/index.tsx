@@ -1,23 +1,23 @@
 import classNames from 'classnames';
+import type { FC } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Clickable from '@/components/Clickable';
 import Modal, { ModalButton } from '@/components/Modal';
 import PhotoList from '@/components/PhotoList';
-import type { FCWithClassName } from '@/types/ComponentProps';
 import dateToStr from '@/utils/dateToStr';
 
 import Photo from './components/Photo';
-import styles from './styles.module.scss';
 
 export interface PhotoManagementProps {
   photos: Blob[];
   onShare: (photos: File[]) => void;
   onSave: (photos: File[]) => void;
   show?: boolean;
+  className?: string;
 }
 
-const PhotoManagement: FCWithClassName<PhotoManagementProps> = ({
+const PhotoManagement: FC<PhotoManagementProps> = ({
   show: defShowModal = false,
   className,
   photos,
@@ -132,7 +132,7 @@ const PhotoManagement: FCWithClassName<PhotoManagementProps> = ({
   return (
     <>
       <Clickable
-        className={classNames(styles['photo-management-button'], className)}
+        className={classNames('box-border', className)}
         onClick={showPhotoManagement}
       >
         <PhotoList aspectRatio={aspectRatio} photos={photos} />
@@ -140,7 +140,7 @@ const PhotoManagement: FCWithClassName<PhotoManagementProps> = ({
 
       <Modal
         show={showModal}
-        className={styles['photo-management-modal']}
+        bodyClassName="grid grid-cols-3 gap-[0.75em]"
         hideOnClickOutside={false}
         onClickOutside={hidePhotoManagement}
         buttons={buttons}

@@ -15,8 +15,6 @@ import { useModalContext } from '@/contexts/ModalContext';
 import Logger from '@/utils/logger';
 import { minifyCameraStream, startStream, stopStream } from '@/utils/userMedia';
 
-import styles from './styles.module.scss';
-
 const logger = new Logger({ tag: '[Photoer]' });
 
 const Photoer: FC = () => {
@@ -225,7 +223,6 @@ const Photoer: FC = () => {
 
   return (
     <CameraView
-      className={styles.photoer}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
       disableFlipCamera={disableFlipCamera}
@@ -236,7 +233,7 @@ const Photoer: FC = () => {
       minorContent={localStream}
       onClickMajor={onClickMajor}
     >
-      <div className={styles.title}>
+      <div className="absolute top-0 left-0 m-[0.25em] flex items-center z-[1]">
         <Tag>Photoer #{connectionId}</Tag>
       </div>
 

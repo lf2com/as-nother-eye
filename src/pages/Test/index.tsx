@@ -4,14 +4,13 @@ import React from 'react';
 import Logger from '@/utils/logger';
 import randomStr from '@/utils/random';
 
-import styles from './styles.module.scss';
-
 const logger = new Logger({
   tag: '[Test]',
 });
 
 const photoerId = randomStr();
 const cameraId = randomStr();
+const className = 'm-[1rem] w-[30vw] h-[calc(30vw*16/10)] border border-black';
 
 const Test: FC = () => {
   const leftUrl = `/photoer/${cameraId}?id=${photoerId}`;
@@ -24,8 +23,8 @@ const Test: FC = () => {
 
   return (
     <div>
-      <iframe className={styles['inner-view']} src={leftUrl} />
-      <iframe className={styles['inner-view']} src={rightUrl} />
+      <iframe className={className} src={leftUrl} />
+      <iframe className={className} src={rightUrl} />
     </div>
   );
 };

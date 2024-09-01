@@ -1,18 +1,16 @@
 import classNames from 'classnames';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, FC } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { FCWithClassName } from '@/types/ComponentProps';
-
 import Photo from './components/Photo';
-import styles from './styles.module.scss';
 
 interface PhotoListProps {
   aspectRatio?: number;
   photos: (Blob | File)[];
+  className?: string;
 }
 
-const PhotoList: FCWithClassName<PhotoListProps> = ({
+const PhotoList: FC<PhotoListProps> = ({
   photos,
   className,
   aspectRatio = 1,
@@ -48,7 +46,14 @@ const PhotoList: FCWithClassName<PhotoListProps> = ({
   }, [lastPhotoUrl]);
 
   return (
-    <div className={classNames(styles['photo-list'], className)} style={style}>
+    <div
+      className={classNames(
+        'relative left-1/2 -translate-x-1/2 w-full h-auto box-border text-[1em] flex flex-col-reverse',
+        '[&:nth-child(2)]:absolute',
+        className
+      )}
+      style={style}
+    >
       {photoUrls.map((url, urlIndex) => (
         <Photo
           key={url}
