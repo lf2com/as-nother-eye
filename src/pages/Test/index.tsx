@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import Logger from '@/utils/logger';
 import randomStr from '@/utils/random';
@@ -16,7 +17,10 @@ const Test: FC = () => {
   const leftUrl = `/photoer/${cameraId}?id=${photoerId}`;
   const rightUrl = `/camera?id=${cameraId}`;
 
-  logger.log({ photoerId, cameraId });
+  logger.log({
+    photoerId,
+    cameraId,
+  });
 
   return (
     <div>

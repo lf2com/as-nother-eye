@@ -1,24 +1,32 @@
+import type { FC } from 'react';
 import React, {
-  FC, useCallback, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 
-import {
-  OnCall, OnCommand, OnHangUp, useConnectionContext,
-} from '@/contexts/ConnectionContext';
-import { CommandType, FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
-import { useModalContext } from '@/contexts/ModalContext';
-
-import CameraView, { CameraViewProps } from '@/components/CameraView';
-import PhotoManagement, { PhotoManagementProps } from '@/components/PhotoManagement';
+import type { CameraViewProps } from '@/components/CameraView';
+import CameraView from '@/components/CameraView';
+import type { PhotoManagementProps } from '@/components/PhotoManagement';
+import PhotoManagement from '@/components/PhotoManagement';
 import Tag from '@/components/Tag';
 import Video from '@/components/Video';
-
+import type { OnCall, OnCommand, OnHangUp } from '@/contexts/ConnectionContext';
+import { useConnectionContext } from '@/contexts/ConnectionContext';
+import type { FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
+import { CommandType } from '@/contexts/ConnectionContext/Command';
+import { useModalContext } from '@/contexts/ModalContext';
 import createRoutePath from '@/utils/createRoutePath';
 import { downloadFiles } from '@/utils/downloadFile';
 import Logger from '@/utils/logger';
 import shareData from '@/utils/shareData';
 import {
-  getNextCamera, minifyCameraStream, startStream, stopStream,
+  getNextCamera,
+  minifyCameraStream,
+  startStream,
+  stopStream,
 } from '@/utils/userMedia';
 
 import styles from './styles.module.scss';
@@ -48,7 +56,10 @@ const Camera: FC = () => {
   const [localMinStream, setLocalMinStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [photos, setPhotos] = useState<Blob[]>([]);
-  const cameraUrl = useMemo(() => createRoutePath(`/photoer/${connectionId}`), [connectionId]);
+  const cameraUrl = useMemo(
+    () => createRoutePath(`/photoer/${connectionId}`),
+    [connectionId]
+  );
   const flipCameraRef = useRef<FlipCameraCommand['param'][]>([]);
   const localRawVideoRef = useRef<HTMLVideoElement>(null);
   const localCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -85,10 +96,7 @@ const Camera: FC = () => {
           }
 
           const flipOptions = flipCameraRef.current;
-          const {
-            naturalWidth: width,
-            naturalHeight: height,
-          } = img;
+          const { naturalWidth: width, naturalHeight: height } = img;
 
           canvas.width = width;
           canvas.height = height;
@@ -101,7 +109,7 @@ const Camera: FC = () => {
           }
 
           context.drawImage(img, 0, 0, width, height);
-          canvas.toBlob((bitmapBlob) => {
+          canvas.toBlob(bitmapBlob => {
             if (bitmapBlob) {
               resolve(bitmapBlob);
             } else {
@@ -110,7 +118,7 @@ const Camera: FC = () => {
           });
         });
 
-        img.addEventListener('error', (error) => {
+        img.addEventListener('error', error => {
           reject(error);
         });
 
@@ -123,7 +131,7 @@ const Camera: FC = () => {
 
       const url = URL.createObjectURL(photoBlob);
 
-      setPhotos((prevPhotos) => prevPhotos.concat(photoBlob));
+      setPhotos(prevPhotos => prevPhotos.concat(photoBlob));
       URL.revokeObjectURL(url);
     } catch (error) {
       notice(`${error}`);
@@ -132,19 +140,25 @@ const Camera: FC = () => {
     setDisableShutter(undefined);
   }, [localRawStream, disableSwitchCamera, disableShutter, notice]);
 
-  const onSaveSelectedPhotos = useCallback<PhotoManagementProps['onSave']>((selectedPhotos) => {
-    downloadFiles(selectedPhotos);
-  }, []);
+  const onSaveSelectedPhotos = useCallback<PhotoManagementProps['onSave']>(
+    selectedPhotos => {
+      downloadFiles(selectedPhotos);
+    },
+    []
+  );
 
-  const onShareSelectedPhotos = useCallback<PhotoManagementProps['onShare']>(async (selectedPhotos) => {
-    try {
-      await shareData({
-        files: selectedPhotos,
-      });
-    } catch (error) {
-      notice(`${error}`);
-    }
-  }, [notice]);
+  const onShareSelectedPhotos = useCallback<PhotoManagementProps['onShare']>(
+    async selectedPhotos => {
+      try {
+        await shareData({
+          files: selectedPhotos,
+        });
+      } catch (error) {
+        notice(`${error}`);
+      }
+    },
+    [notice]
+  );
 
   const switchCamera = useCallback(async () => {
     const nextCameraInfo = await getNextCamera(localRawStream);
@@ -193,82 +207,91 @@ const Camera: FC = () => {
     }
   }, [sendCommand, switchCamera, notice]);
 
-  const flipCameraWithMessage = useCallback<CameraViewProps['onFlipCamera']>(async (direction) => {
-    try {
-      const flipOptions = flipCameraRef.current;
-      const indexOfDirection = flipOptions.indexOf(direction);
+  const flipCameraWithMessage = useCallback<CameraViewProps['onFlipCamera']>(
+    async direction => {
+      try {
+        const flipOptions = flipCameraRef.current;
+        const indexOfDirection = flipOptions.indexOf(direction);
 
-      await sendCommand(CommandType.flippingCamera, true, true);
+        await sendCommand(CommandType.flippingCamera, true, true);
 
-      if (indexOfDirection === -1) {
-        flipCameraRef.current = [...flipOptions, direction];
-      } else {
-        flipCameraRef.current = [
-          ...flipOptions.slice(0, indexOfDirection),
-          ...flipOptions.slice(indexOfDirection + 1),
-        ];
+        if (indexOfDirection === -1) {
+          flipCameraRef.current = [...flipOptions, direction];
+        } else {
+          flipCameraRef.current = [
+            ...flipOptions.slice(0, indexOfDirection),
+            ...flipOptions.slice(indexOfDirection + 1),
+          ];
+        }
+
+        await sendCommand(CommandType.flippingCamera, false, true);
+      } catch (error) {
+        notice(`${error}`);
       }
+    },
+    [notice, sendCommand]
+  );
 
-      await sendCommand(CommandType.flippingCamera, false, true);
-    } catch (error) {
-      notice(`${error}`);
-    }
-  }, [notice, sendCommand]);
+  const onCommand = useCallback<OnCommand>(
+    async (type, command) => {
+      logger.log('command', type, command);
 
-  const onCommand = useCallback<OnCommand>(async (type, command) => {
-    logger.log('command', type, command);
+      switch (type) {
+        case CommandType.takePhoto:
+          setShutterAnimationId(Date.now());
+          await takePhotoWithMessage();
+          break;
 
-    switch (type) {
-      case CommandType.takePhoto:
-        setShutterAnimationId(Date.now());
-        await takePhotoWithMessage();
-        break;
+        case CommandType.switchCamera:
+          await switchCameraWithMessage();
+          break;
 
-      case CommandType.switchCamera:
-        await switchCameraWithMessage();
-        break;
+        case CommandType.flipCamera:
+          await flipCameraWithMessage(command as FlipCameraCommand['param']);
+          break;
 
-      case CommandType.flipCamera:
-        await flipCameraWithMessage(command as FlipCameraCommand['param']);
-        break;
-
-      default:
-        break;
-    }
-  }, [switchCameraWithMessage, takePhotoWithMessage, flipCameraWithMessage]);
-
-  const onCall = useCallback<OnCall>(async (sourceId, answer) => {
-    logger.log(`Get call from <${sourceId}>`);
-
-    const acceptCall = await askYesNo(`Accept call from <${sourceId}>?`);
-
-    try {
-      if (!acceptCall) {
-        logger.log(`Declined call from <${sourceId}>`);
-        answer(false);
-
-        throw Error('Declined call');
+        default:
+          break;
       }
+    },
+    [switchCameraWithMessage, takePhotoWithMessage, flipCameraWithMessage]
+  );
 
-      if (!localMinStream) {
-        throw ReferenceError('Media stream not ready');
+  const onCall = useCallback<OnCall>(
+    async (sourceId, answer) => {
+      logger.log(`Get call from <${sourceId}>`);
+
+      const acceptCall = await askYesNo(`Accept call from <${sourceId}>?`);
+
+      try {
+        if (!acceptCall) {
+          logger.log(`Declined call from <${sourceId}>`);
+          answer(false);
+
+          throw Error('Declined call');
+        }
+
+        if (!localMinStream) {
+          throw ReferenceError('Media stream not ready');
+        }
+
+        const stream = await answer(true, localMinStream);
+
+        if (!stream) {
+          throw ReferenceError('Not receive remote stream');
+        }
+
+        logger.log(`Receive remote stream <${sourceId}>`);
+        setRemoteStream(stream);
+      } catch (error) {
+        const errorMessage = `${error}`;
+
+        logger.warn(errorMessage);
+        notice(errorMessage);
       }
-
-      const stream = await answer(true, localMinStream);
-
-      if (!stream) {
-        throw ReferenceError('Not receive remote stream');
-      }
-
-      logger.log(`Receive remote stream <${sourceId}>`);
-      setRemoteStream(stream);
-    } catch (error) {
-      const errorMessage = `${error}`;
-
-      logger.warn(errorMessage);
-      notice(errorMessage);
-    }
-  }, [askYesNo, localMinStream, notice]);
+    },
+    [askYesNo, localMinStream, notice]
+  );
 
   const onHangUp: OnHangUp = () => {
     setLocalRawStream(undefined);
@@ -321,27 +344,25 @@ const Camera: FC = () => {
     canvas.height = videoHeight;
     video.play();
     drawNextFrame();
-    setLocalStream(
-      new MediaStream(canvasStream),
-    );
+    setLocalStream(new MediaStream(canvasStream));
   };
 
   useEffect(() => {
     startStream()
-      .then((stream) => {
+      .then(stream => {
         setLocalRawStream(stream);
         setDisableShutter(undefined);
         setDisableSwitchCamera(undefined);
         setDisableFlipCamera(undefined);
       })
-      .catch((error) => {
+      .catch(error => {
         notice(`Failed to init stream: ${error}`);
       });
   }, [notice]);
 
   useEffect(() => {
     if (localRawStream) {
-      const defaultFlip = localRawStream.getVideoTracks().some((track) => {
+      const defaultFlip = localRawStream.getVideoTracks().some(track => {
         const facingModes = track.getCapabilities().facingMode;
 
         return !!facingModes?.includes('user');
@@ -399,11 +420,14 @@ const Camera: FC = () => {
     };
   }, [isMediaConnected, setOnHangUp]);
 
-  useEffect(() => () => {
-    if (isOnline) {
-      onHangUp();
-    }
-  }, [isOnline]);
+  useEffect(
+    () => () => {
+      if (isOnline) {
+        onHangUp();
+      }
+    },
+    [isOnline]
+  );
 
   useEffect(() => {
     setDisableShutter(true);

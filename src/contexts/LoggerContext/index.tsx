@@ -1,14 +1,18 @@
 import classNames from 'classnames';
+import type { Reducer } from 'react';
 import React, {
-  createContext, Reducer, useContext, useMemo, useReducer, useState,
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+  useState,
 } from 'react';
 
-import LogMessage, { LogMessageProps } from './components/LogMessage';
-
+import type { FCWithChildren } from '@/types/ComponentProps';
 import Logger from '@/utils/logger';
 
-import { FCWithChildren } from '@/types/ComponentProps';
-
+import type { LogMessageProps } from './components/LogMessage';
+import LogMessage from './components/LogMessage';
 import styles from './styles.module.scss';
 
 interface LoggerContextProps {
@@ -39,36 +43,42 @@ const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
 }) => {
   const [show, setShow] = useState(defaultShow);
 
-  const [logs, appendLog] = useReducer<Reducer<LogMessageItem[], LogMessageItem>>(
-    (prevLogs, log) => prevLogs.concat(log),
-    [],
+  const [logs, appendLog] = useReducer<
+    Reducer<LogMessageItem[], LogMessageItem>
+  >((prevLogs, log) => prevLogs.concat(log), []);
+
+  const logger = useMemo(
+    () =>
+      new Logger({
+        tag,
+        onLog: (type, ...args) => {
+          appendLog({
+            type,
+            timestamp: Date.now(),
+            message: args.map(arg => `${arg}`).join(' '),
+          });
+        },
+      }),
+    [tag]
   );
 
-  const logger = useMemo(() => new Logger({
-    tag,
-    onLog: (type, ...args) => {
-      appendLog({
-        type,
-        timestamp: Date.now(),
-        message: args.map((arg) => `${arg}`).join(' '),
-      });
-    },
-  }), [tag]);
-
-  const contextValue = useMemo<LoggerContextProps>(() => ({
-    logger,
-    showLog: () => setShow(true),
-    hideLog: () => setShow(false),
-  }), [logger]);
+  const contextValue = useMemo<LoggerContextProps>(
+    () => ({
+      logger,
+      showLog: () => setShow(true),
+      hideLog: () => setShow(false),
+    }),
+    [logger]
+  );
 
   return (
     <LoggerContext.Provider value={contextValue}>
       {children}
-      <div className={
-        classNames(styles.logger, {
+      <div
+        className={classNames(styles.logger, {
           [styles.show]: show,
-        })
-      }>
+        })}
+      >
         {logs.map(({ type, timestamp, message }) => (
           <LogMessage
             key={`${type}-${message}-${timestamp}`}

@@ -28,9 +28,10 @@
     opacity: inherit;
     pointer-events: inherit;
     animation: anim-shining 0.4s linear infinite;
-    
+
     @keyframes anim-shining {
-      0%, 100% {
+      0%,
+      100% {
         color: inherit;
       }
 

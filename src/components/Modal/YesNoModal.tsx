@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { FCWithChildren } from '@/types/ComponentProps';
+import type { FCWithChildren } from '@/types/ComponentProps';
 
-import Modal, { ModalBasicProps, ModalButton } from '.';
+import type { ModalBasicProps } from '.';
+import Modal, { ModalButton } from '.';
 
 interface YesNoModalProps extends ModalBasicProps {
   onYes: () => void;
@@ -18,16 +19,12 @@ const YesNoModal: FCWithChildren<YesNoModalProps> = ({
   <Modal
     {...restProps}
     buttons={[
-      (
-        <ModalButton key='no' onClick={onNo}>
-          No
-        </ModalButton>
-      ),
-      (
-        <ModalButton key='yes' highlight onClick={onYes}>
-          Yes
-        </ModalButton>
-      ),
+      <ModalButton key="no" onClick={onNo}>
+        No
+      </ModalButton>,
+      <ModalButton key="yes" highlight onClick={onYes}>
+        Yes
+      </ModalButton>,
     ]}
   >
     {children}

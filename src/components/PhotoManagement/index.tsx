@@ -1,17 +1,13 @@
 import classNames from 'classnames';
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import Photo from './components/Photo';
 import Clickable from '@/components/Clickable';
 import Modal, { ModalButton } from '@/components/Modal';
 import PhotoList from '@/components/PhotoList';
-
+import type { FCWithClassName } from '@/types/ComponentProps';
 import dateToStr from '@/utils/dateToStr';
 
-import { FCWithClassName } from '@/types/ComponentProps';
-
+import Photo from './components/Photo';
 import styles from './styles.module.scss';
 
 export interface PhotoManagementProps {
@@ -59,45 +55,58 @@ const PhotoManagement: FCWithClassName<PhotoManagementProps> = ({
     setShowModal(false);
   };
 
-  const togglePhoto = useCallback((photoIndex: number) => {
-    const index = selectedPhotoIndexs.indexOf(photoIndex);
+  const togglePhoto = useCallback(
+    (photoIndex: number) => {
+      const index = selectedPhotoIndexs.indexOf(photoIndex);
 
-    if (index === -1) {
-      setSelectedPhotoIndexs(selectedPhotoIndexs.concat(photoIndex));
-    } else {
-      setSelectedPhotoIndexs((selectedPhotoIndexs
-        .slice(0, index)
-        .concat(selectedPhotoIndexs.slice(index + 1))
-      ));
-    }
-  }, [selectedPhotoIndexs]);
+      if (index === -1) {
+        setSelectedPhotoIndexs(selectedPhotoIndexs.concat(photoIndex));
+      } else {
+        setSelectedPhotoIndexs(
+          selectedPhotoIndexs
+            .slice(0, index)
+            .concat(selectedPhotoIndexs.slice(index + 1))
+        );
+      }
+    },
+    [selectedPhotoIndexs]
+  );
 
-  const shareButton = useMemo(() => (
-    <ModalButton
-      key="share-button"
-      disabled={selectedPhotoIndexs.length === 0}
-      onClick={() => {
-        onShare(selectedPhotos);
-      }}
-    >
-      Share
-    </ModalButton>
-  ), [selectedPhotoIndexs.length, onShare, selectedPhotos]);
+  const shareButton = useMemo(
+    () => (
+      <ModalButton
+        key="share-button"
+        disabled={selectedPhotoIndexs.length === 0}
+        onClick={() => {
+          onShare(selectedPhotos);
+        }}
+      >
+        Share
+      </ModalButton>
+    ),
+    [selectedPhotoIndexs.length, onShare, selectedPhotos]
+  );
 
-  const saveButton = useMemo(() => (
-    <ModalButton
-      highlight
-      key="save-button"
-      disabled={selectedPhotoIndexs.length === 0}
-      onClick={() => {
-        onSave(selectedPhotos);
-      }}
-    >
-      Save
-    </ModalButton>
-  ), [onSave, selectedPhotoIndexs.length, selectedPhotos]);
+  const saveButton = useMemo(
+    () => (
+      <ModalButton
+        highlight
+        key="save-button"
+        disabled={selectedPhotoIndexs.length === 0}
+        onClick={() => {
+          onSave(selectedPhotos);
+        }}
+      >
+        Save
+      </ModalButton>
+    ),
+    [onSave, selectedPhotoIndexs.length, selectedPhotos]
+  );
 
-  const buttons = useMemo(() => [shareButton, saveButton], [shareButton, saveButton]);
+  const buttons = useMemo(
+    () => [shareButton, saveButton],
+    [shareButton, saveButton]
+  );
 
   useEffect(() => {
     const [photoBlob] = photos;
@@ -126,10 +135,7 @@ const PhotoManagement: FCWithClassName<PhotoManagementProps> = ({
         className={classNames(styles['photo-management-button'], className)}
         onClick={showPhotoManagement}
       >
-        <PhotoList
-          aspectRatio={aspectRatio}
-          photos={photos}
-        />
+        <PhotoList aspectRatio={aspectRatio} photos={photos} />
       </Clickable>
 
       <Modal

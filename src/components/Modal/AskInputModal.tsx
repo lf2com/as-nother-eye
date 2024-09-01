@@ -1,11 +1,11 @@
-import React, {
-  ChangeEventHandler, KeyboardEventHandler, useCallback, useEffect, useRef, useState,
-} from 'react';
+import type { ChangeEventHandler, KeyboardEventHandler } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { FCWithChildren } from '@/types/ComponentProps';
+import type { FCWithChildren } from '@/types/ComponentProps';
 
-import { ModalBasicProps } from '.';
 import OkCancelModal from './OkCancelModal';
+
+import type { ModalBasicProps } from '.';
 
 export interface AskInputModalProps {
   show: boolean;
@@ -39,34 +39,40 @@ const AskInputModal: FCWithChildren<AskInputModalProps> = ({
     onConfirm(inputValue);
   }, [inputValue, onConfirm]);
 
-  const handleChange = useCallback<ChangeEventHandler<HTMLInputElement>>((event) => {
-    const {
-      target: {
-        value,
-      },
-    } = event;
-
-    setInputValue(value);
-    onChange?.(value);
-  }, [onChange]);
-
-  const handleKeyDown = useCallback<KeyboardEventHandler<HTMLInputElement>>((event) => {
-    const { key } = event;
-
-    if (onKeyDown) {
+  const handleChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    event => {
       const {
-        altKey, ctrlKey, metaKey, shiftKey,
+        target: { value },
       } = event;
 
-      onKeyDown?.({
-        key, altKey, ctrlKey, metaKey, shiftKey,
-      });
-    }
-    if (key === 'Enter') {
-      setIsConfirmed(true);
-      onOk();
-    }
-  }, [onKeyDown, onOk]);
+      setInputValue(value);
+      onChange?.(value);
+    },
+    [onChange]
+  );
+
+  const handleKeyDown = useCallback<KeyboardEventHandler<HTMLInputElement>>(
+    event => {
+      const { key } = event;
+
+      if (onKeyDown) {
+        const { altKey, ctrlKey, metaKey, shiftKey } = event;
+
+        onKeyDown?.({
+          key,
+          altKey,
+          ctrlKey,
+          metaKey,
+          shiftKey,
+        });
+      }
+      if (key === 'Enter') {
+        setIsConfirmed(true);
+        onOk();
+      }
+    },
+    [onKeyDown, onOk]
+  );
 
   useEffect(() => {
     if (show) {
@@ -85,9 +91,7 @@ const AskInputModal: FCWithChildren<AskInputModalProps> = ({
       onClickOutside={onClickOutside}
       disabled={isConfirmed}
     >
-      <p>
-        {children}
-      </p>
+      <p>{children}</p>
       <input
         ref={refInput}
         disabled={isConfirmed}

@@ -1,12 +1,10 @@
 import classNames from 'classnames';
 import React from 'react';
 
-import { useModalButtonContext } from '../../contexts/ModalButtonContext';
-
 import Clickable from '@/components/Clickable';
+import type { FCWithChildren } from '@/types/ComponentProps';
 
-import { FCWithChildren } from '@/types/ComponentProps';
-
+import { useModalButtonContext } from '../../contexts/ModalButtonContext';
 import styles from './styles.module.scss';
 
 export interface ModalButtonProps {

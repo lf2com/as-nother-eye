@@ -1,5 +1,5 @@
+import { RemoteConnection } from './base';
 import './connect';
 import './event';
-import { RemoteConnection } from './base';
 
 export default RemoteConnection;

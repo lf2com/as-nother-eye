@@ -1,16 +1,16 @@
 import classNames from 'classnames';
-import React, {
-  MouseEventHandler, ReactNode, TransitionEventHandler, useCallback, useEffect, useState,
+import type {
+  MouseEventHandler,
+  ReactNode,
+  TransitionEventHandler,
 } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import ModalButtonContextProvider from './contexts/ModalButtonContext';
-
-import ModalButton from './components/Button';
-
+import type { FCWithClassNameAndChildren } from '@/types/ComponentProps';
 import wait from '@/utils/wait';
 
-import { FCWithClassNameAndChildren } from '@/types/ComponentProps';
-
+import ModalButton from './components/Button';
+import ModalButtonContextProvider from './contexts/ModalButtonContext';
 import styles from './styles.module.scss';
 
 export interface ModalBasicProps {
@@ -52,7 +52,7 @@ const Modal: FCWithClassNameAndChildren<ModalProps> = ({
     }
   }, [hideOnClickOutside, onClickOutside]);
 
-  const onClickContainer = useCallback<MouseEventHandler>((event) => {
+  const onClickContainer = useCallback<MouseEventHandler>(event => {
     event.stopPropagation();
   }, []);
 
@@ -89,12 +89,14 @@ const Modal: FCWithClassNameAndChildren<ModalProps> = ({
   return (
     <ModalButtonContextProvider disabledAll={disabledAll}>
       <div
-        className={
-          classNames(styles.modal, {
+        className={classNames(
+          styles.modal,
+          {
             [styles.highlight]: highlight,
             [styles.show]: show,
-          }, className)
-        }
+          },
+          className
+        )}
         onClick={handleClickOutside}
       >
         <div
@@ -102,9 +104,7 @@ const Modal: FCWithClassNameAndChildren<ModalProps> = ({
           onClick={onClickContainer}
           onTransitionEnd={onTransitionEnd}
         >
-          <div className={classNames(styles.head, 'modal-head')}>
-            {title}
-          </div>
+          <div className={classNames(styles.head, 'modal-head')}>{title}</div>
           <div className={classNames(styles.body, 'modal-body')}>
             {children}
           </div>

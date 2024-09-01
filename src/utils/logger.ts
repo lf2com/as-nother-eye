@@ -1,9 +1,6 @@
 export type LogType = 'debug' | 'log' | 'info' | 'warn' | 'error';
 
-type OnLogFunc = (
-  type: LogType,
-  ...args: unknown[]
-) => void;
+type OnLogFunc = (type: LogType, ...args: unknown[]) => void;
 
 interface LoggerOptions {
   tag?: string;
@@ -18,10 +15,7 @@ class Logger {
   tag: string;
 
   constructor(props: LoggerOptions = {}) {
-    const {
-      tag = '',
-      onLog = () => {},
-    } = props;
+    const { tag = '', onLog = () => {} } = props;
 
     this.tag = tag;
     this.onLog = onLog;

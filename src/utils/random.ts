@@ -1,6 +1,9 @@
 const randomPool: string[] = [];
 
-const createStringList = (st: string | number, ed: string | number): string[] => {
+const createStringList = (
+  st: string | number,
+  ed: string | number
+): string[] => {
   const strSt = `${st}`;
   const strEd = `${ed}`;
   const codeSt = strSt.charCodeAt(0);
