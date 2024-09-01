@@ -2,7 +2,7 @@ type IterableObject = Record<string, unknown>;
 
 const mergeObject = <A extends IterableObject, B extends IterableObject>(
   a: A,
-  refB?: B,
+  refB?: B
 ): A & B => {
   const result: IterableObject = {};
   const b: IterableObject = refB ?? {};
@@ -10,7 +10,7 @@ const mergeObject = <A extends IterableObject, B extends IterableObject>(
   Object.keys(a)
     .concat(Object.keys(b))
     .filter((key, index, list) => list.indexOf(key) === index)
-    .forEach((key) => {
+    .forEach(key => {
       const valA = a[key];
       const valB = b[key];
 
@@ -18,7 +18,7 @@ const mergeObject = <A extends IterableObject, B extends IterableObject>(
         if (typeof valA === 'object') {
           result[key] = mergeObject(
             valA as IterableObject,
-            valB as IterableObject,
+            valB as IterableObject
           );
         } else {
           result[key] = mergeObject(valB as IterableObject);

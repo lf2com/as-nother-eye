@@ -19,12 +19,8 @@ const Welcome = () => {
 
   return (
     <Frame className={styles.welcome}>
-      <Button onClick={handleAsPhotoer}>
-        As Photoer
-      </Button>
-      <Button onClick={handleAsCamera}>
-        As Camera
-      </Button>
+      <Button onClick={handleAsPhotoer}>As Photoer</Button>
+      <Button onClick={handleAsCamera}>As Camera</Button>
     </Frame>
   );
 };

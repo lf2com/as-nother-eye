@@ -18,7 +18,7 @@
     height: 100%;
     grid-area: major;
     display: block;
-    
+
     &:not(:has(video)) {
       background-color: $disabled-bg-color;
       font-size: 0.8rem;
@@ -26,12 +26,12 @@
       justify-content: center;
       align-items: center;
     }
-    
+
     &:has(video) {
       &::before,
       &::after {
         $grid-color: var(--bg-color, #fff);
-  
+
         content: '';
         position: absolute;
         box-sizing: border-box;
@@ -39,7 +39,7 @@
         pointer-events: none;
         z-index: 1;
       }
-  
+
       &::before {
         transform: translateY(-50%);
         top: 50%;
@@ -47,7 +47,7 @@
         height: $grid-size;
         border-width: 1px 0;
       }
-  
+
       &::after {
         transform: translateX(-50%);
         left: 50%;
@@ -60,10 +60,10 @@
     &:global(.disabled) {
       cursor: default;
     }
-    
+
     &.taking-photo {
       animation: anim-shot 0.25s linear forwards;
-  
+
       @keyframes anim-shot {
         0% {
           filter: contrast(0);
@@ -104,7 +104,7 @@
       justify-content: center;
       align-items: center;
     }
-    
+
     &:global(.disabled) {
       cursor: default;
     }
@@ -113,7 +113,7 @@
   .shutter {
     $size: 20vmin;
     $color: var(--shutter-color, #fff);
-    
+
     margin: 1em;
     left: 50%;
     padding: 0.5em;
@@ -134,7 +134,7 @@
       color: $color;
     }
   }
-  
+
   .switch-camera {
     $color: var(--bg-color, #fff);
     $disabled-color: var(--font-disabled-color, #ccc);
@@ -162,10 +162,8 @@
     margin: 0.25em 0.5em;
     font-size: 1.5em;
     color: $color;
-    filter:
-      drop-shadow(1px 0 0 $shadow-color)
-      drop-shadow(-1px 0 0 $shadow-color)
-      drop-shadow(0 -1px 0 $shadow-color)
+    filter: drop-shadow(1px 0 0 $shadow-color)
+      drop-shadow(-1px 0 0 $shadow-color) drop-shadow(0 -1px 0 $shadow-color)
       drop-shadow(0 1px 0 $shadow-color);
     z-index: 10;
     display: flex;

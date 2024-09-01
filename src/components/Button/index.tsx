@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import React, { ComponentProps, FC } from 'react';
+import type { ComponentProps, FC } from 'react';
+import React from 'react';
 
 import Clickable from '@/components/Clickable';
 

@@ -1,8 +1,9 @@
 import wait from '../wait';
 
-const flushPromise = () => new Promise((resolve) => {
-  jest.requireActual('timers').setImmediate(resolve);
-});
+const flushPromise = () =>
+  new Promise(resolve => {
+    jest.requireActual('timers').setImmediate(resolve);
+  });
 
 describe('wait', () => {
   it('should wait for 1000 ms', async () => {

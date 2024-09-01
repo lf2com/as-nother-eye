@@ -32,26 +32,21 @@ type FlippingCameraCommand = CommmadParameters<
   boolean
 >;
 
-type TakePhotoCommand = CommmadParameters<
-  CommandType.takePhoto,
-  number
->;
+type TakePhotoCommand = CommmadParameters<CommandType.takePhoto, number>;
 
-type TakingPhotoCommand = CommmadParameters<
-  CommandType.takingPhoto,
-  boolean
->;
+type TakingPhotoCommand = CommmadParameters<CommandType.takingPhoto, boolean>;
 
-export type Command<T extends CommandType> = Extract<(
+export type Command<T extends CommandType> = Extract<
   | SwitchCameraCommand
   | SwitchingCameraCommand
   | FlipCameraCommand
   | FlippingCameraCommand
   | TakePhotoCommand
-  | TakingPhotoCommand
-), { type: T }>;
+  | TakingPhotoCommand,
+  { type: T }
+>;
 
 export type CommandListener<T extends CommandType> = (
   type: T,
-  param: Command<T>['param'],
+  param: Command<T>['param']
 ) => void;

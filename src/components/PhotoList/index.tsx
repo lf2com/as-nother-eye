@@ -1,12 +1,10 @@
 import classNames from 'classnames';
-import React, {
-  CSSProperties, useCallback, useEffect, useMemo, useState,
-} from 'react';
+import type { CSSProperties } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
+import type { FCWithClassName } from '@/types/ComponentProps';
 
 import Photo from './components/Photo';
-
-import { FCWithClassName } from '@/types/ComponentProps';
-
 import styles from './styles.module.scss';
 
 interface PhotoListProps {
@@ -20,21 +18,26 @@ const PhotoList: FCWithClassName<PhotoListProps> = ({
   aspectRatio = 1,
 }) => {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
-  const style = useMemo(() => ({
-    '--aspect-ratio': aspectRatio,
-  }) as CSSProperties, [aspectRatio]);
+  const style = useMemo(
+    () =>
+      ({
+        '--aspect-ratio': aspectRatio,
+      }) as CSSProperties,
+    [aspectRatio]
+  );
   const lastPhoto = useMemo(() => photos[photos.length - 1], [photos]);
-  const lastPhotoUrl = useMemo(() => (
-    lastPhoto ? URL.createObjectURL(lastPhoto) : null
-  ), [lastPhoto]);
+  const lastPhotoUrl = useMemo(
+    () => (lastPhoto ? URL.createObjectURL(lastPhoto) : null),
+    [lastPhoto]
+  );
 
   const removePrevPhoto = useCallback(() => {
-    setPhotoUrls((prevUrls) => prevUrls.slice(1, prevUrls.length));
+    setPhotoUrls(prevUrls => prevUrls.slice(1, prevUrls.length));
   }, []);
 
   useEffect(() => {
     if (lastPhotoUrl) {
-      setPhotoUrls((prevUrls) => prevUrls.concat(lastPhotoUrl));
+      setPhotoUrls(prevUrls => prevUrls.concat(lastPhotoUrl));
     }
 
     return () => {
@@ -45,10 +48,7 @@ const PhotoList: FCWithClassName<PhotoListProps> = ({
   }, [lastPhotoUrl]);
 
   return (
-    <div
-      className={classNames(styles['photo-list'], className)}
-      style={style}
-    >
+    <div className={classNames(styles['photo-list'], className)} style={style}>
       {photoUrls.map((url, urlIndex) => (
         <Photo
           key={url}

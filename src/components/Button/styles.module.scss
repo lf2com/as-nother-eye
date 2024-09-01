@@ -17,7 +17,7 @@
   &:active {
     border-color: $dark-color $light-color $light-color $dark-color;
   }
-  
+
   &:global(.disabled) {
     background-color: $disabled-color;
   }
