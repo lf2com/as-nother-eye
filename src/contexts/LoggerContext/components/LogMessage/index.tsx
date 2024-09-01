@@ -1,22 +1,33 @@
 import classNames from 'classnames';
+import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
 
-import type { FCWithChildren } from '@/types/ComponentProps';
 import type { LogType } from '@/utils/logger';
-
-import styles from './styles.module.scss';
 
 export interface LogMessageProps {
   type?: LogType;
   timestamp: number;
 }
 
-const LogMessage: FCWithChildren<LogMessageProps> = ({
+const LogMessage: FC<PropsWithChildren<LogMessageProps>> = ({
   type = 'log',
   // timestamp,
   children,
 }) => (
-  <div className={classNames(styles.message, styles[type])}>{children}</div>
+  <div
+    className={classNames(
+      '-mb-px px-[0.5em] py-[0.25em] border-[#eee] border-y bg-transparent text-[#eee] text-[0.8rem] pointer-events-auto',
+      {
+        'text-[#ccc]': type === 'debug',
+        'text-[#eee]': type === 'log',
+        'border-[#9cf] bg-[#bce] text-[#03f]': type === 'info',
+        'border-[#fec] bg-[#ecb] text-[#630]': type === 'warn',
+        'border-[#fdd] bg-[#fee] text-[#f00]': type === 'error',
+      }
+    )}
+  >
+    {children}
+  </div>
 );
 
 export default React.memo(LogMessage);

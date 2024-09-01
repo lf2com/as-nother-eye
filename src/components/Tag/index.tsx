@@ -1,12 +1,10 @@
+import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
 
 import WithTextShadow from '@/components/WithTextShadow';
-import type { FCWithChildren } from '@/types/ComponentProps';
 
-import styles from './styles.module.scss';
-
-const Tag: FCWithChildren = ({ children }) => (
-  <div className={styles.tag}>
+const Tag: FC<PropsWithChildren> = ({ children }) => (
+  <div className="p-[0.5em] text-[1rem] text-black">
     <WithTextShadow>{children}</WithTextShadow>
   </div>
 );

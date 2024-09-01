@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import type { ComponentProps, RefCallback } from 'react';
 import React, { forwardRef, useCallback } from 'react';
 
-import styles from './styles.module.scss';
+import twClassNames from '@/utils/twClassNames';
 
 interface VideoProps extends ComponentProps<'video'> {
   srcObject?: MediaStream;
@@ -32,11 +32,20 @@ const Video = forwardRef<HTMLVideoElement, VideoProps>(
 
     return (
       <div
-        className={classNames(styles.video, className, {
-          [styles.show]: hasContent,
-        })}
+        className={classNames(
+          'relative w-full h-full box-border bg-[#999] overflow-hidden',
+          className
+        )}
       >
-        <video {...restProps} ref={handleRef} autoPlay />
+        <video
+          {...restProps}
+          ref={handleRef}
+          className={twClassNames(
+            'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full bg-[#999] pointer-events-none',
+            { hidden: !hasContent }
+          )}
+          autoPlay
+        />
       </div>
     );
   }

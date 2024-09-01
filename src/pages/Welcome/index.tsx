@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Frame from '@/components/Frame';
 
-import styles from './styles.module.scss';
-
 const Welcome = () => {
   const navigate = useNavigate();
 
@@ -18,7 +16,7 @@ const Welcome = () => {
   }, [navigate]);
 
   return (
-    <Frame className={styles.welcome}>
+    <Frame className="w-full h-full flex flex-col justify-center items-center gap-[1em]">
       <Button onClick={handleAsPhotoer}>As Photoer</Button>
       <Button onClick={handleAsCamera}>As Camera</Button>
     </Frame>

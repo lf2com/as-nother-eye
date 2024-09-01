@@ -1,9 +1,0 @@
-.shadow {
-  $shadow-color: var(--bg-color, #fff);
-
-  text-shadow:
-    -1px -1px 0 $shadow-color,
-    -1px 1px 0 $shadow-color,
-    1px -1px 0 $shadow-color,
-    1px 1px 0 $shadow-color;
-}
