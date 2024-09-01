@@ -1,6 +1,5 @@
+import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
-
-import type { FCWithChildren } from '@/types/ComponentProps';
 
 import type { ModalBasicProps } from '.';
 import Modal, { ModalButton } from '.';
@@ -9,7 +8,7 @@ interface NotificationModalProps extends ModalBasicProps {
   onOk: () => void;
 }
 
-const NotificationModal: FCWithChildren<NotificationModalProps> = ({
+const NotificationModal: FC<PropsWithChildren<NotificationModalProps>> = ({
   onOk,
   children,
   ...restProps

@@ -29,8 +29,6 @@ import {
   stopStream,
 } from '@/utils/userMedia';
 
-import styles from './styles.module.scss';
-
 const logger = new Logger({ tag: '[Camera]' });
 
 const Camera: FC = () => {
@@ -441,7 +439,6 @@ const Camera: FC = () => {
 
   return (
     <CameraView
-      className={styles.camera}
       disableShutter={disableShutter}
       disableSwitchCamera={disableSwitchCamera}
       disableFlipCamera={disableFlipCamera}
@@ -453,11 +450,11 @@ const Camera: FC = () => {
       minorContent={remoteStream ?? 'Share Camera'}
       onClickMinor={remoteStream ? undefined : shareCamera}
     >
-      <div className={styles.title}>
+      <div className="absolute top-0 left-0 m-[0.25em] flex items-center z-[1]">
         <Tag>Camera #{connectionId}</Tag>
       </div>
 
-      <div className={styles.hidden}>
+      <div className="absolute opacity-0 pointer-events-none">
         <Video
           ref={localRawVideoRef}
           srcObject={localRawStream}
@@ -471,7 +468,7 @@ const Camera: FC = () => {
       </div>
 
       <PhotoManagement
-        className={styles['photo-list']}
+        className="absolute top-[7.5%] right-0 m-[0.5em] w-[30%]"
         photos={photos}
         onShare={onShareSelectedPhotos}
         onSave={onSaveSelectedPhotos}

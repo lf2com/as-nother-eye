@@ -1,17 +1,18 @@
 import classNames from 'classnames';
-import type { ComponentProps, MouseEventHandler } from 'react';
+import type {
+  ComponentProps,
+  FC,
+  MouseEventHandler,
+  PropsWithChildren,
+} from 'react';
 import React, { useCallback } from 'react';
-
-import type { FCWithClassNameAndChildren } from '@/types/ComponentProps';
-
-import styles from './styles.module.scss';
 
 interface ClickableProps extends ComponentProps<'span'> {
   disabled?: boolean;
   stopPropagation?: boolean;
 }
 
-const Clickable: FCWithClassNameAndChildren<ClickableProps> = ({
+const Clickable: FC<PropsWithChildren<ClickableProps>> = ({
   disabled = false,
   className,
   onClick,
@@ -32,7 +33,14 @@ const Clickable: FCWithClassNameAndChildren<ClickableProps> = ({
 
   return (
     <span
-      className={classNames(styles.clickable, { disabled }, className)}
+      className={classNames(
+        '[-webkit-tap-highlight-color:transparent] select-none bg-black/0 cursor-pointer z-[1]',
+        {
+          'cursor-not-allowed': disabled,
+          'active:brightness-90': !disabled,
+        },
+        className
+      )}
       onClick={handleClick}
       {...restProps}
     />

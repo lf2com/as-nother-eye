@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { FC, PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React, {
   createContext,
   useCallback,
@@ -11,7 +11,6 @@ import type { ModalBasicProps } from '@/components/Modal';
 import NotificationModal from '@/components/Modal/NotificationModal';
 import OkCancelModal from '@/components/Modal/OkCancelModal';
 import YesNoModal from '@/components/Modal/YesNoModal';
-import type { FCWithChildren } from '@/types/ComponentProps';
 
 type BaseModalFunc<T = void> = (
   message: ReactNode,
@@ -35,7 +34,7 @@ interface ModalItem {
   Modal: ReactElement;
 }
 
-const ModalContextProvider: FCWithChildren = ({ children }) => {
+const ModalContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [modals, setModals] = useState<ModalItem[]>([]);
 
   const removeModal = useCallback((id: ModalItem['id']) => {

@@ -1,4 +1,5 @@
 import type { DataConnection, MediaConnection } from 'peerjs';
+import type { FC, PropsWithChildren } from 'react';
 import React, {
   createContext,
   useCallback,
@@ -9,7 +10,6 @@ import React, {
   useState,
 } from 'react';
 
-import type { FCWithChildren } from '@/types/ComponentProps';
 import RemoteConnection from '@/utils/RemoteConnection';
 import type EventHandler from '@/utils/RemoteConnection/event/handler';
 
@@ -66,7 +66,7 @@ const ConnectionContext = createContext<ConnectionContextProps>({
   setOnHangUp: () => {},
 });
 
-const ConnectionContextProvider: FCWithChildren = ({ children }) => {
+const ConnectionContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const searchParams = useMemo(
     () => new URLSearchParams(globalThis.location.search),
     []

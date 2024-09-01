@@ -1,11 +1,8 @@
+import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
 
-import type { FCWithChildren } from '@/types/ComponentProps';
-
-import styles from './styles.module.scss';
-
-const WithTextShadow: FCWithChildren = ({ children }) => (
-  <span className={styles.shadow}>{children}</span>
+const WithTextShadow: FC<PropsWithChildren> = ({ children }) => (
+  <span className="text-shadow-white">{children}</span>
 );
 
 export default WithTextShadow;

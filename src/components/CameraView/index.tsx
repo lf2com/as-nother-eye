@@ -1,20 +1,18 @@
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
+import type { FC, PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Clickable from '@/components/Clickable';
 import Frame from '@/components/Frame';
 import Video from '@/components/Video';
 import type { FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
-import type { FCWithClassNameAndChildren } from '@/types/ComponentProps';
+import twClassNames from '@/utils/twClassNames';
 import {
   faArrowsLeftRight,
   faArrowsUpDown,
   faCameraRotate,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import styles from './styles.module.scss';
 
 export interface CameraViewProps {
   majorClassName?: string;
@@ -29,9 +27,10 @@ export interface CameraViewProps {
   onFlipCamera: (direction: FlipCameraCommand['param']) => void | Promise<void>;
   onClickMajor?: () => void | Promise<void>;
   onClickMinor?: () => void | Promise<void>;
+  className?: string;
 }
 
-const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
+const CameraView: FC<PropsWithChildren<CameraViewProps>> = ({
   className,
   majorContent = null,
   minorContent = null,
@@ -112,26 +111,58 @@ const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
   }, [refShutterAnimationId]);
 
   return (
-    <Frame className={classNames(styles['camera-view'], className)}>
+    <Frame
+      className={classNames(
+        'relative text-[1rem] grid grid-areas-[major,shutter] grid-rows-[1fr_auto]',
+        className
+      )}
+    >
       <Clickable
-        className={classNames(styles.major, {
-          [styles['taking-photo']]: !!shutterAnimationId,
+        className={classNames('relative w-full h-full grid-in-[major] block', {
+          'animate-shot': !!shutterAnimationId,
+          'text-[0.8rem] flex justify-center items-center': !(
+            majorContent instanceof MediaStream
+          ),
+          'cursor-default': !onClickMajor,
         })}
         onAnimationEnd={onShutterAnimationEnd}
         disabled={!onClickMajor}
         onClick={onClickMajor}
       >
         {majorContent instanceof MediaStream && (
-          <Video
-            ref={refMajorVideo}
-            className={styles.video}
-            srcObject={majorContent}
-          />
+          <>
+            <Video
+              ref={refMajorVideo}
+              className="absolute"
+              srcObject={majorContent}
+            />
+            <div
+              className={twClassNames(
+                'absolute box-border border-white pointer-events-none z-[1]',
+                '-translate-y-1/2 top-1/2 w-full h-[calc(100%/3)] border-y'
+              )}
+            />
+            <div
+              className={twClassNames(
+                'absolute box-border border-white pointer-events-none z-[1]',
+                '-translate-x-1/2 left-1/2 w-[calc(100%/3)] h-full border-x'
+              )}
+            />
+          </>
         )}
       </Clickable>
 
       <Clickable
-        className={styles.minor}
+        className={twClassNames(
+          'absolute right-0 bottom-0 m-[0.5rem] max-w-[30%] max-h-[30%] w-full h-full',
+          'border border-white outline outline-1 outline-black bg-inherit block',
+          {
+            'text-[0.8rem] flex justify-center items-center': !(
+              minorContent instanceof MediaStream
+            ),
+            'cursor-default': !onClickMinor,
+          }
+        )}
         disabled={!onClickMinor}
         onClick={onClickMinor}
       >
@@ -142,25 +173,46 @@ const CameraView: FCWithClassNameAndChildren<CameraViewProps> = ({
 
       <Clickable
         disabled={disableShutter}
-        className={styles.shutter}
+        className={twClassNames(
+          'm-[1em] left-1/2 p-[0.5em] w-[20vmin] h-[20vmin] box-border',
+          'rounded-50% border-[0.2em] border-current bg-current bg-clip-content',
+          'text-white grid-in-[shutter] justify-self-center',
+          { 'text-[#ccc]': disableShutter }
+        )}
         stopPropagation
         onClick={handleShutter}
       />
 
       <Clickable
-        className={styles['switch-camera']}
+        className={twClassNames(
+          'absolute bottom-0 left-0 m-[0.25em] text-white text-[3em]',
+          { 'text-[#ccc]': disableSwitchCamera }
+        )}
         disabled={disableSwitchCamera}
         onClick={handleSwitchCamera}
       >
         <FontAwesomeIcon icon={faCameraRotate} />
       </Clickable>
 
-      <div className={styles['flip-camera-tool']}>
-        <Clickable disabled={disableFlipCamera} onClick={flipCameraVertical}>
+      <div
+        className={twClassNames(
+          'absolute top-0 right-0 my-[0.25em] mx-[0.5em] text-[1.5em] text-black',
+          'drop-shadow-white z-10 flex gap-[0.5em]'
+        )}
+      >
+        <Clickable
+          disabled={disableFlipCamera}
+          className={twClassNames({ 'text-[#999]': disableFlipCamera })}
+          onClick={flipCameraVertical}
+        >
           <FontAwesomeIcon icon={faArrowsUpDown} />
         </Clickable>
 
-        <Clickable disabled={disableFlipCamera} onClick={flipCameraHorizontal}>
+        <Clickable
+          disabled={disableFlipCamera}
+          className={twClassNames({ 'text-[#999]': disableFlipCamera })}
+          onClick={flipCameraHorizontal}
+        >
           <FontAwesomeIcon icon={faArrowsLeftRight} />
         </Clickable>
       </div>

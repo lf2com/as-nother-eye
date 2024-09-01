@@ -2,8 +2,6 @@ import classNames from 'classnames';
 import type { FC } from 'react';
 import React, { useEffect, useMemo } from 'react';
 
-import styles from './styles.module.scss';
-
 interface PhotoProps {
   photo: File | Blob;
   selected: boolean;
@@ -22,9 +20,10 @@ const Photo: FC<PhotoProps> = ({ photo, selected, onClick }) => {
 
   return (
     <img
-      className={classNames(styles.photo, {
-        [styles.selected]: selected,
-      })}
+      className={classNames(
+        'w-full box-border border border-white object-contain',
+        { 'outline outline-[0.2em] outline-[#69f]': selected }
+      )}
       src={photoUrl}
       onClick={onClick}
     />

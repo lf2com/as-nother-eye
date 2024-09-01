@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import type { Reducer } from 'react';
+import type { FC, PropsWithChildren, Reducer } from 'react';
 import React, {
   createContext,
   useContext,
@@ -8,12 +8,10 @@ import React, {
   useState,
 } from 'react';
 
-import type { FCWithChildren } from '@/types/ComponentProps';
 import Logger from '@/utils/logger';
 
 import type { LogMessageProps } from './components/LogMessage';
 import LogMessage from './components/LogMessage';
-import styles from './styles.module.scss';
 
 interface LoggerContextProps {
   logger: Logger;
@@ -36,11 +34,9 @@ interface LoggerContextProviderProps {
   show?: boolean;
 }
 
-const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
-  tag,
-  show: defaultShow = true,
-  children,
-}) => {
+const LoggerContextProvider: FC<
+  PropsWithChildren<LoggerContextProviderProps>
+> = ({ tag, show: defaultShow = true, children }) => {
   const [show, setShow] = useState(defaultShow);
 
   const [logs, appendLog] = useReducer<
@@ -75,9 +71,13 @@ const LoggerContextProvider: FCWithChildren<LoggerContextProviderProps> = ({
     <LoggerContext.Provider value={contextValue}>
       {children}
       <div
-        className={classNames(styles.logger, {
-          [styles.show]: show,
-        })}
+        className={classNames(
+          'absolute top-0 right-0 bottom-0 left-0 z-[1000] flex flex-col justify-end items-end',
+          'opacity-0 pointer-events-none [&>*]:opacity-0 [&>*]:pointer-events-none',
+          {
+            'opacity-100 [&>*]:pointer-events-auto': show,
+          }
+        )}
       >
         {logs.map(({ type, timestamp, message }) => (
           <LogMessage
