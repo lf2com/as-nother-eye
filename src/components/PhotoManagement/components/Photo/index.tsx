@@ -1,6 +1,7 @@
-import classNames from 'classnames';
 import type { FC } from 'react';
 import React, { useEffect, useMemo } from 'react';
+
+import twClassNames from '@/utils/twClassNames';
 
 interface PhotoProps {
   photo: File | Blob;
@@ -20,7 +21,7 @@ const Photo: FC<PhotoProps> = ({ photo, selected, onClick }) => {
 
   return (
     <img
-      className={classNames(
+      className={twClassNames(
         'w-full box-border border border-white object-contain',
         { 'outline outline-[0.2em] outline-[#69f]': selected }
       )}

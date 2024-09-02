@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import type {
   FC,
   MouseEventHandler,
@@ -93,7 +92,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
   return (
     <ModalButtonContextProvider disabledAll={disabledAll}>
       <div
-        className={classNames(
+        className={twClassNames(
           'fixed top-0 right-0 bottom-0 left-0 bg-black/0 text-black text-[1rem] z-[1000] flex justify-center items-center pointer-events-none',
           {
             'bg-black/50 brightness-75': highlight,
@@ -104,7 +103,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
         onClick={handleClickOutside}
       >
         <div
-          className={classNames(
+          className={twClassNames(
             'relative translate-y-[0.35em] -top-[2em] m-[1em] max-h-[80%] box-border shadow-[0_0_0.5em_rgba(0,0,0,0.5)]',
             'rounded-[0.25em] bg-white flex flex-col overflow-hidden opacity-0',
             '[&>*]:py-0 [&>*]:px-[1em]',
@@ -121,7 +120,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
           }}
         >
           <div
-            className={classNames(
+            className={twClassNames(
               'py-[0.5em] px-[1em] bg-[#36f] text-white font-bold text-center',
               'empty:p-0'
             )}
@@ -137,7 +136,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
             {children}
           </div>
           <div
-            className={classNames(
+            className={twClassNames(
               'my-[1em] mx-0 flex justify-evenly empty:m-0'
             )}
             onClick={onClickButton}

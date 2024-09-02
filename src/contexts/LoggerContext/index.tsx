@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import type { FC, PropsWithChildren, Reducer } from 'react';
 import React, {
   createContext,
@@ -9,6 +8,7 @@ import React, {
 } from 'react';
 
 import Logger from '@/utils/logger';
+import twClassNames from '@/utils/twClassNames';
 
 import type { LogMessageProps } from './components/LogMessage';
 import LogMessage from './components/LogMessage';
@@ -71,7 +71,7 @@ const LoggerContextProvider: FC<
     <LoggerContext.Provider value={contextValue}>
       {children}
       <div
-        className={classNames(
+        className={twClassNames(
           'absolute top-0 right-0 bottom-0 left-0 z-[1000] flex flex-col justify-end items-end',
           'opacity-0 pointer-events-none [&>*]:opacity-0 [&>*]:pointer-events-none',
           {

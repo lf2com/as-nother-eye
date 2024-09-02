@@ -1,8 +1,8 @@
-import classNames from 'classnames';
 import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
 
 import type { LogType } from '@/utils/logger';
+import twClassNames from '@/utils/twClassNames';
 
 export interface LogMessageProps {
   type?: LogType;
@@ -15,7 +15,7 @@ const LogMessage: FC<PropsWithChildren<LogMessageProps>> = ({
   children,
 }) => (
   <div
-    className={classNames(
+    className={twClassNames(
       '-mb-px px-[0.5em] py-[0.25em] border-[#eee] border-y bg-transparent text-[#eee] text-[0.8rem] pointer-events-auto',
       {
         'text-[#ccc]': type === 'debug',
