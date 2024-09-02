@@ -1,8 +1,8 @@
-import classNames from 'classnames';
 import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
 
 import Clickable from '@/components/Clickable';
+import twClassNames from '@/utils/twClassNames';
 
 import { useModalButtonContext } from '../../contexts/ModalButtonContext';
 
@@ -23,7 +23,7 @@ const ModalButton: FC<PropsWithChildren<ModalButtonProps>> = ({
   return (
     <Clickable
       disabled={disabledAll || disabled}
-      className={classNames(
+      className={twClassNames(
         'my-0 mx-[1em] py-[0.35em] px-[1em] min-w-[3em] max-w-full rounded-[0.25em] border-[0.05em] border-[#36f]',
         'bg-white text-[#36f] text-[0.95em] text-center block select-none',
         {

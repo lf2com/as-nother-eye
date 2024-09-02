@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import type { FC } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -6,6 +5,7 @@ import Clickable from '@/components/Clickable';
 import Modal, { ModalButton } from '@/components/Modal';
 import PhotoList from '@/components/PhotoList';
 import dateToStr from '@/utils/dateToStr';
+import twClassNames from '@/utils/twClassNames';
 
 import Photo from './components/Photo';
 
@@ -132,7 +132,7 @@ const PhotoManagement: FC<PhotoManagementProps> = ({
   return (
     <>
       <Clickable
-        className={classNames('box-border', className)}
+        className={twClassNames('box-border', className)}
         onClick={showPhotoManagement}
       >
         <PhotoList aspectRatio={aspectRatio} photos={photos} />

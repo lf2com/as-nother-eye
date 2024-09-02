@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import type { ComponentProps, RefCallback } from 'react';
 import React, { forwardRef, useCallback } from 'react';
 
@@ -32,7 +31,7 @@ const Video = forwardRef<HTMLVideoElement, VideoProps>(
 
     return (
       <div
-        className={classNames(
+        className={twClassNames(
           'relative w-full h-full box-border bg-[#999] overflow-hidden',
           className
         )}
