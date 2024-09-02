@@ -25,7 +25,7 @@ const config: Config = {
           '-1px 1px 0 #fff',
           '1px -1px 0 #fff',
           '1px 1px 0 #fff',
-        ],
+        ].join(','),
       },
       animation: {
         shining: 'shining 0.4s linear infinite',
