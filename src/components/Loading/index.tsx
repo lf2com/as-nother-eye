@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import type { FC, ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
 
@@ -27,7 +26,7 @@ const Loading: FC<LoadingProps> = ({
 
   return (
     <div
-      className={classNames(
+      className={twClassNames(
         'absolute top-0 right-0 bottom-0 left-0 z-[1000] bg-black/0 text-[1rem] flex justify-center items-center transition-all dur-[0.4s]',
         {
           fixed: fullscreen,

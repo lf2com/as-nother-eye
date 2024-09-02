@@ -1,6 +1,7 @@
-import classNames from 'classnames';
 import type { FC, ReactEventHandler } from 'react';
 import React, { useCallback, useState } from 'react';
+
+import twClassNames from '@/utils/twClassNames';
 
 interface PhotoItemProps {
   url: string;
@@ -20,7 +21,7 @@ const Photo: FC<PhotoItemProps> = ({ url, onShown }) => {
 
   return (
     <div
-      className={classNames(
+      className={twClassNames(
         'outline outline-1 outline-black border-[0.2em] border-white',
         {
           'opacity-0 pointer-events-none z-[1]': !isLoaded,

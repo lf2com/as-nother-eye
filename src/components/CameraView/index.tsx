@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import type { FC, PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -111,20 +110,23 @@ const CameraView: FC<PropsWithChildren<CameraViewProps>> = ({
 
   return (
     <div
-      className={classNames(
+      className={twClassNames(
         'relative w-full h-full text-[1rem] grid grid-areas-[major,shutter] grid-rows-[1fr_auto]',
         'bg-black',
         className
       )}
     >
       <Clickable
-        className={classNames('relative w-full h-full grid-in-[major] block', {
-          'animate-shot': !!shutterAnimationId,
-          'text-[0.8rem] flex justify-center items-center': !(
-            majorContent instanceof MediaStream
-          ),
-          'cursor-default': !onClickMajor,
-        })}
+        className={twClassNames(
+          'relative w-full h-full grid-in-[major] block',
+          {
+            'animate-shot': !!shutterAnimationId,
+            'text-[0.8rem] flex justify-center items-center': !(
+              majorContent instanceof MediaStream
+            ),
+            'cursor-default': !onClickMajor,
+          }
+        )}
         onAnimationEnd={onShutterAnimationEnd}
         disabled={!onClickMajor}
         onClick={onClickMajor}
