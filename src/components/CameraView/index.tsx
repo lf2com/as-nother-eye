@@ -3,7 +3,6 @@ import type { FC, PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Clickable from '@/components/Clickable';
-import Frame from '@/components/Frame';
 import Video from '@/components/Video';
 import type { FlipCameraCommand } from '@/contexts/ConnectionContext/Command';
 import twClassNames from '@/utils/twClassNames';
@@ -111,9 +110,10 @@ const CameraView: FC<PropsWithChildren<CameraViewProps>> = ({
   }, [refShutterAnimationId]);
 
   return (
-    <Frame
+    <div
       className={classNames(
-        'relative text-[1rem] grid grid-areas-[major,shutter] grid-rows-[1fr_auto]',
+        'relative w-full h-full text-[1rem] grid grid-areas-[major,shutter] grid-rows-[1fr_auto]',
+        'bg-black',
         className
       )}
     >
@@ -218,7 +218,7 @@ const CameraView: FC<PropsWithChildren<CameraViewProps>> = ({
       </div>
 
       {children}
-    </Frame>
+    </div>
   );
 };
 
