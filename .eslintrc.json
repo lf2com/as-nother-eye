@@ -17,8 +17,14 @@
     {
       "files": ["*.tsx"],
       "rules": {
-        "react-hooks/exhaustive-deps": "warn",
+        "react-hooks/exhaustive-deps": [
+          "warn",
+          {
+            "additionalHooks": "(useRenderedEffect)"
+          }
+        ],
         "react-hooks/rules-of-hooks": "error",
+        "react/jsx-key": "error",
         "react/jsx-no-leaked-render": ["error"],
         "react/jsx-no-script-url": "error",
         "react/jsx-no-useless-fragment": "error",
