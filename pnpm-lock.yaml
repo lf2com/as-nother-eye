@@ -32,6 +32,7 @@ specifiers:
   react-router-dom: ^6.26.1
   tailwind-merge: ^2.5.2
   tailwindcss: ^3.4.10
+  tailwindcss-animate: ^1.0.7
   ts-jest: ^29.0.3
   ts-node: ^10.9.1
   typescript: ^5.5.4
@@ -70,6 +71,7 @@ devDependencies:
   prettier: 3.3.3
   prettier-plugin-sort-json: 4.0.0_prettier@3.3.3
   process: 0.11.10
+  tailwindcss-animate: 1.0.7_tailwindcss@3.4.10
   ts-jest: 29.1.1_m7vbrry3evxccnqda3e2m7rane
   ts-node: 10.9.2_typescript@5.5.4
   typescript: 5.5.4
@@ -6373,6 +6375,14 @@ packages:
   /tailwind-merge/2.5.2:
     resolution: {integrity: sha512-kjEBm+pvD+6eAwzJL2Bi+02/9LFLal1Gs61+QB7HvTfQQ0aXwC5LGT8PEt1gS0CWKktKe6ysPTAy3cBC5MeiIg==}
     dev: false
+
+  /tailwindcss-animate/1.0.7_tailwindcss@3.4.10:
+    resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      tailwindcss: 3.4.10_ts-node@10.9.2
+    dev: true
 
   /tailwindcss/3.4.10_ts-node@10.9.2:
     resolution: {integrity: sha512-KWZkVPm7yJRhdu4SRSl9d4AK2wM3a50UsvgHZO7xY77NQr2V+fIrEuoDGQcbvswWvFGbS2f6e+jC/6WJm1Dl0w==}

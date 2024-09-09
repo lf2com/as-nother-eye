@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "parcel --hmr-port 8080 -p 8080 --open",
     "dev:https": "parcel --hmr-port 8443 -p 8443 --https --open",
-    "build": "parcel puild",
+    "build": "parcel build",
     "lint": "eslint --ext .ts,.tsx src/",
     "test": "jest"
   },
@@ -39,6 +39,7 @@
     "prettier": "^3.3.3",
     "prettier-plugin-sort-json": "^4.0.0",
     "process": "^0.11.10",
+    "tailwindcss-animate": "^1.0.7",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.5.4"
