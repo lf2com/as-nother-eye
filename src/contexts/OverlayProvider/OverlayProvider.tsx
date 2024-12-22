@@ -10,8 +10,6 @@ import {
 
 import Overlay from './Overlay';
 import type {
-  CloseOverlayFn,
-  HoistOverlayFn,
   OverlayContentFn,
   OverlayContentResolve,
   OverlayOption,
@@ -23,6 +21,7 @@ interface OverlayContextValue {
     content: C,
     options?: OverlayOption
   ) => Promise<OverlayContentResolve<C>>;
+  close: (id: string) => void;
 }
 
 const OverlayContext = createContext<OverlayContextValue | null>(null);
@@ -36,6 +35,12 @@ interface OverlayItem {
 const OverlayProvider: FC<PropsWithChildren> = ({ children }) => {
   const [overlays, setOverlays] = useState<OverlayItem[]>([]);
   const [closingIds, setClosingIds] = useState<Array<OverlayItem['id']>>([]);
+
+  const close = useCallback<OverlayContextValue['close']>(id => {
+    setClosingIds(prevIds =>
+      prevIds.includes(id) ? prevIds : prevIds.concat(id)
+    );
+  }, []);
 
   const open = useCallback<OverlayContextValue['open']>(
     (content, options = {}) => {
@@ -52,22 +57,20 @@ const OverlayProvider: FC<PropsWithChildren> = ({ children }) => {
                   .slice(0, index)
                   .concat(prevOverlays.slice(index + 1));
           });
+          setClosingIds(prevIds => prevIds.filter(prevId => prevId !== id));
         };
 
         if (options.id) {
           onHidden();
         }
 
-        const closeOverlay: CloseOverlayFn<
-          OverlayContentResolve<typeof content>
-        > = result => {
+        const closeOverlay = () => {
           setClosingIds(prevIds =>
             prevIds.includes(id) ? prevIds : prevIds.concat(id)
           );
-          resolve(result);
         };
 
-        const hoistOverlay: HoistOverlayFn = () => {
+        const hoistOverlay = () => {
           setOverlays(prevOverlays => {
             const index = prevOverlays.findIndex(overlay => id === overlay.id);
 
@@ -87,9 +90,8 @@ const OverlayProvider: FC<PropsWithChildren> = ({ children }) => {
           : createElement(content, {
               hoistOverlay,
               closeOverlay: result => {
-                return closeOverlay(
-                  result as OverlayContentResolve<typeof content>
-                );
+                resolve(result as OverlayContentResolve<typeof content>);
+                closeOverlay();
               },
             });
 
@@ -105,15 +107,21 @@ const OverlayProvider: FC<PropsWithChildren> = ({ children }) => {
           })
         );
 
-        if (isContentNode) {
-          resolve();
-        }
+        // if (isContentNode) {
+        //   resolve();
+        // }
       });
     },
     []
   );
 
-  const value = useMemo<OverlayContextValue>(() => ({ open }), [open]);
+  const value = useMemo<OverlayContextValue>(
+    () => ({
+      open,
+      close,
+    }),
+    [close, open]
+  );
 
   return (
     <OverlayContext.Provider value={value}>
