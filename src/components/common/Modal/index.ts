@@ -1,5 +1,14 @@
+import DoubleBtnModal from './DoubleBtnModal';
+import InputValueModal from './InputValueModal';
 import ModalButton from './ModalButton';
-import PosNegModal from './PosNegModal';
+import NoBtnModal from './NoBtnModal';
 import SingleBtnModal from './SingleBtnModal';
 
-export { ModalButton, SingleBtnModal, PosNegModal };
+export {
+  ModalButton,
+  SingleBtnModal,
+  DoubleBtnModal,
+  InputValueModal,
+  NoBtnModal,
+};
+export { default } from './Modal';
