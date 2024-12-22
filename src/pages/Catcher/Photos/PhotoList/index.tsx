@@ -59,6 +59,7 @@ const PhotoList: FC<PhotoListProps> = ({ urls, onOk, onClose }) => {
           <CheckboxWithIndeterminate
             checked={selectedCount === total}
             indeterminate={!!selectedCount && selectedCount < total}
+            onChange={() => undefined}
           />
           Select all
         </ModalButton>
