@@ -4,6 +4,7 @@ import { useState } from 'react';
 import twClassNames from '@/utils/twClassNames';
 
 const DEG_BASE = 15;
+const OFFSET_BASE = 10;
 
 interface PhotoProps {
   url: string;
@@ -11,7 +12,13 @@ interface PhotoProps {
 
 const Photo: FC<PhotoProps> = ({ url }) => {
   const [isReady, setIsReady] = useState(false);
-  const [deg] = useState(() => DEG_BASE * (-1 + 2 * Math.random()));
+  const [{ deg, offset }] = useState(() => ({
+    deg: DEG_BASE * (-1 + 2 * Math.random()),
+    offset: {
+      x: OFFSET_BASE * (-1 + 2 * Math.random()),
+      y: OFFSET_BASE * (-1 + 2 * Math.random()),
+    },
+  }));
 
   return (
     <div
@@ -22,7 +29,9 @@ const Photo: FC<PhotoProps> = ({ url }) => {
     >
       <div
         className="border-[2vmin] border-white shadow-[0_0_1vmin_0_#000]"
-        style={{ transform: `rotate(${deg}deg)` }}
+        style={{
+          transform: `translate3d(${offset.x}%, ${offset.y}%, 0) rotate(${deg}deg)`,
+        }}
       >
         <img
           src={url}
