@@ -331,7 +331,7 @@ const Catcher: FC = () => {
   }, [cameraStream, mediaState, send]);
 
   return (
-    <div className="relative w-full h-full bg-black">
+    <div className="relative w-full h-full bg-black overflow-hidden">
       {cameraStream && (
         <VideoWithSrcObject
           srcObject={cameraStream}
