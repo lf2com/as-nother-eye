@@ -5,15 +5,15 @@ import Modal from './Modal';
 import ModalButton from './ModalButton';
 
 interface SingleBtnModalProps extends ModalBaseProps {
-  disabled?: boolean;
+  onClick?: () => void;
   btnContent?: ReactNode;
-  onClick: () => void;
+  disabled?: boolean;
 }
 
 const SingleBtnModal: FC<SingleBtnModalProps> = ({
-  disabled = false,
-  btnContent = 'OK',
   onClick,
+  btnContent = 'OK',
+  disabled = !onClick,
   ...restProps
 }) => (
   <Modal

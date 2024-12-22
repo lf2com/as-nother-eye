@@ -4,6 +4,8 @@ import twClassNames from '@/utils/twClassNames';
 
 export interface ModalBaseProps extends PropsWithChildren {
   className?: string;
+  header?: ReactNode;
+  headerClassName?: string;
 }
 
 interface ModalProps extends ModalBaseProps {
@@ -13,21 +15,37 @@ interface ModalProps extends ModalBaseProps {
 
 const Modal: FC<ModalProps> = ({
   className,
+  headerClassName,
   footerClassName,
   children,
+  header,
   footer,
 }) => (
   <div
     className={twClassNames(
-      'flex flex-col justify-center bg-gray-300 gap-px',
+      'max-w-[85%] max-h-[85%] flex flex-col justify-center bg-gray-300 gap-px',
       'border border-gray-500 rounded-md overflow-hidden'
     )}
   >
-    <div className={twClassNames('px-2 py-1 bg-white', className)}>
+    {!!header && (
+      <div
+        className={twClassNames('shrink-0 bg-white text-sm', headerClassName)}
+      >
+        {header}
+      </div>
+    )}
+    <div
+      className={twClassNames('shrink p-4 bg-white overflow-auto', className)}
+    >
       {children}
     </div>
     {!!footer && (
-      <div className={twClassNames('grid gap-px text-xs', footerClassName)}>
+      <div
+        className={twClassNames(
+          'shrink-0 grid gap-px text-xs',
+          footerClassName
+        )}
+      >
         {footer}
       </div>
     )}
