@@ -14,6 +14,9 @@ const config: Config = {
       borderRadius: {
         '50%': '50%',
       },
+      gridTemplateColumns: {
+        'photo-list': 'repeat(auto-fill, minmax(40px, 1fr))',
+      },
       dropShadow: {
         white: [
           '1px 0 0 #fff',
@@ -21,6 +24,7 @@ const config: Config = {
           '0 1px 0 #fff',
           '0 -1px 0 #fff',
         ],
+        photo: '0 0 0.2em rgba(0, 0, 0, 0.25)',
       },
       textShadow: {
         white: [
