@@ -3,38 +3,32 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 
-import ConnectionContextProvider from '@/contexts/ConnectionContext';
-import LoggerContextProvider from '@/contexts/LoggerContext';
-import ModalContextProvider from '@/contexts/ModalContext';
-import Camera from '@/pages/AsCamera';
-import Photoer from '@/pages/AsPhotoer';
-import Test from '@/pages/Test';
-import Welcome from '@/pages/Welcome';
-
 import OverlayProvider from './contexts/OverlayProvider';
+import Catcher from './pages/Catcher';
 import Entry from './pages/Entry';
+import PeerTest from './pages/PeerTest';
+import PeerCatcherTest from './pages/PeerTest/PeerCatcherTest';
+import PeerTwinTest from './pages/PeerTest/PeerTwinTest';
+import PeerViewerTest from './pages/PeerTest/PeerViewerTest';
+import TwinTest from './pages/PeerTest/TwinTest';
+import Viewer from './pages/Viewer';
 
 const App: FC = () => (
   <div className="w-screen h-screen select-none [-webkit-tap-highlight-color:transparent]">
     <OverlayProvider>
       <div className="w-full h-full flex justify-center items-center">
-        <LoggerContextProvider show={false}>
-          <ModalContextProvider>
-            <ConnectionContextProvider>
-              <HashRouter>
-                <Routes>
-                  <Route path="/photoer/:targetId" element={<Photoer />} />
-                  <Route path="/photoer" element={<Photoer />} />
-                  <Route path="/camera/:targetId" element={<Camera />} />
-                  <Route path="/camera" element={<Camera />} />
-                  <Route path="/test" element={<Test />} />
-                  {/* <Route path="/" element={<Welcome />} /> */}
-                  <Route path="/" element={<Entry />} />
-                </Routes>
-              </HashRouter>
-            </ConnectionContextProvider>
-          </ModalContextProvider>
-        </LoggerContextProvider>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<Entry />} />
+            <Route path="/twin-test" element={<TwinTest />} />
+            <Route path="/peer-twin-test" element={<PeerTwinTest />} />
+            <Route path="/peer-catcher-test" element={<PeerCatcherTest />} />
+            <Route path="/peer-viewer-test" element={<PeerViewerTest />} />
+            <Route path="/peer-test/:id?" element={<PeerTest />} />
+            <Route path="/catcher/:id?" element={<Catcher />} />
+            <Route path="/viewer/:id?" element={<Viewer />} />
+          </Routes>
+        </HashRouter>
       </div>
     </OverlayProvider>
   </div>

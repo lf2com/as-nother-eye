@@ -1,26 +1,32 @@
 import type { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { DoubleBtnModal } from '@/components/common/Modal';
 import { useOverlayContext } from '@/contexts/OverlayProvider/OverlayProvider';
 import useMount from '@/hooks/useMount';
 
-import DeviceTypeModal from './DeviceTypeModal';
-
 const Entry: FC = () => {
   const { open } = useOverlayContext();
+  const navigate = useNavigate();
 
   useMount(() => {
-    open(DeviceTypeModal, {
-      id: 'device-type',
-      closeOnBackdrop: false,
-    }).then(type => {
-      // TODO: switch to pages
-      console.log('device type:', type);
-    });
+    open(
+      <DoubleBtnModal
+        btnAContent="Catcher"
+        btnBContent="Viewer"
+        onClickA={() => {
+          navigate('/catcher');
+        }}
+        onClickB={() => {
+          navigate('/viewer');
+        }}
+      >
+        Choose photo mode
+      </DoubleBtnModal>
+    );
   });
 
-  return (
-    <div className="w-full h-full bg-slash bg-slash-fg-gray-200 bg-size-[0.5rem] animate-bg-slide" />
-  );
+  return null;
 };
 
 export default Entry;
