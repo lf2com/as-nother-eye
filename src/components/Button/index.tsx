@@ -8,7 +8,7 @@ type ButtonProps = ComponentProps<'button'>;
 const Button: FC<ButtonProps> = ({ className, ...restProps }) => (
   <button
     className={twClassNames(
-      'px-1 border border-black disabled:opacity-10',
+      'px-1 border border-black disabled:opacity-10 pointer-events-auto',
       className
     )}
     {...restProps}
