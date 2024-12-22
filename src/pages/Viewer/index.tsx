@@ -90,7 +90,7 @@ const Viewer: FC = () => {
     },
   });
 
-  const [waitCamera, setWaitCamera] = useState(true);
+  const [waitCamera, setWaitCamera] = useState(false);
   const [waitPhoto, setWaitPhoto] = useState(false);
 
   const { send } = usePeerMediaConnection(mediaConn, {
