@@ -5,7 +5,7 @@ import useMount from './useMount';
 const useCamera = () => {
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [cameraIndex, setCameraIndex] = useState(0);
-  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
   const camera = useMemo<MediaDeviceInfo | null>(
     () => cameras[cameraIndex] ?? null,
@@ -44,7 +44,7 @@ const useCamera = () => {
       });
 
       if (!aborted) {
-        setCameraStream(stream);
+        setStream(stream);
       }
     };
 
@@ -52,13 +52,13 @@ const useCamera = () => {
 
     return () => {
       aborted = true;
-      setCameraStream(null);
+      setStream(null);
     };
   }, [camera]);
 
   return {
     switchCamera,
-    cameraStream,
+    stream,
     camera,
   };
 };
