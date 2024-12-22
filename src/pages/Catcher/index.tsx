@@ -354,7 +354,7 @@ const Catcher: FC = () => {
       </div>
 
       <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-between pointer-events-none">
-        <div className="p-2 flex gap-2 bg-white/50 [&>*]:pointer-events-auto">
+        <div className="p-2 flex gap-2 [&>*]:bg-white/75">
           <Button onClick={() => setFlipX(prev => !prev)}>Flip X</Button>
           <Button onClick={() => setFlipY(prev => !prev)}>Flip Y</Button>
         </div>
