@@ -52,6 +52,7 @@ const LongPress: FC<LongPressProps> = ({
 
   const handleContextMenu = useCallback<RequiredProps['onContextMenu']>(
     e => {
+      e.preventDefault();
       onContextMenu?.(e);
       onLongPress();
     },
