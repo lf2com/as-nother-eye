@@ -45,6 +45,7 @@ const Catcher: FC = () => {
   const [peerStream, setPeerStream] = useState<MediaStream | null>(null);
   const [flipX, setFlipX] = useState(true);
   const [flipY, setFlipY] = useState(false);
+
   const { canvas, stream: cameraStream } = useStream(stream, {
     flipX,
     flipY,
@@ -329,6 +330,24 @@ const Catcher: FC = () => {
       send(ViewerMessage.nextCameraStart);
     }
   }, [cameraStream, mediaState, send]);
+
+  useEffect(() => {
+    const isFaceCamera = stream?.getVideoTracks().some(track => {
+      return track.getCapabilities().facingMode?.includes('user');
+    });
+
+    setFlipX(!!isFaceCamera);
+
+    const track = cameraStream?.getVideoTracks()[0];
+
+    if (mediaConn && track) {
+      mediaConn?.peerConnection.getSenders().forEach(sender => {
+        if (sender.track?.kind === 'video') {
+          sender.replaceTrack(track);
+        }
+      });
+    }
+  }, [cameraStream, mediaConn, stream]);
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
