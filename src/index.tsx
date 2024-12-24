@@ -14,7 +14,7 @@ import TwinTest from './pages/PeerTest/TwinTest';
 import Viewer from './pages/Viewer';
 
 const App: FC = () => (
-  <div className="w-screen h-screen select-none [-webkit-tap-highlight-color:transparent]">
+  <div className="fixed w-full h-full select-none [-webkit-tap-highlight-color:transparent]">
     <OverlayProvider>
       <div className="w-full h-full flex justify-center items-center">
         <HashRouter>
