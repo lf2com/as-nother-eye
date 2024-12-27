@@ -337,7 +337,9 @@ const Catcher: FC = () => {
     });
 
     setFlipX(!!isFaceCamera);
+  }, [stream]);
 
+  useEffect(() => {
     const track = cameraStream?.getVideoTracks()[0];
 
     if (mediaConn && track) {
@@ -347,7 +349,7 @@ const Catcher: FC = () => {
         }
       });
     }
-  }, [cameraStream, mediaConn, stream]);
+  }, [cameraStream, mediaConn]);
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
