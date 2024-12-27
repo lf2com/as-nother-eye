@@ -33,18 +33,14 @@ const Photos: FC<PhotosProps> = ({ urls }) => {
               const result = await fetch(url);
               const blob = await result.blob();
               const { type } = blob;
-              const name = `photo_${dateStr}_${index + 1}`;
+              const ext = type.replace(/^image\/(.+)$/, '$1');
+              const name = `${dateStr}_${index + 1}.${ext}`;
 
               return new File([blob], name, { type });
             })
           );
 
-          await shareData({
-            title: 'As nother eye',
-            text: `I took ${selectedUrls.length} photos with this app`,
-            files,
-            url: location.origin,
-          });
+          await shareData({ files });
         }}
         onClose={() => close(OVERLAY_ID)}
       />,
