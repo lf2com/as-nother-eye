@@ -40,7 +40,10 @@ const useCamera = () => {
     const init = async () => {
       const { deviceId } = camera;
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId },
+        video: {
+          deviceId,
+          focusMode: 'continuous',
+        },
       });
 
       if (!aborted) {
