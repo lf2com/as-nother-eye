@@ -20,7 +20,7 @@ const Photo: FC<PhotoProps> = ({ focused = false, url, onClick }) => {
     <LongPress
       key={url}
       className={twClassNames('border border-black', {
-        'outline outline-[1vmin] outline-amber-400': focused,
+        'outline outline-[.15rem] outline-amber-400': focused,
       })}
       onClick={onClick}
       onLongPress={() => {

@@ -363,7 +363,7 @@ const Catcher: FC = () => {
       {peerStream && (
         <VideoWithSrcObject
           srcObject={peerStream}
-          className="absolute z-10 bottom-0 left-0 w-[30%] h-auto"
+          className="absolute z-10 bottom-0 left-0 max-w-[25%] max-h-[25%]"
           autoPlay
         />
       )}
@@ -377,14 +377,14 @@ const Catcher: FC = () => {
           <Button onClick={() => setFlipX(prev => !prev)}>Flip X</Button>
           <Button onClick={() => setFlipY(prev => !prev)}>Flip Y</Button>
         </div>
-        <div className="py-[10vmin] flex justify-center">
+        <div className="py-[1rem] flex justify-center">
           <Clickable
             isActive={isPhotoing}
             disabled={!cameraStream || isPhotoing}
             onClick={takePhoto}
             className="pointer-events-auto"
           >
-            <div className="w-[25vmin] aspect-square outline outline-1 outline-black border-2 border-white shadow-[inset_0_0_0_2vmin_#000] bg-white rounded-50%" />
+            <div className="w-[3.25rem] aspect-square outline outline-1 outline-black border-2 border-white shadow-[inset_0_0_0_.35rem_#000] bg-white rounded-50%" />
           </Clickable>
         </div>
       </div>

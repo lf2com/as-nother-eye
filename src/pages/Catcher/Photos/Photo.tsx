@@ -28,7 +28,7 @@ const Photo: FC<PhotoProps> = ({ url }) => {
       )}
     >
       <div
-        className="border-[2vmin] border-white shadow-[0_0_1vmin_0_#000]"
+        className="border-[.2rem] border-white shadow-[0_0_.2rem_0_#000]"
         style={{
           transform: `translate3d(${offset.x}%, ${offset.y}%, 0) rotate(${deg}deg)`,
         }}
