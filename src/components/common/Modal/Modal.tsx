@@ -6,6 +6,7 @@ export interface ModalBaseProps extends PropsWithChildren {
   className?: string;
   header?: ReactNode;
   headerClassName?: string;
+  onCloseButton?: () => void;
 }
 
 interface ModalProps extends ModalBaseProps {
@@ -20,10 +21,12 @@ const Modal: FC<ModalProps> = ({
   children,
   header,
   footer,
+  onCloseButton,
 }) => (
   <div
     className={twClassNames(
-      'max-w-[85%] max-h-[85%] flex flex-col justify-center bg-gray-300 gap-px',
+      'relative max-w-[85%] max-h-[85%] bg-gray-300',
+      'flex flex-col justify-center gap-px',
       'border border-gray-500 rounded-md overflow-hidden'
     )}
   >
@@ -47,6 +50,17 @@ const Modal: FC<ModalProps> = ({
         )}
       >
         {footer}
+      </div>
+    )}
+    {onCloseButton && (
+      <div
+        className={twClassNames(
+          'absolute top-0 right-0 w-[1rem] h-[1rem] text-sm',
+          'flex justify-center items-center font-[monospace]'
+        )}
+        onClick={onCloseButton}
+      >
+        x
       </div>
     )}
   </div>

@@ -34,11 +34,13 @@ enum OverlayId {
   error = 'error',
   answerCall = 'answerCall',
   callClosed = 'callClosed',
+  localMode = 'localMode',
 }
 
 const Catcher: FC = () => {
   const { open, close } = useOverlayContext();
   const { id: paramId } = useParams();
+  const [isLocalMode, setIsLocalMode] = useState(false);
   const [id] = useState(() => paramId ?? randomStr());
   const { stream, switchCamera } = useCamera();
   const [mediaConn, setMediaConn] = useState<MediaConnection | null>(null);
@@ -206,6 +208,10 @@ const Catcher: FC = () => {
   }, [canvas, close, isPhotoingRef, open, send]);
 
   useEffect(() => {
+    if (isLocalMode) {
+      return;
+    }
+
     if (!peer || !cameraStream) {
       open(<NoBtnModal>Initializing</NoBtnModal>, {
         id: OverlayId.busy,
@@ -220,6 +226,21 @@ const Catcher: FC = () => {
     if (!mediaConn) {
       open(
         <DoubleBtnModal
+          onCloseButton={() => {
+            open(
+              <DoubleBtnModal
+                btnAContent="Yes"
+                btnBContent="No"
+                onClickA={() => setIsLocalMode(true)}
+                onClickB={() => close(OverlayId.localMode)}
+              >
+                Use local camera mode?
+              </DoubleBtnModal>,
+              {
+                id: OverlayId.localMode,
+              }
+            );
+          }}
           btnAContent="Share camera"
           btnBContent="Connect peer"
           onClickA={async () => {
@@ -315,9 +336,10 @@ const Catcher: FC = () => {
         close(OverlayId.peerId);
         close(OverlayId.noPeer);
         close(OverlayId.waitPeer);
+        close(OverlayId.localMode);
       };
     }
-  }, [cameraStream, close, open, peer, mediaConn, send]);
+  }, [cameraStream, close, open, peer, mediaConn, send, isLocalMode]);
 
   useEffect(() => {
     if (!send || mediaState !== 'connected') {
