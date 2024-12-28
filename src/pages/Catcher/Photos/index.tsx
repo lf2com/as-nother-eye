@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
 
+import Clickable from '@/components/Clickable';
 import { useOverlayContext } from '@/contexts/OverlayProvider/OverlayProvider';
 import shareData from '@/utils/shareData';
 
@@ -51,11 +52,11 @@ const Photos: FC<PhotosProps> = ({ urls }) => {
   }, [close, open, urls]);
 
   return (
-    <div className="w-full h-full" onClick={handleClick}>
+    <Clickable className="w-full h-full" onClick={handleClick}>
       {urls.map(url => (
         <Photo key={url} url={url} />
       ))}
-    </div>
+    </Clickable>
   );
 };
 
