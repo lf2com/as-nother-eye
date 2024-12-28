@@ -6,9 +6,11 @@ import { DoubleBtnModal, ModalButton } from '@/components/common/Modal';
 
 import Photo from './Photo';
 
+const SELECTED_LIMITATION = 10;
+
 interface PhotoListProps {
   urls: string[];
-  onOk: (urls: string[]) => void;
+  onOk: (urls: string[]) => Promise<void>;
   onClose: () => void;
 }
 
@@ -20,6 +22,7 @@ const PhotoList: FC<PhotoListProps> = ({ urls, onOk, onClose }) => {
   );
   const selectedCount = selectedUrls.length;
   const total = urls.length;
+  const hitSelectLimitation = selectedCount === SELECTED_LIMITATION;
 
   const sendBtnContent = useMemo(() => {
     switch (selectedCount) {
@@ -44,14 +47,20 @@ const PhotoList: FC<PhotoListProps> = ({ urls, onOk, onClose }) => {
       btnBContent={sendBtnContent}
       disabledB={0 === selectedCount}
       onClickA={() => onClose()}
-      onClickB={() => onOk(selectedUrls)}
+      onClickB={async () => {
+        await onOk(selectedUrls);
+        setSelectedIndexes([]);
+      }}
       header={
         <ModalButton
           className="w-full flex justify-center items-center gap-1 py-1"
           onClick={() => {
             setSelectedIndexes(
-              !selectedCount || selectedCount < total
-                ? Array.from({ length: total }, (_, index) => index)
+              !selectedCount && !hitSelectLimitation && selectedCount < total
+                ? Array.from(
+                    { length: SELECTED_LIMITATION },
+                    (_, index) => index
+                  )
                 : []
             );
           }}
@@ -68,12 +77,14 @@ const PhotoList: FC<PhotoListProps> = ({ urls, onOk, onClose }) => {
       {urls.map((url, index) => {
         const urlIndex = selectedIndexes.indexOf(index);
         const selected = urlIndex !== -1;
+        const disabled = hitSelectLimitation && !selected;
 
         return (
           <Photo
             key={url}
             url={url}
-            focused={urlIndex !== -1}
+            disabled={disabled}
+            focused={selected}
             onClick={() => {
               setSelectedIndexes(prev =>
                 selected
