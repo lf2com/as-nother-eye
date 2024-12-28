@@ -282,14 +282,13 @@ const Viewer: FC = () => {
   return (
     <div className="relative w-full h-full bg-black">
       {peerStream && (
-        <VideoWithSrcObject
-          srcObject={peerStream}
-          className="absolute w-full h-full"
-          autoPlay
-          onClick={() => {
-            send?.(CatcherMessage.nextCamera);
-          }}
-        />
+        <Clickable onClick={() => send?.(CatcherMessage.nextCamera)}>
+          <VideoWithSrcObject
+            srcObject={peerStream}
+            className="absolute top-0 left-0 w-full h-full"
+            autoPlay
+          />
+        </Clickable>
       )}
 
       {cameraStream && (

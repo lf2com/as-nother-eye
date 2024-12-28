@@ -10,19 +10,27 @@ const OVERLAY_ID = 'photo-preview';
 interface PhotoProps {
   url: string;
   onClick: () => void;
+  disabled?: boolean;
   focused?: boolean;
 }
 
-const Photo: FC<PhotoProps> = ({ focused = false, url, onClick }) => {
+const Photo: FC<PhotoProps> = ({
+  disabled = false,
+  focused = false,
+  url,
+  onClick,
+}) => {
   const { open, close } = useOverlayContext();
 
   return (
     <LongPress
       key={url}
+      disabled={disabled}
       className={twClassNames('border border-black', {
         'outline outline-[.15rem] outline-amber-400': focused,
+        'grayscale opacity-50': disabled,
       })}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       onLongPress={() => {
         open(
           <SingleBtnModal

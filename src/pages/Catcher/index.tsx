@@ -376,12 +376,13 @@ const Catcher: FC = () => {
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
       {cameraStream && (
-        <VideoWithSrcObject
-          srcObject={cameraStream}
-          className="absolute w-full h-full"
-          autoPlay
-          onClick={() => switchCamera()}
-        />
+        <Clickable onClick={() => switchCamera()}>
+          <VideoWithSrcObject
+            srcObject={cameraStream}
+            className="absolute top-0 left-0 w-full h-full"
+            autoPlay
+          />
+        </Clickable>
       )}
 
       {peerStream && (
@@ -392,7 +393,7 @@ const Catcher: FC = () => {
         />
       )}
 
-      <div className="absolute right-0 bottom-0 m-2 w-[25%] h-[25%] pointer-events-none">
+      <div className="absolute right-0 bottom-0 m-[1rem] w-[20%] h-[20%] pointer-events-none">
         <Photos urls={photoUrls} />
       </div>
 
