@@ -9,7 +9,7 @@
     "dev": "pnpm clear-cache && parcel --hmr-port 8080 -p 8080 --open",
     "dev:https": "pnpm clear-cache &&parcel --hmr-port 8443 -p 8443 --https --open",
     "clear-cache": "rm -rf .parcel-cache",
-    "build": "parcel build",
+    "build": "rm -rf dist && parcel build",
     "lint": "eslint --ext .ts,.tsx src/",
     "test": "jest"
   },
