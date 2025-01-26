@@ -3,8 +3,10 @@ import { renderHook } from '@testing-library/react';
 import useMount, { useUnmount } from '../useMount';
 
 describe('useMount', () => {
-  const renderer = (...args: Parameters<typeof useMount>) =>
-    renderHook(() => useMount(...args));
+  const renderer = (...[fn]: Parameters<typeof useMount>) =>
+    renderHook((...[newFn = fn]: Parameters<typeof useMount>) =>
+      useMount(newFn)
+    );
 
   it('should call fn once on render', () => {
     const fn = jest.fn();
