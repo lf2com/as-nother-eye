@@ -2,7 +2,7 @@ name: 'Deploy'
 on:
   push:
     branches:
-      - main
+      - build/test
 
 jobs:
   deploy:
@@ -23,7 +23,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-
       - if: ${{ steps.cache-node-modules.outputs.cache-hit == 'false' }}
         name: Install Node Modules
         continue-on-error: true
@@ -38,18 +37,18 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Commit Changes
-        run: |
-          git config --local user.email "github-actions[bot]@noreply.github.com"
-          git config --local user.name "Github Actions [bot]"
-          git rm --cached -r .
-          git add dist
-          git mv dist/* .
-          git commit -m "Deployment"
+      # - name: Commit Changes
+      #   run: |
+      #     git config --local user.email "github-actions[bot]@noreply.github.com"
+      #     git config --local user.name "Github Actions [bot]"
+      #     git rm --cached -r .
+      #     git add dist
+      #     git mv dist/* .
+      #     git commit -m "Deployment"
 
-      - name: Deploy
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force: true
-          branch: deploy
+      # - name: Deploy
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     force: true
+      #     branch: deploy
