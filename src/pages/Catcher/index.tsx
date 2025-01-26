@@ -18,7 +18,7 @@ import useCurrRef from '@/hooks/useCurrRef';
 import usePeer from '@/hooks/usePeer';
 import usePeerMediaConnection from '@/hooks/usePeerMediaConnection';
 import useStream from '@/hooks/useStream';
-import randomStr from '@/utils/random';
+import { randomId } from '@/utils/random';
 import shareData from '@/utils/shareData';
 
 import { CatcherMessage, ViewerMessage } from '../constants';
@@ -41,7 +41,7 @@ const Catcher: FC = () => {
   const { open, close } = useOverlayContext();
   const { id: paramId } = useParams();
   const [isLocalMode, setIsLocalMode] = useState(false);
-  const [id] = useState(() => paramId ?? randomStr());
+  const [id] = useState(() => paramId ?? randomId());
   const { stream, switchCamera } = useCamera();
   const [mediaConn, setMediaConn] = useState<MediaConnection | null>(null);
   const [peerStream, setPeerStream] = useState<MediaStream | null>(null);

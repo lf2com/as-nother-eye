@@ -13,7 +13,7 @@ import { useUnmount } from '@/hooks/useMount';
 import usePeer from '@/hooks/usePeer';
 import usePeerDataConnection from '@/hooks/usePeerDataConnection';
 import usePeerMediaConnection from '@/hooks/usePeerMediaConnection';
-import randomStr from '@/utils/random';
+import { randomId } from '@/utils/random';
 
 enum OverlayId {
   getValue = 'getValue',
@@ -60,7 +60,7 @@ const ValueButton: FC<
 
 const PeerTest: FC = () => {
   const { open, close } = useOverlayContext();
-  const { id = randomStr() } = useParams();
+  const { id = randomId() } = useParams();
   const { stream: cameraStream } = useCamera();
   const [dataConn, setDataConn] = useState<DataConnection | null>(null);
   const [mediaConn, setMediaConn] = useState<MediaConnection | null>(null);
