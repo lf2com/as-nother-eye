@@ -16,7 +16,7 @@ import { useOverlayContext } from '@/contexts/OverlayProvider/OverlayProvider';
 import useCamera from '@/hooks/useCamera';
 import usePeer from '@/hooks/usePeer';
 import usePeerMediaConnection from '@/hooks/usePeerMediaConnection';
-import randomStr from '@/utils/random';
+import { randomId } from '@/utils/random';
 import shareData from '@/utils/shareData';
 
 import { CatcherMessage, ViewerMessage } from '../constants';
@@ -36,7 +36,7 @@ enum OverlayId {
 const Viewer: FC = () => {
   const { open, close } = useOverlayContext();
   const { id: paramId } = useParams();
-  const [id] = useState(() => paramId ?? randomStr());
+  const [id] = useState(() => paramId ?? randomId());
   const { stream: cameraStream, switchCamera } = useCamera();
   const [mediaConn, setMediaConn] = useState<MediaConnection | null>(null);
   const [peerStream, setPeerStream] = useState<MediaStream | null>(null);
