@@ -1,17 +1,13 @@
-import type { ComponentProps, FC, PropsWithChildren } from 'react';
-import React from 'react';
+import type { ComponentProps, FC } from 'react';
 
 import twClassNames from '@/utils/twClassNames';
 
-type ButtonProps = ComponentProps<'button'>;
-
-interface ClickableProps extends ButtonProps {
-  onClick: ButtonProps['onClick'];
+interface ClickableProps extends ComponentProps<'button'> {
   stopPropagation?: boolean;
   isActive?: boolean;
 }
 
-const Clickable: FC<PropsWithChildren<ClickableProps>> = ({
+const Clickable: FC<ClickableProps> = ({
   className,
   disabled,
   isActive,

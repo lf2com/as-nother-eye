@@ -6,16 +6,70 @@
     "jest/globals": true,
     "node": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react-hooks/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "extends": ["eslint:recommended", "prettier"],
   "ignorePatterns": ["node_modules/", "dist/"],
   "overrides": [
     {
+      "extends": ["plugin:jest/recommended"],
+      "files": ["*.test.ts", "*.test.tsx"],
+      "plugins": ["jest"],
+      "rules": {
+        "jest/expect-expect": "error",
+        "jest/no-alias-methods": "error",
+        "jest/no-commented-out-tests": "error",
+        "jest/no-conditional-expect": "error",
+        "jest/no-conditional-in-test": "error",
+        "jest/no-deprecated-functions": "error",
+        "jest/no-disabled-tests": "warn",
+        "jest/no-done-callback": "error",
+        "jest/no-duplicate-hooks": "error",
+        "jest/no-export": "error",
+        "jest/no-focused-tests": "error",
+        "jest/no-hooks": "off",
+        "jest/no-identical-title": "error",
+        "jest/no-interpolation-in-snapshots": "error",
+        "jest/no-jasmine-globals": "error",
+        "jest/no-large-snapshots": "off",
+        "jest/no-mocks-import": "error",
+        "jest/no-restricted-jest-methods": "off",
+        "jest/no-restricted-matchers": "off",
+        "jest/no-standalone-expect": "error",
+        "jest/no-test-prefixes": "error",
+        "jest/no-test-return-statement": "error",
+        "jest/no-untyped-mock-factory": "error",
+        "jest/prefer-called-with": "error",
+        "jest/prefer-comparison-matcher": "error",
+        "jest/prefer-each": "error",
+        "jest/prefer-equality-matcher": "error",
+        "jest/prefer-expect-assertions": "off",
+        "jest/prefer-expect-resolves": "off",
+        "jest/prefer-hooks-in-order": "error",
+        "jest/prefer-hooks-on-top": "error",
+        "jest/prefer-lowercase-title": ["error", { "ignore": ["describe"] }],
+        "jest/prefer-mock-promise-shorthand": "error",
+        "jest/prefer-snapshot-hint": "off",
+        "jest/prefer-spy-on": "error",
+        "jest/prefer-strict-equal": "error",
+        "jest/prefer-to-be": "error",
+        "jest/prefer-to-contain": "error",
+        "jest/prefer-to-have-length": "error",
+        "jest/prefer-todo": "error",
+        "jest/require-hook": "error",
+        "jest/require-to-throw-message": "warn",
+        "jest/require-top-level-describe": [
+          "error",
+          { "maxNumberOfTopLevelDescribes": 2 }
+        ],
+        "jest/valid-describe-callback": "error",
+        "jest/valid-expect": "error",
+        "jest/valid-expect-in-promise": "error",
+        "jest/valid-title": "error"
+      }
+    },
+    {
+      "extends": ["plugin:react-hooks/recommended"],
       "files": ["*.tsx"],
+      "plugins": ["react", "react-hooks"],
       "rules": {
         "react-hooks/exhaustive-deps": [
           "warn",
@@ -32,10 +86,26 @@
         "react/no-typos": "error",
         "react/react-in-jsx-scope": "off",
         "react/style-prop-object": "error"
+      },
+      "settings": {
+        "react": {
+          "version": "detect"
+        }
       }
     },
     {
+      "extends": ["plugin:@typescript-eslint/recommended"],
       "files": ["*.ts", "*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaFeatures": {
+          "jsx": true
+        },
+        "project": ["./tsconfig.json"],
+        "requireConfigFile": false,
+        "sourceType": "module"
+      },
+      "plugins": ["prefer-arrow", "@typescript-eslint"],
       "rules": {
         "@typescript-eslint/ban-types": [
           "error",
@@ -49,6 +119,7 @@
         "@typescript-eslint/consistent-type-imports": [
           "warn",
           {
+            "disallowTypeAnnotations": true,
             "fixStyle": "separate-type-imports",
             "prefer": "type-imports"
           }
@@ -61,40 +132,17 @@
             "ignoreRestSiblings": true,
             "varsIgnorePattern": "^_"
           }
-        ]
+        ],
+        "default-case": "error",
+        "default-case-last": "error",
+        "no-console": "warn",
+        "no-fallthrough": "error",
+        "no-nested-ternary": "error",
+        "no-unused-vars": "off",
+        "object-property-newline": "error",
+        "prefer-arrow/prefer-arrow-functions": "error"
       }
     }
   ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "project": ["./tsconfig.json"],
-    "requireConfigFile": false,
-    "sourceType": "module"
-  },
-  "plugins": [
-    "prefer-arrow",
-    "react",
-    "react-hooks",
-    "@typescript-eslint",
-    "jest"
-  ],
-  "root": true,
-  "rules": {
-    "default-case": "error",
-    "default-case-last": "error",
-    "no-console": "warn",
-    "no-fallthrough": "error",
-    "no-nested-ternary": "error",
-    "no-unused-vars": "off",
-    "object-property-newline": "error",
-    "prefer-arrow/prefer-arrow-functions": "error"
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  }
+  "root": true
 }
