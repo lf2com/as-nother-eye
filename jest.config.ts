@@ -1,21 +1,32 @@
-export default {
+import type { JestConfigWithTsJest } from 'ts-jest';
+
+const config: JestConfigWithTsJest = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  transform: {
+    '\\w\\.tsx?$': ['ts-jest', { isolatedModules: true }],
+  },
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: ['/node_modules/'],
   coverageProvider: 'babel',
-  moduleDirectories: ['node_modules'],
-  preset: 'ts-jest',
+  extensionsToTreatAsEsm: ['.tsx', '.ts'],
+  moduleDirectories: ['node_modules', '<rootDir>'],
+  moduleFileExtensions: ['js', 'ts', 'tsx'],
   resetModules: true,
   rootDir: '.',
   roots: ['<rootDir>/src'],
+  setupFilesAfterEnv: [
+    'jest-extended/all',
+    '@testing-library/jest-dom',
+    '@testing-library/jest-dom/jest-globals',
+  ],
   slowTestThreshold: 5,
-  testEnvironment: 'jsdom',
-  testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[tj]s?(x)'],
-  testPathIgnorePatterns: ['/node_modules/'],
-  watchPathIgnorePatterns: [],
-  watchman: true,
+  testMatch: ['**/*.test.ts(x)'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 };
+
+export default config;
